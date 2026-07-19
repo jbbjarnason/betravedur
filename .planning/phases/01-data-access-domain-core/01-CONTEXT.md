@@ -17,7 +17,7 @@ Confirmed, license-clear access to real Veðurstofan station data plus a tested,
 - Each component (temp/rain/wind) scored via fixed, interpretable 0–10 curves: temperature better toward ~15–20°C, rain and wind less-is-better. Curves must be simple enough to explain in the "hvernig er einkunnin reiknuð?" panel (SCORE-03).
 - Default weights: rain 40% / wind 30% / temp 30% — dry + calm is the classic Icelandic "gott veður"; warmth matters least.
 - User-facing scale: 0–10 with a continuous red→green color ramp.
-- Stations missing a component (e.g. no rain gauge): show the marker with available data plus a "vantar gögn" note, but exclude from the ranked best-stations list.
+- Missing components are handled by weight renormalization (decision upgraded 2026-07-19 after research found precipitation exists only on ~8 SYNOP stations): every station is scored from its available components with weights renormalized to sum to 1 (e.g. AWS stations without rain: wind 50% / temp 50%). Stations scored without rain carry an "án úrkomu" badge everywhere the score appears, including the ranked list. The ~8 SYNOP stations get the full 3-component score. The score object must record which components contributed.
 - Components are computed and stored separately; final score combined at display time (keeps future weight sliders possible — WGT-01).
 
 ### Climatology Windows & N-honesty
