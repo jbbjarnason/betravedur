@@ -17,6 +17,7 @@ import {
   combine,
   effectiveN,
   expandWindow,
+  groupBySeasonYear,
   leapFoldedDoy,
   qualifyingYears,
   rainComponent,
@@ -38,10 +39,11 @@ const YEARS = [2011, 2012, 2013, 2014, 2015];
 const AWS_STATIONS = [1350, 1395, 1470];
 const SYNOP_STATIONS = [1];
 
-const WINDOW = expandWindow({
+const WINDOW_SPEC = {
   startDoy: leapFoldedDoy(`2011-${WINDOW_FROM}`)!,
   endDoy: leapFoldedDoy(`2011-${WINDOW_TO}`)!,
-});
+};
+const WINDOW = expandWindow(WINDOW_SPEC);
 
 /** Group observations by station ID, preserving row order. */
 function groupByStation(rows: DailyObservation[]): Map<number, DailyObservation[]> {
@@ -54,29 +56,29 @@ function groupByStation(rows: DailyObservation[]): Map<number, DailyObservation[
   return m;
 }
 
-/** Split a flat list of rows into a per-year map (year parsed from the date). */
-function byYear(rows: DailyObservation[]): Map<number, DailyObservation[]> {
-  const m = new Map<number, DailyObservation[]>();
-  for (const r of rows) {
-    const year = Number(r.date.slice(0, 4));
-    const arr = m.get(year) ?? [];
-    arr.push(r);
-    m.set(year, arr);
-  }
-  return m;
-}
-
 function fmt(n: number | null | undefined, digits = 1): string {
   return typeof n === "number" && Number.isFinite(n) ? n.toFixed(digits) : "—";
 }
 
 /**
  * Run the FULL real chain for one station's multi-year rows and return a display
- * record: coverage-honest N per metric, the aggregated means, and the combined
+ * record: coverage-honest N PER METRIC, the aggregated means, and the combined
  * score. rain is only scored for SYNOP (structurally null on AWS).
+ *
+ * Coverage honesty (WR-10, WR-11):
+ *   - every component is gated on ITS OWN metric's qualifying years (N>=3),
+ *     never on temperature's N;
+ *   - every mean pools only in-window rows from that metric's QUALIFYING years —
+ *     years that failed the 80% gate never leak into a mean;
+ *   - grouping is season-anchored (groupBySeasonYear), correct even if the
+ *     window ever wraps the year end (WR-03).
  */
 interface StationReport {
-  effN: number;
+  nTemp: number;
+  nWind: number;
+  /** null = rain not applicable (AWS). */
+  nRain: number | null;
+  /** True when at least one component passes its own N>=3 gate. */
   sufficient: boolean;
   meanTemp: number | null;
   meanSpeed: number | null;
@@ -87,30 +89,42 @@ interface StationReport {
 }
 
 function computeStation(rows: DailyObservation[], network: "AWS" | "SYNOP"): StationReport {
-  const rowsByYear = byYear(rows);
-  const inWindow = rows.filter((r) => WINDOW.has(r.doy));
+  const rowsByYear = groupBySeasonYear(rows, WINDOW_SPEC);
 
-  // Coverage-honest N on the temperature metric (present in both networks).
+  // Per-metric coverage-honest gates (WR-10): each component earns its own N.
   const tempYears = qualifyingYears(rowsByYear, WINDOW, (o) => o.t);
-  const { n: effN, sufficient } = effectiveN(tempYears);
-
-  // Aggregate means over the in-window rows (missing != zero everywhere).
-  const meanTemp = scalarMeanSpeed(inWindow.map((r) => r.t));
-  const meanSpeed = scalarMeanSpeed(inWindow.map((r) => r.f));
-  const meanDir = circularMeanDirection(
-    inWindow
-      .filter((r) => r.dv != null && r.f != null)
-      .map((r) => ({ speed: r.f as number, dirDeg: r.dv as number })),
-  );
-
-  // Rain only for SYNOP: sum-per-year-then-average over qualifying rain years.
+  const windYears = qualifyingYears(rowsByYear, WINDOW, (o) => o.f);
   const hasRain = network === "SYNOP";
   const rainYears = hasRain ? qualifyingYears(rowsByYear, WINDOW, (o) => o.r) : [];
-  const typicalRain = hasRain
-    ? sumPerYearThenAverage(rowsByYear, WINDOW, rainYears)
+  const tempOk = effectiveN(tempYears).sufficient;
+  const windOk = effectiveN(windYears).sufficient;
+  const rainOk = effectiveN(rainYears).sufficient;
+
+  // In-window rows restricted to a metric's qualifying years (WR-11).
+  const inWindowFrom = (years: number[]): DailyObservation[] =>
+    years.flatMap((y) => (rowsByYear.get(y) ?? []).filter((r) => WINDOW.has(r.doy)));
+  const tempRows = inWindowFrom(tempYears);
+  const windRows = inWindowFrom(windYears);
+
+  // Aggregate means over qualifying-year in-window rows (missing != zero everywhere).
+  const meanTemp = tempOk ? scalarMeanSpeed(tempRows.map((r) => r.t)) : null;
+  const meanSpeed = windOk ? scalarMeanSpeed(windRows.map((r) => r.f)) : null;
+  const meanDir = windOk
+    ? circularMeanDirection(
+        windRows
+          .filter((r) => r.dv != null && r.f != null)
+          .map((r) => ({ speed: r.f as number, dirDeg: r.dv as number })),
+      )
     : null;
 
-  // Map means -> 0-10 component scores; null components drop out of combine().
+  // Rain only for SYNOP, and only when rain itself clears the N>=3 gate:
+  // sum-per-year-then-average over the qualifying rain years.
+  const typicalRain =
+    hasRain && rainOk ? sumPerYearThenAverage(rowsByYear, WINDOW, rainYears) : null;
+
+  // Map means -> 0-10 component scores; a component that failed its own gate is
+  // null here and drops out of combine()'s renormalization.
+  const sufficient = tempOk || windOk || rainOk;
   const combined = sufficient
     ? combine({
         temp: meanTemp != null ? tempComponent(meanTemp) : null,
@@ -119,7 +133,18 @@ function computeStation(rows: DailyObservation[], network: "AWS" | "SYNOP"): Sta
       })
     : null;
 
-  return { effN, sufficient, meanTemp, meanSpeed, meanDir, typicalRain, combined, hasRain };
+  return {
+    nTemp: tempYears.length,
+    nWind: windYears.length,
+    nRain: hasRain ? rainYears.length : null,
+    sufficient,
+    meanTemp,
+    meanSpeed,
+    meanDir,
+    typicalRain,
+    combined,
+    hasRain,
+  };
 }
 
 function reportStation(
@@ -136,9 +161,15 @@ function reportStation(
     : "—";
   const rainStr = rep.hasRain ? `${fmt(rep.typicalRain)} mm` : "án úrkomu";
 
+  // Per-metric N badge (WR-10): the displayed N never misrepresents a component's
+  // own evidence base by borrowing temperature's coverage.
+  const nStr =
+    `N: hiti=${rep.nTemp} vindur=${rep.nWind}` +
+    (rep.nRain !== null ? ` úrkoma=${rep.nRain}` : "");
+
   let scoreLine: string;
   if (!rep.sufficient) {
-    scoreLine = `ófullnægjandi gögn (N=${rep.effN} < 3)`;
+    scoreLine = `ófullnægjandi gögn (N < 3 í öllum þáttum)`;
   } else if (rep.combined && rep.combined.score != null) {
     const contrib = rep.combined.contributing.join("+");
     const badge = rep.combined.missingRain ? "  [án úrkomu]" : "";
@@ -148,7 +179,7 @@ function reportStation(
   }
 
   console.log(
-    `[${network}] ${name} (#${stationId})  N=${rep.effN}\n` +
+    `[${network}] ${name} (#${stationId})  ${nStr}\n` +
       `    meðalhiti=${fmt(rep.meanTemp)}°C  meðalvindur=${fmt(rep.meanSpeed)} m/s  vindátt=${dirStr}  úrkoma=${rainStr}\n` +
       `    ${scoreLine}`,
   );
