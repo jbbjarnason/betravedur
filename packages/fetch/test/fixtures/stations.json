@@ -1,0 +1,54 @@
+[
+  {
+    "station": 990,
+    "name": "Keflavíkurflugvöllur",
+    "abbr": "kvk",
+    "type": "sk",
+    "lat": 63.9802398682,
+    "lon": -22.5952606201,
+    "ele": 51,
+    "wigos": "0-20000-0-04018",
+    "owner": "Veðurstofa Íslands",
+    "start": 1952,
+    "ending": null
+  },
+  {
+    "station": 1350,
+    "name": "Keflavíkurflugvöllur",
+    "abbr": "kefla",
+    "type": "sj",
+    "lat": 63.9828987122,
+    "lon": -22.6005191803,
+    "ele": 50.9000015259,
+    "wigos": "0-20000-0-04018",
+    "owner": "Veðurstofa Íslands",
+    "start": 2008,
+    "ending": null
+  },
+  {
+    "station": 1,
+    "name": "Reykjavík",
+    "abbr": "rvk",
+    "type": "sk",
+    "lat": 64.1288833618,
+    "lon": -21.9081897736,
+    "ele": 60.2000007629,
+    "wigos": "0-20000-0-04030",
+    "owner": "Veðurstofa Íslands",
+    "start": 1920,
+    "ending": null
+  },
+  {
+    "station": 4,
+    "name": "Reykjavík S",
+    "abbr": "rvk",
+    "type": "sk",
+    "lat": 64.1274719238,
+    "lon": -21.9027690887,
+    "ele": 52,
+    "wigos": "0-20000-0-04030",
+    "owner": "Veðurstofa Íslands",
+    "start": 2015,
+    "ending": 2024
+  }
+]
