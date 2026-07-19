@@ -1,0 +1,16 @@
+{
+  "detail": [
+    {
+      "type": "enum",
+      "loc": [
+        "path",
+        "aggregation"
+      ],
+      "msg": "Input should be '10min', 'hour', 'day', 'month' or 'year'",
+      "input": "notanenum",
+      "ctx": {
+        "expected": "'10min', 'hour', 'day', 'month' or 'year'"
+      }
+    }
+  ]
+}
