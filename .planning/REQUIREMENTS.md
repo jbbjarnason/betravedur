@@ -1,0 +1,87 @@
+# Requirements: Betra Veður
+
+**Defined:** 2026-07-19
+**Core Value:** A visitor picks a time-of-year period and instantly sees, on a map, where in Iceland the weather has historically been best — backed by real Veðurstofan station history.
+**Mode:** Auto-scoped (fully-automatic bridge) — all table stakes + discussed features included; data-gated and complexity-heavy differentiators deferred.
+
+## v1 Requirements
+
+### Data Pipeline
+
+- [ ] **DATA-01**: Pipeline fetches daily station observations (temp mean/max/min, wind mean/max/gust + direction, precipitation) from the Veðurstofa Íslands open API (`api.vedur.is/weather/`)
+- [ ] **DATA-02**: One-time backfill ingests available per-station daily history deep enough to support baseline year ranges like 2010–2015
+- [ ] **DATA-03**: Nightly GitHub Actions cron appends new observations idempotently (upsert by station+date, gap-fill on missed runs, safe to re-run, off-peak schedule)
+- [ ] **DATA-04**: Pipeline precomputes per-station, per-year, day-of-year summaries as static files the client can aggregate over any {period × year-range} selection without a backend
+- [ ] **DATA-05**: Aggregation statistics are correct: wind direction uses circular mean, missing precipitation is treated as missing (never zero), and every average tracks actual data coverage
+- [ ] **DATA-06**: Station metadata registry keys on station ID with active-date windows (handles moves, closures, and network churn without splicing records)
+- [ ] **DATA-07**: Data storage keeps the repo within GitHub Pages limits (dedicated data branch or partitioned additive files; nightly commits must not balloon `.git` history)
+- [ ] **DATA-08**: Site complies with Veðurstofan CC BY 4.0 terms — attribution displayed, terms verified before ingest
+
+### Map
+
+- [ ] **MAP-01**: Interactive pan/zoom map of Iceland (MapLibre GL + self-hosted PMTiles basemap, no API keys)
+- [ ] **MAP-02**: Station markers show historical averages for the selected period: temperature, wind speed + direction arrow, precipitation indicator
+- [ ] **MAP-03**: Markers are colored by the combined weather score, with a legend explaining the color scale
+- [ ] **MAP-04**: Marker density adapts to zoom level (more stations appear as user zooms in; no unreadable overlap)
+
+### Selection
+
+- [ ] **SEL-01**: User can select a time-of-year window of 1 week, 2 weeks, 3 weeks, or 1 month
+- [ ] **SEL-02**: User can select the baseline year range the averages are computed over (e.g. 2010–2015)
+- [ ] **SEL-03**: Every displayed average shows how many years it is actually based on ("meðaltal N ára"), where N derives from real data coverage, not the picker range
+- [ ] **SEL-04**: Changing period or year range recomputes and recolors the map instantly client-side (no page reload, no network fetch)
+
+### Score & Ranking
+
+- [ ] **SCORE-01**: Combined weather score computed from temperature, precipitation, and wind components (components precomputed separately so weights can change later)
+- [ ] **SCORE-02**: Ranked "best stations for this period" list answers the core question directly
+- [ ] **SCORE-03**: Score formula is transparent — an explainer shows how the score is calculated ("hvernig er einkunnin reiknuð?")
+
+### Station Detail
+
+- [ ] **CHART-01**: Clicking a station opens a chart panel: candlestick-style distribution charts for temperature and wind per day across the chosen years, precipitation as bars
+- [ ] **CHART-02**: Charts use distribution semantics (min/typical range/max — not financial OHLC) with a plain-Icelandic reading key
+- [ ] **CHART-03**: Panel shows daylight hours for the selected period (astronomical computation)
+- [ ] **CHART-04**: Panel handles missing data explicitly ("engin gögn fyrir þetta tímabil") instead of blank charts
+
+### UX & Site
+
+- [ ] **UX-01**: Icelandic-only UI with the slogan "Leitin að betra veðri" in the site branding
+- [ ] **UX-02**: Full UI state (period, year range, selected station, map view) is encoded in the URL — permalinks are shareable and bookmarkable
+- [ ] **UX-03**: Mobile-responsive: bottom-sheet station panel on phones, side panel on desktop
+- [ ] **UX-04**: Info panel explains "sögulegt meðaltal, ekki spá" (historical, not forecast), shows Veðurstofan attribution and data currency ("uppfært í nótt")
+- [ ] **UX-05**: Loading, empty, and no-data states for map and panels
+- [ ] **SITE-01**: Fully static site built with Vite/TypeScript, deployed to GitHub Pages by CI on every data update
+
+## v2 Requirements (Deferred)
+
+- **SUN-01**: Sunshine / cloud-cover metric in the score — gated on Veðurstofan data availability per station
+- **CMP-01**: Side-by-side comparison of 2+ stations
+- **TOG-01**: "Meðaltal / dreifing" chart toggle (simpler mean-line default view)
+- **RANK-04**: Reverse "worst weather" ranking
+- **WGT-01**: User-adjustable score weights (temp/rain/wind sliders) — component precompute in DATA-04/SCORE-01 keeps this possible
+- **LANG-01**: English UI — only if a non-Icelandic audience is validated
+
+## Out of Scope
+
+| Exclusion | Reasoning |
+|-----------|-----------|
+| Weather forecasts / current conditions | gottvedur.is and vedur.is own this; dilutes the historical premise — link out instead |
+| Backend/API server | Static-only keeps hosting free and maintenance near zero |
+| Raw data download / CSV re-hosting | Repo bloat + licensing surface; link to Veðurstofan's own open-data portal |
+| Arbitrary start–end date queries | Combinatorial explosion, static-hostile; designed windows cover the use case |
+| User accounts / saved preferences | URL permalink is the save mechanism |
+| Climate-change trend analysis | Different product (Climate Atlas of Iceland); statistically fraught with uneven station records |
+| Real-time / hourly granularity | Nightly pipeline; daily granularity is correct for climatology |
+| Heavy marker animations / condition sprites | Mobile performance killer; color-as-score does the visual work |
+
+## Traceability
+
+Which phases cover which requirements. Filled by roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (populated by roadmapper) | | |
+
+---
+*Requirements scoped from .planning/research/FEATURES.md (MVP definition) + questioning session, 2026-07-19*
