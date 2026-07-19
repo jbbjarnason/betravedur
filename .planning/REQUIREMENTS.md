@@ -33,7 +33,7 @@
 
 ### Score & Ranking
 
-- [ ] **SCORE-01**: Combined weather score computed from temperature, precipitation, and wind components (components precomputed separately so weights can change later)
+- [x] **SCORE-01**: Combined weather score computed from temperature, precipitation, and wind components (components precomputed separately so weights can change later)
 - [ ] **SCORE-02**: Ranked "best stations for this period" list answers the core question directly
 - [ ] **SCORE-03**: Score formula is transparent — an explainer shows how the score is calculated ("hvernig er einkunnin reiknuð?")
 
@@ -85,7 +85,7 @@ Which phases cover which requirements.
 | DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Complete |
 | DATA-08 | Phase 1 | Complete |
-| SCORE-01 | Phase 1 | Pending |
+| SCORE-01 | Phase 1 | Complete |
 | DATA-02 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Pending |
 | DATA-07 | Phase 2 | Pending |
