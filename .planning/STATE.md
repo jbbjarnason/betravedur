@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 - Roadmap: Data access + domain math is the sole blocking foundation (Phase 1) — no UI is built on unvalidated data assumptions.
 - Roadmap: Precompute component-level aggregates (temp/rain/wind separately), not a single baked score, so weight sliders remain possible later.
 - Roadmap: Data lives on a dedicated data branch to keep nightly commits out of the Pages-build repo history.
+- User directive (2026-07-19): No human review checkpoints — Claude performs all `checkpoint:human-verify` tasks and `human_needed` verification items itself, thoroughly (run the commands, inspect real output, cross-check acceptance criteria, document evidence). Pause only for real blockers or product-level grey areas.
+- User directive (2026-07-19): UI phases (3–7) must be verified with Playwright driving the real built site (installed via npm in-repo; no Playwright MCP available) — exercise map/selectors/panels and capture screenshots as evidence.
+- Research finding (Phase 1): precipitation exists only on ~8 active SYNOP stations; AWS stations have temp+wind only. Score uses weight renormalization over available components with "án úrkomu" badge (locked in 01-CONTEXT.md).
 
 ### Pending Todos
 
