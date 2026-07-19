@@ -70,11 +70,19 @@ function clampRange(v: unknown, min: number, max: number): number | null {
   return n >= min && n <= max ? n : null;
 }
 
-/** Wind direction: valid on [0, 360); anything else -> null. */
+/**
+ * Wind direction: valid on [0, 360], normalized so 360 -> 0; anything else -> null.
+ * SYNOP/METAR convention reports 1-360 with 360 = north (WR-06): rejecting 360
+ * would silently discard every due-north observation and bias the circular mean
+ * away from north. (If the API distinguishes calm/variable as 0 vs north as 360,
+ * both normalize to 0 here; calm rows carry near-zero speed and thus barely weigh
+ * in the speed-weighted circular mean.)
+ */
 function clampDir(v: unknown): number | null {
   const n = toNum(v);
   if (n === null) return null;
-  return n >= 0 && n < 360 ? n : null;
+  if (n < 0 || n > 360) return null;
+  return n % 360; // 360 -> 0 (north)
 }
 
 /** Precipitation: non-negative only; negative -> null (never coerced to 0). */

@@ -108,6 +108,20 @@ describe("parse observations — value clamping (implausible values nulled)", ()
     expect(p!.r).toBeNull();
   });
 
+  it("WR-06 regression: dv=360 (north) is accepted and normalized to 0, not nulled", () => {
+    const raw = [
+      { station: 1350, time: "2024-07-15", t: 10, f: 5, dv: 360, r: null },
+      { station: 1350, time: "2024-07-16", t: 10, f: 5, dv: 0, r: null },
+      { station: 1350, time: "2024-07-17", t: 10, f: 5, dv: 361, r: null }, // out of range
+      { station: 1350, time: "2024-07-18", t: 10, f: 5, dv: -1, r: null }, // out of range
+    ];
+    const rows = normalizeObservations(raw, "aws");
+    expect(rows[0]!.dv).toBe(0); // 360 -> 0
+    expect(rows[1]!.dv).toBe(0);
+    expect(rows[2]!.dv).toBeNull();
+    expect(rows[3]!.dv).toBeNull();
+  });
+
   it("keeps plausible values intact", () => {
     const raw = [{ station: 1350, time: "2024-07-15", t: 11.97, f: 5, dv: 151, r: null }];
     const [row] = normalizeObservations(raw, "aws");
