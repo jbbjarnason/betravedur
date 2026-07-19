@@ -225,8 +225,13 @@ async function fetchDay(
   checkApiVersion(res, kind);
   // 404 "no data" bodies are parsed (yield []); other non-ok statuses surface here.
   if (!res.ok && res.status !== 404) {
-    const errBody = await res.json().catch(() => ({ message: `HTTP ${res.status}` }));
-    return parseObservationBody(errBody, kind); // 422 {detail} -> throws inside
+    // WR-07: an unparseable error body must stay an ERROR ({detail} -> throws),
+    // never degrade into the {message} no-data envelope that yields [] — a bad
+    // request must not read as a permanent data gap in an append-only pipeline.
+    const errBody = await res
+      .json()
+      .catch(() => ({ detail: `HTTP ${res.status} (unparseable body)` }));
+    return parseObservationBody(errBody, kind); // {detail} -> throws inside
   }
   const body = (await res.json()) as unknown;
   return parseObservationBody(body, kind);

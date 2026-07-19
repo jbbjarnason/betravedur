@@ -4,12 +4,19 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   assertObservationSchema,
+  fetchAwsDay,
   normalizeObservations,
   parseObservationBody,
 } from "../src/observations.js";
+import { fetchWithRetry } from "../src/client.js";
+
+vi.mock("../src/client.js", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("../src/client.js")>();
+  return { ...mod, fetchWithRetry: vi.fn(mod.fetchWithRetry) };
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIX = join(__dirname, "fixtures");
@@ -88,6 +95,22 @@ describe("parse observations — error bodies never become rows", () => {
   it("a 422-style {detail} body throws (bad request, not no-data)", () => {
     const body = loadFixture("error-422");
     expect(() => parseObservationBody(body, "aws")).toThrow();
+  });
+
+  it("WR-07 regression: a 422 with an UNPARSEABLE body throws, never resolves to []", async () => {
+    vi.mocked(fetchWithRetry).mockResolvedValueOnce(
+      new Response("<html>bad gateway page, not json</html>", { status: 422 }),
+    );
+    await expect(fetchAwsDay([1350], "2024-07-15", "2024-07-16")).rejects.toThrow(
+      /API_BAD_REQUEST.*HTTP 422.*unparseable body/,
+    );
+  });
+
+  it("WR-07 guard: a parseable 404 {message} body still resolves to an empty result", async () => {
+    vi.mocked(fetchWithRetry).mockResolvedValueOnce(
+      new Response(JSON.stringify({ message: "No data found." }), { status: 404 }),
+    );
+    await expect(fetchAwsDay([1350], "2024-07-15", "2024-07-16")).resolves.toEqual([]);
   });
 });
 
