@@ -1,5 +1,7 @@
 # Betra Veður
 
+**Slogan:** *Leitin að betra veðri* — use this tagline in the site header/branding.
+
 ## What This Is
 
 Betra Veður is a static website — a historical counterpart to gottvedur.is. Where gottvedur.is shows where the weather *will be* good in Iceland, Betra Veður shows where it *has been* good: an interactive map of Iceland with weather-station markers displaying multi-year historical averages for a user-selected time-of-year window. It answers the question "I'm free in week 30 — where in Iceland has the weather historically been best?" for Icelanders planning trips.
