@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 Plans:
 - [x] 01-01-PLAN.md — Walking Skeleton: npm-workspaces TS monorepo, pure @betravedur/domain contracts+stubs, live fetch client, end-to-end demo CLI on real data
-- [ ] 01-02-PLAN.md — Domain math (DATA-05): leap-folded window, circular wind mean (350/10), coverage-honest N (>=80%, N>=3), precip missing != zero
+- [x] 01-02-PLAN.md — Domain math (DATA-05): leap-folded window, circular wind mean (350/10), coverage-honest N (>=80%, N>=3), precip missing != zero
 - [ ] 01-03-PLAN.md — Data access (DATA-01/06/08): schema-assert+normalize fetchers, no-splice station registry, CC BY 4.0 attribution constant, live fixtures
 - [ ] 01-04-PLAN.md — Combined score (SCORE-01): 0-10 component curves, renormalizing combine() with "án úrkomu" flag, close the Walking Skeleton loop
 **Research flag**: Retrieve Veðurstofan terms/conditions page directly; verify aws/day vs synop/day field schema live; check sunshine sensor coverage (gates v1.x)
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Access & Domain Core | 1/4 | In Progress|  |
+| 1. Data Access & Domain Core | 2/4 | In Progress|  |
 | 2. Derived Data Pipeline & Backfill | 0/TBD | Not started | - |
 | 3. Static Site Shell & Interactive Map | 0/TBD | Not started | - |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |

@@ -12,7 +12,7 @@
 - [ ] **DATA-02**: One-time backfill ingests available per-station daily history deep enough to support baseline year ranges like 2010–2015
 - [ ] **DATA-03**: Nightly GitHub Actions cron appends new observations idempotently (upsert by station+date, gap-fill on missed runs, safe to re-run, off-peak schedule)
 - [ ] **DATA-04**: Pipeline precomputes per-station, per-year, day-of-year summaries as static files the client can aggregate over any {period × year-range} selection without a backend
-- [ ] **DATA-05**: Aggregation statistics are correct: wind direction uses circular mean, missing precipitation is treated as missing (never zero), and every average tracks actual data coverage
+- [x] **DATA-05**: Aggregation statistics are correct: wind direction uses circular mean, missing precipitation is treated as missing (never zero), and every average tracks actual data coverage
 - [ ] **DATA-06**: Station metadata registry keys on station ID with active-date windows (handles moves, closures, and network churn without splicing records)
 - [ ] **DATA-07**: Data storage keeps the repo within GitHub Pages limits (dedicated data branch or partitioned additive files; nightly commits must not balloon `.git` history)
 - [ ] **DATA-08**: Site complies with Veðurstofan CC BY 4.0 terms — attribution displayed, terms verified before ingest
@@ -82,7 +82,7 @@ Which phases cover which requirements.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | DATA-01 | Phase 1 | Complete |
-| DATA-05 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Pending |
 | DATA-08 | Phase 1 | Pending |
 | SCORE-01 | Phase 1 | Pending |

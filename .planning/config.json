@@ -40,6 +40,5 @@
   "agent_skills": {},
   "features": {},
   "mode": "yolo",
-  "granularity": "fine",
-  "branching_strategy": "none"
+  "granularity": "fine"
 }
