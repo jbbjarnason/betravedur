@@ -136,7 +136,11 @@ export function normalizeObservations(
   for (const raw of rows) {
     const date = typeof raw.time === "string" ? raw.time : "";
     const doy = date ? leapFoldedDoy(date) : null;
-    if (doy === null) continue; // Feb 29 folded out, or unparseable date dropped
+    // Defensive contract guard (WR-04): treat NaN / out-of-range like null so a
+    // malformed date can never ship a row violating DailyObservation.doy (1-365).
+    if (doy === null || !Number.isInteger(doy) || doy < 1 || doy > 365) {
+      continue; // Feb 29 folded out, or unparseable date dropped
+    }
     out.push({
       station: toNum(raw.station) ?? 0,
       date,

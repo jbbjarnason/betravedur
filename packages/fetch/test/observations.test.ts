@@ -64,6 +64,18 @@ describe("parse observations — leap day (Feb 29 dropped)", () => {
     expect(rows.map((r) => r.date)).toEqual(["2024-02-28", "2024-03-01"]);
     expect(rows.every((r) => r.doy >= 1 && r.doy <= 365)).toBe(true);
   });
+
+  it("WR-04 regression: a malformed date can never yield a row with doy NaN / out of 1-365", () => {
+    const raw = [
+      { station: 1350, time: "2024-07-", t: 1, f: 2, dv: 90, r: null }, // NaN day slice
+      { station: 1350, time: "2024-07-00", t: 1, f: 2, dv: 90, r: null }, // doy 0
+      { station: 1350, time: "2024-07-15", t: 1, f: 2, dv: 90, r: null }, // valid
+    ];
+    const rows = normalizeObservations(raw, "aws");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.date).toBe("2024-07-15");
+    expect(Number.isInteger(rows[0]!.doy)).toBe(true);
+  });
 });
 
 describe("parse observations — error bodies never become rows", () => {

@@ -45,6 +45,16 @@ describe("leapFoldedDoy — leap day fold", () => {
     expect(leapFoldedDoy("2024-02-28")).toBe(leapFoldedDoy("2023-02-28"));
     expect(leapFoldedDoy("2023-02-28")).toBe(59);
   });
+
+  it("WR-04 regression: malformed day slices return null, never NaN", () => {
+    expect(leapFoldedDoy("2024-07-")).toBeNull(); // empty day slice -> NaN before
+    expect(leapFoldedDoy("2024-07-ab")).toBeNull(); // non-numeric day
+    expect(leapFoldedDoy("2024-07-00")).toBeNull(); // day 0, below documented range
+    expect(leapFoldedDoy("2024-07-32")).toBeNull(); // day beyond any month
+    expect(leapFoldedDoy("2024--x-15")).toBeNull(); // non-numeric month
+    expect(leapFoldedDoy("2024-00-15")).toBeNull(); // month 0
+    expect(leapFoldedDoy("")).toBeNull(); // empty string
+  });
 });
 
 describe("expandWindow", () => {

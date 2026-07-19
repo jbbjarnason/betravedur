@@ -29,11 +29,17 @@ const CUMULATIVE_DAYS_BEFORE_MONTH = [
 export function leapFoldedDoy(date: string): number | null {
   const month = Number(date.slice(5, 7));
   const day = Number(date.slice(8, 10));
+  // Malformed month/day (empty slice, non-numeric, "00", fractional) -> null,
+  // never NaN or an out-of-range integer leaking into DailyObservation.doy (WR-04).
+  if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+  if (!Number.isInteger(day) || day < 1 || day > 31) return null;
   // Feb 29 is folded out entirely.
   if (month === 2 && day === 29) return null;
   const before = CUMULATIVE_DAYS_BEFORE_MONTH[month];
   if (before === undefined) return null; // out-of-range month guard
-  return before + day;
+  const doy = before + day;
+  // Belt-and-braces: the documented contract is 1-365, nothing else.
+  return doy >= 1 && doy <= 365 ? doy : null;
 }
 
 /**
