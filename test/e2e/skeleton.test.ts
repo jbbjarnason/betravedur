@@ -186,6 +186,58 @@ describe("skeleton chain — offline FULL CHAIN (deterministic, no network)", ()
   });
 });
 
+describe("skeleton chain — demo chain driven offline (computeStation export)", () => {
+  // Importing the demo module must be side-effect free (IN-04 guard) so the
+  // e2e test can drive the EXACT chain the demo runs, instead of re-implementing it.
+  it("WR-10 regression: rain with only 1 qualifying year is NOT scored, even when temp/wind qualify", async () => {
+    const { computeStation, WINDOW } = await import("../../scripts/skeleton-demo");
+    const doys = [...WINDOW].sort((a, b) => a - b);
+    const rows: DailyObservation[] = [];
+    for (const year of [2011, 2012, 2013]) {
+      doys.forEach((doy, i) => {
+        const dd = String(15 + i).padStart(2, "0");
+        rows.push(
+          day(1, `${year}-07-${dd}`, doy, {
+            t: 12,
+            f: 4,
+            // rain present ONLY in 2011 -> rainYears = [2011], fails its own N>=3 gate
+            r: year === 2011 ? 1.5 : null,
+          }),
+        );
+      });
+    }
+    const rep = computeStation(rows, "SYNOP");
+    expect(rep.nTemp).toBe(3);
+    expect(rep.nWind).toBe(3);
+    expect(rep.nRain).toBe(1);
+    expect(rep.sufficient).toBe(true);
+    expect(rep.typicalRain).toBeNull(); // gated: 1 qualifying rain year < 3
+    expect(rep.combined!.contributing.slice().sort()).toEqual(["temp", "wind"]);
+    expect(rep.combined!.missingRain).toBe(true);
+  });
+
+  it("WR-11 regression: means pool only qualifying years — a sparse hot year cannot bias the mean", async () => {
+    const { computeStation, WINDOW } = await import("../../scripts/skeleton-demo");
+    const doys = [...WINDOW].sort((a, b) => a - b);
+    const rows: DailyObservation[] = [];
+    for (const year of [2011, 2012, 2013]) {
+      doys.forEach((doy, i) => {
+        const dd = String(15 + i).padStart(2, "0");
+        rows.push(day(1350, `${year}-07-${dd}`, doy, { t: 10, f: 3, dv: 200 }));
+      });
+    }
+    // 2014: only 2 of 11 window days (fails the 80% gate) with an extreme temp.
+    rows.push(day(1350, "2014-07-15", doys[0]!, { t: 40, f: 30, dv: 10 }));
+    rows.push(day(1350, "2014-07-16", doys[1]!, { t: 40, f: 30, dv: 10 }));
+
+    const rep = computeStation(rows, "AWS");
+    expect(rep.nTemp).toBe(3); // 2014 does not qualify
+    expect(rep.meanTemp).toBe(10); // pooled ONLY over qualifying years, not 2014's 40s
+    expect(rep.meanSpeed).toBe(3);
+    expect(rep.meanDir?.dirDeg).toBeCloseTo(200, 0);
+  });
+});
+
 describe("skeleton chain — live (BETRA_LIVE)", () => {
   it.skipIf(!LIVE)(
     "AWS rows have wind direction present and precipitation null",

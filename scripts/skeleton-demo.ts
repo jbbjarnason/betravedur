@@ -234,11 +234,16 @@ async function main(): Promise<void> {
   );
 }
 
-// Exported so tests can drive the exact same chain offline (no network).
-export { computeStation, WINDOW };
+// Exported so tests can drive the exact same chain offline (no network) —
+// see test/e2e/skeleton.test.ts "demo chain" block.
+export { computeStation, WINDOW, WINDOW_SPEC };
 export type { Component };
 
-main().catch((err) => {
-  console.error("skeleton-demo failed:", err);
-  process.exit(1);
-});
+// Only run when executed as a script (IN-04): importing this module for its
+// exported chain must never print, hit the network gate, or process.exit.
+if (process.argv[1]?.endsWith("skeleton-demo.ts")) {
+  main().catch((err) => {
+    console.error("skeleton-demo failed:", err);
+    process.exit(1);
+  });
+}
