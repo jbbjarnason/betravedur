@@ -1,0 +1,22 @@
+{
+  "name": "betravedur",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p packages/domain/tsconfig.json --noEmit && tsc -p packages/fetch/tsconfig.json --noEmit",
+    "skeleton": "tsx scripts/skeleton-demo.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}
