@@ -64,6 +64,22 @@ describe("qualifyingYears — qualifying years coverage", () => {
     expect(qualifyingYears(rowsByYear, windowDays, temp)).toEqual([]);
   });
 
+  it("WR-02 regression: duplicate rows for the same doy count as ONE window day", () => {
+    // 4 distinct days covered, but 8 rows (each day duplicated). Row-counting
+    // would yield 8/7 > 0.8 and wrongly qualify; distinct-day counting gives
+    // 4/7 = 0.571 < 0.8 -> reject.
+    const dup = [1, 2, 3, 4].flatMap((d) => [obs(d, 10), obs(d, 11)]);
+    const rowsByYear = new Map<number, DailyObservation[]>([[2011, dup]]);
+    expect(qualifyingYears(rowsByYear, windowDays, temp)).toEqual([]);
+  });
+
+  it("WR-02 regression: duplicates of already-covered days do not change a qualifying year", () => {
+    // 6 distinct days (qualifies at 6/7) plus duplicates — still qualifies, once.
+    const rows = [1, 2, 3, 4, 5, 6].map((d) => obs(d, 10)).concat([obs(1, 9), obs(2, 9)]);
+    const rowsByYear = new Map<number, DailyObservation[]>([[2011, rows]]);
+    expect(qualifyingYears(rowsByYear, windowDays, temp)).toEqual([2011]);
+  });
+
   it("ignores rows outside the window and returns sorted ascending", () => {
     const rowsByYear = new Map<number, DailyObservation[]>([
       [2013, [1, 2, 3, 4, 5, 6, 7].map((d) => obs(d, 10))],

@@ -6,6 +6,11 @@ import type { DailyObservation } from "./types.js";
  * Return the years whose window coverage is >= minCoverage (default 0.8):
  * a year qualifies when the fraction of window days with a usable metric value
  * is at least minCoverage. A present row whose metric is null does NOT count.
+ * Coverage counts DISTINCT window days (WR-02): duplicate rows for the same doy
+ * (overlapping fetch ranges, API duplicates, append-only re-runs) count once —
+ * row counts must never defeat the 80% gate.
+ * For wrap-around windows, `rowsByYear` must be season-keyed (groupBySeasonYear
+ * in window.ts), never calendar-keyed — see WR-03.
  * Result is sorted ascending.
  */
 export function qualifyingYears(
@@ -18,10 +23,11 @@ export function qualifyingYears(
   if (need === 0) return [];
   const out: number[] = [];
   for (const [year, rows] of rowsByYear) {
-    const present = rows.filter(
-      (r) => windowDays.has(r.doy) && metric(r) != null,
-    ).length;
-    if (present / need >= minCoverage) out.push(year);
+    const covered = new Set<number>();
+    for (const r of rows) {
+      if (windowDays.has(r.doy) && metric(r) != null) covered.add(r.doy);
+    }
+    if (covered.size / need >= minCoverage) out.push(year);
   }
   return out.sort((a, b) => a - b);
 }

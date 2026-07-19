@@ -40,6 +40,23 @@ describe("sumPerYearThenAverage", () => {
     expect(sumPerYearThenAverage(rowsByYear, windowDays, [2011, 2012])).toBe(15);
   });
 
+  it("WR-02 regression: duplicate rows for the same doy are summed ONCE (first present value wins)", () => {
+    const rowsByYear = new Map<number, DailyObservation[]>([
+      // doy 1 appears three times (5mm, then 7mm, then null): only the first
+      // present value (5) may contribute. doy 2 contributes 3. Total = 8.
+      [2011, [obs(1, 5), obs(1, 7), obs(1, null), obs(2, 3)]],
+    ]);
+    expect(sumPerYearThenAverage(rowsByYear, windowDays, [2011])).toBe(8);
+  });
+
+  it("WR-02 regression: a null duplicate does not consume a day before the present value arrives", () => {
+    const rowsByYear = new Map<number, DailyObservation[]>([
+      // null first, then the real 4mm for the same doy: the day still counts 4.
+      [2011, [obs(1, null), obs(1, 4)]],
+    ]);
+    expect(sumPerYearThenAverage(rowsByYear, windowDays, [2011])).toBe(4);
+  });
+
   it("returns null when there are no qualifying years", () => {
     const rowsByYear = new Map<number, DailyObservation[]>([[2011, [obs(1, 10)]]]);
     expect(sumPerYearThenAverage(rowsByYear, windowDays, [])).toBeNull();
