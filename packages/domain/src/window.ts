@@ -31,7 +31,9 @@ export function leapFoldedDoy(date: string): number | null {
   const day = Number(date.slice(8, 10));
   // Feb 29 is folded out entirely.
   if (month === 2 && day === 29) return null;
-  return CUMULATIVE_DAYS_BEFORE_MONTH[month] + day;
+  const before = CUMULATIVE_DAYS_BEFORE_MONTH[month];
+  if (before === undefined) return null; // out-of-range month guard
+  return before + day;
 }
 
 /**
