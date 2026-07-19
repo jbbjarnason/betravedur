@@ -77,11 +77,39 @@
 
 ## Traceability
 
-Which phases cover which requirements. Filled by roadmap creation.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| DATA-01 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Pending |
+| DATA-06 | Phase 1 | Pending |
+| DATA-08 | Phase 1 | Pending |
+| SCORE-01 | Phase 1 | Pending |
+| DATA-02 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Pending |
+| DATA-07 | Phase 2 | Pending |
+| MAP-01 | Phase 3 | Pending |
+| MAP-02 | Phase 3 | Pending |
+| MAP-04 | Phase 3 | Pending |
+| UX-01 | Phase 3 | Pending |
+| SITE-01 | Phase 3 | Pending |
+| SEL-01 | Phase 4 | Pending |
+| SEL-02 | Phase 4 | Pending |
+| SEL-03 | Phase 4 | Pending |
+| SEL-04 | Phase 4 | Pending |
+| UX-02 | Phase 4 | Pending |
+| MAP-03 | Phase 5 | Pending |
+| SCORE-02 | Phase 5 | Pending |
+| SCORE-03 | Phase 5 | Pending |
+| CHART-01 | Phase 6 | Pending |
+| CHART-02 | Phase 6 | Pending |
+| CHART-03 | Phase 6 | Pending |
+| CHART-04 | Phase 6 | Pending |
+| UX-03 | Phase 7 | Pending |
+| UX-04 | Phase 7 | Pending |
+| UX-05 | Phase 7 | Pending |
+| DATA-03 | Phase 8 | Pending |
 
 ---
 *Requirements scoped from .planning/research/FEATURES.md (MVP definition) + questioning session, 2026-07-19*
