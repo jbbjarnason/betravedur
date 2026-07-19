@@ -116,6 +116,14 @@ export function assertObservationSchema(rows: RawDayRow[], kind: ObservationKind
         );
       }
     }
+    // Key presence is not enough for the row's identity (WR-05): a string or
+    // null station would otherwise be silently attributed to a fabricated ID.
+    if (typeof row.station !== "number" || !Number.isFinite(row.station)) {
+      throw new Error(
+        `SCHEMA_DRIFT: ${kind} row "station" is not a finite number ` +
+          `(got ${typeof row.station}: ${JSON.stringify(row.station)})`,
+      );
+    }
   }
 }
 
@@ -141,8 +149,14 @@ export function normalizeObservations(
     if (doy === null || !Number.isInteger(doy) || doy < 1 || doy > 365) {
       continue; // Feb 29 folded out, or unparseable date dropped
     }
+    // Never fabricate a station identity (WR-05): a non-numeric station would
+    // merge unrelated rows under a fake ID 0 — the exact splicing failure the
+    // registry exists to prevent. assertObservationSchema throws before this
+    // in the parse path; direct callers get the row skipped.
+    const station = toNum(raw.station);
+    if (station === null) continue;
     out.push({
-      station: toNum(raw.station) ?? 0,
+      station,
       date,
       doy,
       t: clampRange(raw.t, TEMP_MIN, TEMP_MAX),

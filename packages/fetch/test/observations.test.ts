@@ -135,4 +135,23 @@ describe("parse observations — schema drift fails loudly", () => {
     const body = [{ station: 1350, nope: true }];
     expect(() => parseObservationBody(body, "aws")).toThrow(/SCHEMA_DRIFT/);
   });
+
+  it("WR-05 regression: a string station ID throws SCHEMA_DRIFT instead of becoming station 0", () => {
+    const drifted = [
+      { station: "1350", time: "2024-07-15", t: 11.97, f: 5, dv: 151, r: null },
+    ];
+    expect(() => assertObservationSchema(drifted, "aws")).toThrow(/SCHEMA_DRIFT/);
+    expect(() => parseObservationBody(drifted, "aws")).toThrow(/SCHEMA_DRIFT/);
+  });
+
+  it("WR-05 regression: normalizeObservations skips (never fabricates ID 0 for) a null station", () => {
+    const raw = [
+      { station: null, time: "2024-07-15", t: 1, f: 2, dv: 90, r: null },
+      { station: 1350, time: "2024-07-16", t: 1, f: 2, dv: 90, r: null },
+    ];
+    const rows = normalizeObservations(raw, "aws");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.station).toBe(1350);
+    expect(rows.some((r) => r.station === 0)).toBe(false);
+  });
 });
