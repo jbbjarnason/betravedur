@@ -8,7 +8,7 @@
 
 ### Data Pipeline
 
-- [ ] **DATA-01**: Pipeline fetches daily station observations (temp mean/max/min, wind mean/max/gust + direction, precipitation) from the Veðurstofa Íslands open API (`api.vedur.is/weather/`)
+- [x] **DATA-01**: Pipeline fetches daily station observations (temp mean/max/min, wind mean/max/gust + direction, precipitation) from the Veðurstofa Íslands open API (`api.vedur.is/weather/`)
 - [ ] **DATA-02**: One-time backfill ingests available per-station daily history deep enough to support baseline year ranges like 2010–2015
 - [ ] **DATA-03**: Nightly GitHub Actions cron appends new observations idempotently (upsert by station+date, gap-fill on missed runs, safe to re-run, off-peak schedule)
 - [ ] **DATA-04**: Pipeline precomputes per-station, per-year, day-of-year summaries as static files the client can aggregate over any {period × year-range} selection without a backend
@@ -81,7 +81,7 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Pending |
 | DATA-06 | Phase 1 | Pending |
 | DATA-08 | Phase 1 | Pending |
