@@ -8,5 +8,5 @@ export {
   assertObservationSchema,
 } from "./observations.js";
 export type { ObservationKind } from "./observations.js";
-export { fetchStations, toStationMeta, writeRegistry } from "./stations.js";
+export { fetchStations, parseStationsBody, toStationMeta, writeRegistry } from "./stations.js";
 export { buildRegistry, serializeRegistry } from "./registry.js";

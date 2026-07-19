@@ -15,7 +15,9 @@ const FIX = join(__dirname, "fixtures");
 
 function loadStations(): StationMeta[] {
   const raw = JSON.parse(readFileSync(join(FIX, "stations.json"), "utf8")) as unknown[];
-  return raw.map(toStationMeta);
+  return raw
+    .map(toStationMeta)
+    .filter((m): m is StationMeta => m !== null);
 }
 
 describe("registry no splice", () => {
