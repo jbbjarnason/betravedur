@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "pipeline"
   ],
   "scripts": {
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -p packages/domain/tsconfig.json --noEmit && tsc -p packages/fetch/tsconfig.json --noEmit",
-    "skeleton": "tsx scripts/skeleton-demo.ts"
+    "typecheck": "tsc -p packages/domain/tsconfig.json --noEmit && tsc -p packages/fetch/tsconfig.json --noEmit && tsc -p pipeline/tsconfig.json --noEmit",
+    "skeleton": "tsx scripts/skeleton-demo.ts",
+    "backfill": "tsx pipeline/src/backfill.ts",
+    "aggregate": "tsx pipeline/src/aggregate.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
