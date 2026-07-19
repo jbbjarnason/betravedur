@@ -36,6 +36,21 @@ function toNum(v: unknown): number | null {
 }
 
 /**
+ * Compute leap-folded day-of-year, tolerating the Plan-02 stub.
+ * The domain `leapFoldedDoy` throws NOT_IMPLEMENTED until Plan 02 lands the math;
+ * the skeleton normalizer must not crash on that — it falls back to doy=0 so real
+ * rows still reach the domain boundary. Full doy population arrives with Plan 02/03.
+ */
+function safeDoy(date: string): number {
+  try {
+    return leapFoldedDoy(date) ?? 0;
+  } catch (err) {
+    if (err instanceof Error && err.message === "NOT_IMPLEMENTED") return 0;
+    throw err;
+  }
+}
+
+/**
  * Normalize a raw day row into DailyObservation.
  * `keepDv`/`keepR` encode the structural network split: AWS has dv but r=null;
  * SYNOP has r but no dv. We force the absent field to null explicitly.
@@ -44,7 +59,7 @@ function normalize(raw: RawDayRow, keepDv: boolean, keepR: boolean): DailyObserv
   return {
     station: raw.station,
     date: raw.time,
-    doy: leapFoldedDoy(raw.time) ?? 0,
+    doy: safeDoy(raw.time),
     t: toNum(raw.t),
     tx: toNum(raw.tx),
     tn: toNum(raw.tn),
