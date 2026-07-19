@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { expandWindow, leapFoldedDoy } from "../src/window.js";
+import { expandWindow, groupBySeasonYear, leapFoldedDoy } from "../src/window.js";
+import { qualifyingYears } from "../src/coverage.js";
+import type { DailyObservation } from "../src/types.js";
+
+/** Minimal row factory: only date/doy/t matter for the grouping tests. */
+function obs(date: string, t: number | null = 10): DailyObservation {
+  return {
+    station: 1,
+    date,
+    doy: leapFoldedDoy(date)!,
+    t,
+    tx: null,
+    tn: null,
+    f: null,
+    fx: null,
+    fg: null,
+    dv: null,
+    r: null,
+  };
+}
 
 describe("leapFoldedDoy — leap day fold", () => {
   it("maps July 19 to the SAME index in a leap and a non-leap year", () => {
@@ -49,5 +68,69 @@ describe("expandWindow", () => {
   it("returns a single-day set when start === end", () => {
     const days = expandWindow({ startDoy: 200, endDoy: 200 });
     expect([...days]).toEqual([200]);
+  });
+});
+
+describe("groupBySeasonYear — season-anchored grouping for wrapping windows (WR-03)", () => {
+  // Dec 28 -> Jan 3: startDoy 362, endDoy 3 (wraps the year end).
+  const SPEC = {
+    startDoy: leapFoldedDoy("2011-12-28")!,
+    endDoy: leapFoldedDoy("2012-01-03")!,
+  };
+
+  it("assigns the full Dec 28 2011 – Jan 3 2012 window to season 2011 (the year it starts)", () => {
+    const rows = [
+      obs("2011-12-28"),
+      obs("2011-12-29"),
+      obs("2011-12-30"),
+      obs("2011-12-31"),
+      obs("2012-01-01"),
+      obs("2012-01-02"),
+      obs("2012-01-03"),
+    ];
+    const grouped = groupBySeasonYear(rows, SPEC);
+    expect([...grouped.keys()]).toEqual([2011]);
+    expect(grouped.get(2011)).toHaveLength(7);
+  });
+
+  it("splits Jan tail vs Dec head of the SAME calendar year into two different seasons", () => {
+    // Calendar 2011 contains the tail of season 2010 AND the head of season 2011:
+    // these must never be spliced into one "year".
+    const rows = [
+      obs("2011-01-01"), // tail of season 2010
+      obs("2011-01-02"),
+      obs("2011-12-28"), // head of season 2011
+      obs("2011-12-29"),
+    ];
+    const grouped = groupBySeasonYear(rows, SPEC);
+    expect([...grouped.keys()].sort()).toEqual([2010, 2011]);
+    expect(grouped.get(2010)!.map((r) => r.date)).toEqual(["2011-01-01", "2011-01-02"]);
+    expect(grouped.get(2011)!.map((r) => r.date)).toEqual(["2011-12-28", "2011-12-29"]);
+  });
+
+  it("drops rows outside a wrapping window (no unambiguous season)", () => {
+    const grouped = groupBySeasonYear([obs("2011-07-19")], SPEC);
+    expect(grouped.size).toBe(0);
+  });
+
+  it("behaves as plain calendar-year grouping for a non-wrapping window", () => {
+    const spec = { startDoy: 196, endDoy: 206 }; // mid-July
+    const rows = [obs("2011-07-19"), obs("2012-07-20"), obs("2011-01-01")];
+    const grouped = groupBySeasonYear(rows, spec);
+    expect(grouped.get(2011)!.map((r) => r.date)).toEqual(["2011-07-19", "2011-01-01"]);
+    expect(grouped.get(2012)!.map((r) => r.date)).toEqual(["2012-07-20"]);
+  });
+
+  it("end-to-end: season-keyed coverage qualifies a complete Dec 28–Jan 3 season that calendar grouping would splice", () => {
+    const windowDays = expandWindow(SPEC); // 7 days: 362..365, 1..3
+    // Two complete back-to-back seasons: 2011/12 and 2012/13.
+    const dates = [
+      "2011-12-28", "2011-12-29", "2011-12-30", "2011-12-31",
+      "2012-01-01", "2012-01-02", "2012-01-03",
+      "2012-12-28", "2012-12-29", "2012-12-30", "2012-12-31",
+      "2013-01-01", "2013-01-02", "2013-01-03",
+    ];
+    const grouped = groupBySeasonYear(dates.map((d) => obs(d)), SPEC);
+    expect(qualifyingYears(grouped, windowDays, (o) => o.t)).toEqual([2011, 2012]);
   });
 });

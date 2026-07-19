@@ -22,7 +22,7 @@ export type {
   CombinedScore,
   WindowAverage,
 } from "./types.js";
-export { leapFoldedDoy, expandWindow } from "./window.js";
+export { leapFoldedDoy, expandWindow, groupBySeasonYear } from "./window.js";
 export { qualifyingYears, effectiveN } from "./coverage.js";
 export { circularMeanDirection, scalarMeanSpeed } from "./wind.js";
 export { sumPerYearThenAverage } from "./precip.js";
