@@ -81,11 +81,33 @@ describe("combine — weight renormalization over available components", () => {
     expect(out.missingRain).toBe(false);
   });
 
-  it("missing component excluded: all components null returns score 0, empty contributing, missingRain=true", () => {
+  it("missing component excluded: all components null returns score null (unscorable), empty contributing, missingRain=true", () => {
     const out = combine({ temp: null, rain: null, wind: null });
-    expect(out.score).toBe(0);
+    expect(out.score).toBeNull();
     expect(out.contributing).toEqual([]);
     expect(out.missingRain).toBe(true);
+  });
+
+  it("WR-01 regression: zero weight mass over present components returns score null, never NaN", () => {
+    // AWS station (rain null) with all user weight on rain: weightSum over the
+    // present components is 0 — must be unscorable, not 0/0 = NaN.
+    const out = combine(
+      { temp: 8, rain: null, wind: 6 },
+      { temp: 0, rain: 1, wind: 0 },
+    );
+    expect(out.score).toBeNull();
+    expect(Number.isNaN(out.score as unknown as number)).toBe(false);
+    expect(out.contributing).toEqual([]);
+    expect(out.missingRain).toBe(true);
+  });
+
+  it("WR-01 regression: negative or non-finite weights throw a RangeError", () => {
+    expect(() =>
+      combine({ temp: 8, rain: 6, wind: 7 }, { temp: -0.5, rain: 1, wind: 0.5 }),
+    ).toThrow(RangeError);
+    expect(() =>
+      combine({ temp: 8, rain: 6, wind: 7 }, { temp: Number.NaN, rain: 1, wind: 0.5 }),
+    ).toThrow(RangeError);
   });
 
   it("renormalize: custom weights are renormalized over present components", () => {

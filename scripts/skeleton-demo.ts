@@ -139,7 +139,7 @@ function reportStation(
   let scoreLine: string;
   if (!rep.sufficient) {
     scoreLine = `ófullnægjandi gögn (N=${rep.effN} < 3)`;
-  } else if (rep.combined) {
+  } else if (rep.combined && rep.combined.score != null) {
     const contrib = rep.combined.contributing.join("+");
     const badge = rep.combined.missingRain ? "  [án úrkomu]" : "";
     scoreLine = `EINKUNN ${rep.combined.score.toFixed(1)}/10  (${contrib})${badge}`;

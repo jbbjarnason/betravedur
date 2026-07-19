@@ -77,10 +77,12 @@ export interface ComponentScores {
 /**
  * Combined weather score, renormalized over the components that contributed.
  * `missingRain` drives the "án úrkomu" badge shown wherever the score appears.
+ * `score` is null exactly when `contributing` is empty (unscorable): either no
+ * component was present, or the present components' weights summed to zero.
  */
 export interface CombinedScore {
-  /** 0-10, renormalized over `contributing`. */
-  score: number;
+  /** 0-10, renormalized over `contributing`; null when unscorable. */
+  score: number | null;
   /** Which components actually contributed to `score`. */
   contributing: Component[];
   /** True when rain was not available (AWS stations) — drives the badge. */

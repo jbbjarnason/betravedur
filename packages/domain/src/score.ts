@@ -80,28 +80,49 @@ const DEFAULT_WEIGHTS = { temp: 0.3, rain: 0.4, wind: 0.3 };
  * fairly on wind+temp instead of being penalised or silently scored as dry).
  * Records `contributing` (the components that actually contributed) and sets
  * `missingRain` when rain did not contribute — driving the "án úrkomu" badge.
- * When no component is present, returns { score: 0, contributing: [], missingRain: true }.
- * `score` is rounded to one decimal but kept a number.
+ *
+ * Unscorable contract: `score` is null (never NaN, never a fabricated 0) when no
+ * component is present OR when the present components' weights sum to zero (e.g.
+ * custom weights { temp: 0, rain: 1, wind: 0 } on an AWS station without rain).
+ * In both cases `contributing` is empty — a 0/10 means "terrible weather", null
+ * means "cannot be scored with these inputs".
+ *
+ * Weights must be non-negative finite numbers (throws RangeError otherwise); the
+ * renormalization itself stays over the PRESENT components only.
+ * `score` is rounded to one decimal and clamped to [0,10].
  */
 export function combine(
   components: ComponentScores,
   weights: { temp: number; rain: number; wind: number } = DEFAULT_WEIGHTS,
 ): CombinedScore {
   const order: Component[] = ["temp", "rain", "wind"];
+  for (const c of order) {
+    const w = weights[c];
+    if (!Number.isFinite(w) || w < 0) {
+      throw new RangeError(
+        `combine(): weight "${c}" must be a non-negative finite number, got ${w}`,
+      );
+    }
+  }
   const present = order.filter((c) => components[c] != null);
 
   if (present.length === 0) {
-    return { score: 0, contributing: [], missingRain: true };
+    return { score: null, contributing: [], missingRain: true };
   }
 
   const weightSum = present.reduce((acc, c) => acc + weights[c], 0);
+  if (weightSum <= 0) {
+    // No usable weight mass over the present components — unscorable (WR-01):
+    // 0/0 must never leak out as NaN, and 0/10 would misread as "terrible".
+    return { score: null, contributing: [], missingRain: !present.includes("rain") };
+  }
   // Weighted average renormalized over present components (weights sum to 1).
   const weighted = present.reduce(
     (acc, c) => acc + (components[c] as number) * (weights[c] / weightSum),
     0,
   );
 
-  const score = Math.round(weighted * 10) / 10;
+  const score = clamp10(Math.round(weighted * 10) / 10);
   return {
     score,
     contributing: present,
