@@ -34,7 +34,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A station metadata registry keyed on station ID with active-date windows resolves moves/closures without splicing records
   4. Domain unit tests pass, including the 350°/10° wind case (result ≈ 0°, not 180°), precipitation-missing treated as absent, and "N years" derived from qualifying data coverage
   5. The combined score is computed from separately-precomputed temperature, precipitation, and wind components (weights swappable later)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: npm-workspaces TS monorepo, pure @betravedur/domain contracts+stubs, live fetch client, end-to-end demo CLI on real data
+- [ ] 01-02-PLAN.md — Domain math (DATA-05): leap-folded window, circular wind mean (350/10), coverage-honest N (>=80%, N>=3), precip missing != zero
+- [ ] 01-03-PLAN.md — Data access (DATA-01/06/08): schema-assert+normalize fetchers, no-splice station registry, CC BY 4.0 attribution constant, live fixtures
+- [ ] 01-04-PLAN.md — Combined score (SCORE-01): 0-10 component curves, renormalizing combine() with "án úrkomu" flag, close the Walking Skeleton loop
 **Research flag**: Retrieve Veðurstofan terms/conditions page directly; verify aws/day vs synop/day field schema live; check sunshine sensor coverage (gates v1.x)
 
 ### Phase 2: Derived Data Pipeline & Backfill
@@ -133,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Access & Domain Core | 0/TBD | Not started | - |
+| 1. Data Access & Domain Core | 0/4 | Planned | - |
 | 2. Derived Data Pipeline & Backfill | 0/TBD | Not started | - |
 | 3. Static Site Shell & Interactive Map | 0/TBD | Not started | - |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
