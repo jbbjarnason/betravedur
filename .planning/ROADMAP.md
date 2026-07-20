@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Access & Domain Core** - Confirm Veðurstofan API/terms and build the tested, shared domain math (circular wind mean, honest N, precipitation-as-missing, combined score) (completed 2026-07-19)
 - [x] **Phase 2: Derived Data Pipeline & Backfill** - Backfill history and precompute compact per-station derived files the browser can aggregate, kept within Pages limits (completed 2026-07-20)
-- [ ] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages
+- [x] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages (completed 2026-07-20)
 - [ ] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state
 - [ ] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer
 - [ ] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling
@@ -73,7 +73,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Foundation slice: site/ Vite+TS workspace, committed PMTiles Iceland basemap + sample data, MapLibre map + Icelandic header/slogan + CC BY 4.0 attribution, preview-build E2E gate (MAP-01, UX-01, SITE-01)
 - [x] 03-02-PLAN.md — Data layer (TDD): manifest hashed-filename resolution + decodeDerived → domain averages → MarkerDatum (án úrkomu / breytileg átt / ófullnægjandi gögn) (MAP-02)
-- [ ] 03-03-PLAN.md — Marker render slice: symbol-layer collision + hybrid white-pill composite at zoom-adaptive density + full 11-criterion UI-SPEC E2E gate (MAP-02, MAP-04)
+- [x] 03-03-PLAN.md — Marker render slice: symbol-layer collision + hybrid white-pill composite at zoom-adaptive density + full 11-criterion UI-SPEC E2E gate (MAP-02, MAP-04)
 **UI hint**: yes
 
 ### Phase 4: Selection & Instant Recompute
@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
-| 3. Static Site Shell & Interactive Map | 2/3 | In Progress|  |
+| 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |

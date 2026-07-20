@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-07-20T08:53:55.626Z"
+status: verifying
+stopped_at: Completed 03-03-PLAN.md (Phase 3 complete)
+last_updated: "2026-07-20T09:04:24.637Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 11
-  completed_plans: 10
-  percent: 25
+  completed_plans: 11
+  percent: 38
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 Phase: 3 (Static Site Shell & Interactive Map) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-20
 
-Progress: [█████████░] 91%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 91%
 | Phase 2 P04 | 7min | 2 tasks | 5 files |
 | Phase 03 P01 | 12 | 2 tasks | 17 files |
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
+| Phase 03 P03 | 7min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,7 @@ Recent decisions affecting current work:
 - [Phase 02]: Plan 02-03: buildStationsJson gates the no-splice registry on >=3 qualifying years of REAL data via domain effectiveN (not start); decommissioned stations clearing the bar retained; entries built field-by-field (no spread).
 - [Phase 03]: Plan 03-01: site/ Vite+TS workspace ships a deployable /betravedur/ base-path dist; self-hosted iceland.pmtiles maxzoom-9 extract is 7.3 MiB (no API keys); grayscale basemap muted to #E8EBED via pure paint override; preview-build Playwright E2E pins the Vite×MapLibre A1 worker risk (5/5 green); attribution sourced from domain ATTRIBUTION.
 - [Phase 03]: Plan 03-02: pure Node-free client data slice — resolveDerivedFile reads manifest.stations[id].file (hashed name, null on unknown/malformed, never throws); computeMarkerDatum decodes via @betravedur/pipeline/derive then runs domain math into MarkerDatum with án úrkomu (hasPrecip=false, still emitted), breytileg átt (dir null or resultantSpeed<0.5), and ófullnægjandi gögn (N<3 → tempC null); DEFAULT_WINDOW {197,210} is the single fixed-period source until Phase 4.
+- [Phase ?]: [Phase 03] Plan 03-03: hybrid marker system — invisible MapLibre symbol layer owns native zoom-adaptive collision (text-allow-overlap:false + symbol-sort-key + text-opacity:0); rich white-pill callouts drawn ONLY for post-collision queryRenderedFeatures survivors into a single reused #marker-overlay (no maplibregl.Marker, grep-gated); accent red reserved to temp numeral; insufficient stations emitted muted (ófullnægjandi gögn) not filtered; pills are focus-ready <button data-station> skeletons, NO click handler (Phase-6 seam); all 11 UI-SPEC criteria green on preview build — MAP-02, MAP-04, Phase 3 complete.
 
 ### Pending Todos
 
@@ -111,6 +113,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T08:52:15.954Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-07-20T09:04:24.632Z
+Stopped at: Completed 03-03-PLAN.md (Phase 3 complete)
 Resume file: None
