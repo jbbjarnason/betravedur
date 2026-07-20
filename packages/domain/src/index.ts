@@ -17,6 +17,7 @@ export { leapFoldedDoy, expandWindow, groupBySeasonYear } from "./window.js";
 export { qualifyingYears, effectiveN } from "./coverage.js";
 export { circularMeanDirection, scalarMeanSpeed } from "./wind.js";
 export { sumPerYearThenAverage } from "./precip.js";
+export { meanPerYearThenAverage } from "./meanPerYear.js";
 export { tempComponent, rainComponent, windComponent, combine } from "./score.js";
 export type { Attribution } from "./attribution.js";
 export { ATTRIBUTION } from "./attribution.js";

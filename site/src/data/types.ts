@@ -11,14 +11,20 @@ import type { WindowSpec } from "@betravedur/domain";
 /**
  * Everything the map needs to draw one station's marker for the selected period.
  *
- * Coverage honesty (mirrors the domain contract, WR-01): when the station has fewer
- * than 3 qualifying years in-window, `sufficient` is false and `tempC` is null — the
- * renderer shows a muted "ófullnægjandi gögn" state, never 0/10.
+ * Coverage honesty (mirrors the domain contract, WR-01/WR-02): the SAME qualifying-
+ * years / N≥3 gate governs EVERY displayed metric, not just temperature. When the
+ * station has fewer than 3 qualifying years in-window, `sufficient` is false and
+ * ALL metric fields collapse to the muted state — `tempC` and `windSpeed` are null,
+ * `windVariable` is true (so `windDir` is null), `hasPrecip` is false — so the
+ * renderer shows a single muted "ófullnægjandi gögn" callout, never a confident wind
+ * arrow / speed / precip drop drawn from data too thin to vouch for. When sufficient,
+ * every metric is computed from the qualifying-year in-window rows only (equal weight
+ * per year — see `meanPerYearThenAverage`), never pooled across non-qualifying years.
  *
- * Edge states the renderer keys off:
+ * Edge states the renderer keys off (only reachable when `sufficient === true`):
  *  - `windVariable === true` (⇒ `windDir === null`)  → "breytileg átt" (no arrow).
  *  - `hasPrecip === false`                           → "án úrkomu" (omit precip glyph).
- *  - `sufficient === false` (⇒ `tempC === null`)     → muted "ófullnægjandi gögn".
+ *  - `sufficient === false` (⇒ ALL metrics null/false) → muted "ófullnægjandi gögn".
  */
 export interface MarkerDatum {
   /** Integer station id. */
@@ -31,13 +37,13 @@ export interface MarkerDatum {
   lat: number;
   /** In-window mean temperature (°C), or null when coverage is insufficient. */
   tempC: number | null;
-  /** In-window scalar mean wind speed (m/s), or null when no usable speeds. */
+  /** Qualifying-years mean wind speed (m/s), or null when insufficient/no usable speeds. */
   windSpeed: number | null;
-  /** Circular-mean wind direction (deg, 0-360); null when variable/undefined. */
+  /** Circular-mean wind direction (deg, 0-360); null when variable/undefined/insufficient. */
   windDir: number | null;
-  /** True when direction is undefined or near-cancelling → "breytileg átt". */
+  /** True when direction is undefined, near-cancelling, or coverage insufficient → "breytileg átt". */
   windVariable: boolean;
-  /** Whether any precip was recorded in-window; false ⇒ "án úrkomu" (station still shown). */
+  /** Whether any precip was recorded in qualifying-year in-window rows; false ⇒ "án úrkomu". */
   hasPrecip: boolean;
   /** Effective N: qualifying years actually used (never the picker span). */
   n: number;

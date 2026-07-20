@@ -7,8 +7,13 @@
 // never the package root barrel (the root pulls Node fs/crypto/path built-ins and breaks
 // the browser bundle). No Node built-ins appear in this module.
 //
-// Coverage honesty (WR-01): effective N comes from the qualifying DATA-coverage years,
-// NOT the picker span; below the N≥3 gate, `tempC` is null (muted "ófullnægjandi gögn").
+// Coverage honesty (WR-01/WR-02): effective N comes from the qualifying DATA-coverage
+// years, NOT the picker span. The SAME N≥3 gate governs EVERY displayed metric — below
+// it, temp, wind speed, wind direction and precip ALL collapse to the muted
+// "ófullnægjandi gögn" state; we never show a confident wind arrow/speed/drop on data
+// too thin to qualify. When sufficient, every metric is computed from the qualifying-
+// year in-window rows only, equal-weight-per-year (meanPerYearThenAverage) — never a flat
+// pool over all years that includes sparse non-qualifying ones or day-weights the years.
 // Missing metrics are null, never 0 — a station with no rain is "án úrkomu" (still shown),
 // a station with no/near-cancelling direction is "breytileg átt". Nothing here ever throws
 // on empty/all-null input (defensive decode — ASVS V5 / threat T-03-04).
@@ -18,8 +23,9 @@ import {
   groupBySeasonYear,
   qualifyingYears,
   effectiveN,
-  scalarMeanSpeed,
   circularMeanDirection,
+  meanPerYearThenAverage,
+  type DailyObservation,
   type WindowSpec,
   type StationMeta,
 } from "@betravedur/domain";
@@ -64,37 +70,51 @@ export function computeMarkerDatum(
 
   // Effective N from the data actually used — season-year grouped so a wrapping
   // window is counted correctly (harmless for a non-wrapping summer window).
+  // Temperature drives the qualifying-years / N gate that ALL displayed metrics
+  // honour (WR-02): if temperature coverage is too thin to vouch for an average,
+  // the whole datum is the muted "ófullnægjandi gögn" state — we never show a
+  // confident wind arrow or precip drop drawn from data below the gate.
   const byYear = groupBySeasonYear(rows, window);
-  const { n, sufficient } = effectiveN(
-    qualifyingYears(byYear, windowDays, (o) => o.t),
-  );
+  const qYears = qualifyingYears(byYear, windowDays, (o) => o.t);
+  const { n, sufficient } = effectiveN(qYears);
 
-  // In-window rows drive the metric means.
-  const inWin = rows.filter((r) => windowDays.has(r.doy));
+  // The rows that back every displayed metric: in-window days of the QUALIFYING
+  // years only. Pooling all in-window rows across all years (including sparse,
+  // non-qualifying ones) is the coverage-dishonesty pitfall WR-01/WR-02 flags.
+  const inWinQual: DailyObservation[] = [];
+  for (const y of qYears) {
+    for (const r of byYear.get(y) ?? []) {
+      if (windowDays.has(r.doy)) inWinQual.push(r);
+    }
+  }
 
-  const temps = inWin
-    .map((r) => r.t)
-    .filter((v): v is number => v != null);
-  const meanTemp = temps.length
-    ? temps.reduce((a, b) => a + b, 0) / temps.length
-    : null;
+  // Temperature: per-year mean over qualifying years, then equal-weight average of
+  // those year-means (WR-01) — the same average the coverage gate vouches for.
+  const meanTemp = meanPerYearThenAverage(byYear, windowDays, qYears, (o) => o.t);
 
-  const windSpeed = scalarMeanSpeed(inWin.map((r) => r.f));
+  // Wind speed: per-year scalar mean over qualifying years, equally weighted (WR-02).
+  const meanWindSpeed = meanPerYearThenAverage(byYear, windowDays, qYears, (o) => o.f);
 
-  const dirSamples = inWin
+  // Wind direction: circular mean over the qualifying-year in-window samples only.
+  const dirSamples = inWinQual
     .filter((r) => r.f != null && r.dv != null)
     .map((r) => ({ speed: r.f as number, dirDeg: r.dv as number }));
   const dir = circularMeanDirection(dirSamples);
 
   // "breytileg átt": no usable samples (dir null) OR a near-cancelling resultant.
-  const windVariable = dir === null || dir.resultantSpeed < VARIABLE_DIRECTION_FLOOR;
-  const windDir = windVariable ? null : dir!.dirDeg;
+  const dirVariable = dir === null || dir.resultantSpeed < VARIABLE_DIRECTION_FLOOR;
 
-  // Precip presence only this phase — false ⇒ "án úrkomu" (omit glyph, keep station).
-  const hasPrecip = inWin.some((r) => r.r != null);
+  // Precip presence over qualifying-year in-window rows only (WR-02). false ⇒
+  // "án úrkomu" (omit glyph, keep station) — but only when the gate is met.
+  const hasPrecipQual = inWinQual.some((r) => r.r != null);
 
-  // Coverage gate: below N≥3 the temperature mean is not shown (muted state).
+  // Coverage gate applied uniformly (WR-02): below N≥3 nothing metric-bearing is
+  // shown — temp, wind speed, direction and precip all collapse to the muted state.
   const tempC = sufficient ? meanTemp : null;
+  const windSpeed = sufficient ? meanWindSpeed : null;
+  const windVariable = sufficient ? dirVariable : true;
+  const windDir = sufficient && !dirVariable ? dir!.dirDeg : null;
+  const hasPrecip = sufficient ? hasPrecipQual : false;
 
   return {
     station: meta.station,
