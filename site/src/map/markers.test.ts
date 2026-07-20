@@ -30,7 +30,7 @@ describe("toFeatureCollection", () => {
     const fc = toFeatureCollection([fullDatum({ station: 1 }), fullDatum({ station: 1350, lon: -22.6, lat: 63.98 })]);
     expect(fc.type).toBe("FeatureCollection");
     expect(fc.features).toHaveLength(2);
-    const [a] = fc.features;
+    const a = fc.features[0]!;
     expect(a.type).toBe("Feature");
     expect(a.geometry.type).toBe("Point");
     expect(a.geometry.coordinates).toEqual([-21.9, 64.13]);
@@ -38,23 +38,23 @@ describe("toFeatureCollection", () => {
 
   it("carries a rounded-degree label for a sufficient datum", () => {
     const fc = toFeatureCollection([fullDatum({ tempC: 7.4, sufficient: true })]);
-    expect(fc.features[0].properties.label).toBe("7°");
+    expect(fc.features[0]!.properties.label).toBe("7°");
   });
 
   it("rounds negative temperatures correctly in the label", () => {
     const fc = toFeatureCollection([fullDatum({ tempC: -3.6, sufficient: true })]);
-    expect(fc.features[0].properties.label).toBe("-4°");
+    expect(fc.features[0]!.properties.label).toBe("-4°");
   });
 
   it("uses an em-dash label for an insufficient datum", () => {
     const fc = toFeatureCollection([fullDatum({ tempC: null, sufficient: false })]);
-    expect(fc.features[0].properties.label).toBe("—");
+    expect(fc.features[0]!.properties.label).toBe("—");
   });
 
   it("exposes station id and priority (the symbol-sort-key) as feature properties", () => {
     const fc = toFeatureCollection([fullDatum({ station: 42, priority: 3.5 })]);
-    expect(fc.features[0].properties.station).toBe(42);
-    expect(fc.features[0].properties.priority).toBe(3.5);
+    expect(fc.features[0]!.properties.station).toBe(42);
+    expect(fc.features[0]!.properties.priority).toBe(3.5);
   });
 });
 
@@ -107,7 +107,8 @@ describe("formatCallout", () => {
     );
     expect(muted).toBe(false);
     expect(html).toMatch(/6°/);
-    expect(html).toMatch(/4\s*(&nbsp;|\s)?m\/s|4.{0,6}m\/s/);
+    expect(html).toContain(">4<"); // integer speed numeral present
+    expect(html).toMatch(/m\/s/); // unit present (nested span between numeral and unit)
     expect(html).toContain("breytileg átt");
   });
 });

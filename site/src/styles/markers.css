@@ -1,0 +1,129 @@
+/*
+ * Station marker callouts — Phase 3 UI-SPEC "Station Marker Anatomy".
+ *
+ * White rounded pills drawn by the hybrid composite renderer (markers.ts) for the
+ * post-collision survivors only. The overlay is a single pointer-events:none layer over
+ * the map; each pill re-enables pointer-events on its 44px hit area (the Phase-6 click seam)
+ * but carries NO handler this phase. Accent red is reserved to the temperature numeral only;
+ * every datum carries a glyph/numeral so colour is never the sole channel.
+ */
+
+/* Overlay container: sits above the basemap, below the header, transparent to clicks. */
+.marker-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5; /* above canvas (0), below header (10) */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/*
+ * One pill. Absolutely positioned at the projected station point; translated so the pill
+ * centres on the coordinate. The transparent padding grows the hit area to the 44px
+ * touch-target minimum (UI-SPEC spacing exception) without inflating the visual box.
+ */
+.marker-pill {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs); /* 4px between temp ↔ wind ↔ precip */
+
+  /* White callout surface. */
+  background: var(--secondary);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 4px 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+
+  /* Compact tabular numerals so values don't jitter at zoom-density changes. */
+  font-family: var(--font-stack);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+
+  /* Reset button chrome (focus-ready skeleton, no handler yet). */
+  margin: 0;
+  cursor: default;
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* 44px min hit area via transparent outline padding (Phase-6 touch seam). */
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
+
+  /* Re-enable pointer events on the hit area only (seam) — overlay stays transparent. */
+  pointer-events: auto;
+}
+
+/* Temperature — the ONLY accent-red element on the map. */
+.marker-pill .marker-temp {
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Wind group — arrow + speed sit together, ink (never red). */
+.marker-pill .marker-wind {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink);
+}
+
+.marker-pill .marker-wind-arrow {
+  color: var(--ink); /* arrow is ink, NOT accent red */
+  flex: 0 0 auto;
+}
+
+.marker-pill .marker-wind-speed {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The "m/s" unit and the "breytileg átt" label are muted (11px, Regular). */
+.marker-pill .marker-unit,
+.marker-pill .marker-variable {
+  color: var(--muted-ink);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Precipitation drop — muted ink shape (absence = "án úrkomu"). */
+.marker-pill .marker-precip {
+  color: var(--muted-ink);
+  flex: 0 0 auto;
+}
+
+/* Muted / missing-average state: greyed box, honesty text, no red, no arrow. */
+.marker-pill--muted {
+  background: var(--marker-empty-bg);
+  border-color: var(--hairline);
+  box-shadow: 0 1px 2px rgba(31, 41, 51, 0.1);
+}
+
+.marker-pill--muted .marker-empty {
+  color: var(--marker-empty-fg);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Focus-ready outline skeleton (activated in Phase 6; no handler now). */
+.marker-pill:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Reduced motion: no pill transition churn on re-render. */
+@media (prefers-reduced-motion: reduce) {
+  .marker-pill {
+    transition: none;
+  }
+}
