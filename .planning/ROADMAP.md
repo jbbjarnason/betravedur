@@ -13,7 +13,7 @@ Betra Veður is a static "baked-data + thin client" site answering "where in Ice
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Access & Domain Core** - Confirm Veðurstofan API/terms and build the tested, shared domain math (circular wind mean, honest N, precipitation-as-missing, combined score) (completed 2026-07-19)
-- [ ] **Phase 2: Derived Data Pipeline & Backfill** - Backfill history and precompute compact per-station derived files the browser can aggregate, kept within Pages limits
+- [x] **Phase 2: Derived Data Pipeline & Backfill** - Backfill history and precompute compact per-station derived files the browser can aggregate, kept within Pages limits (completed 2026-07-20)
 - [ ] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages
 - [ ] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state
 - [ ] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer
@@ -57,7 +57,7 @@ Plans:
 - [x] 02-01-PLAN.md — Pipeline workspace + derive.ts columnar encoder/decoder (season-year round-trip + ≤4KB/station-year size budget)
 - [x] 02-02-PLAN.md — Resumable chunked/paced backfill loop + field-pruned idempotent raw store + 413/502/503 fetch taxonomy
 - [x] 02-03-PLAN.md — Content-hashed manifest.json (delta property) + stations.json from no-splice registry (≥3 qualifying years)
-- [ ] 02-04-PLAN.md — Aggregate orchestrator (touched-only) + orphan data branch + real subset backfill (self-verified) + PIPELINE.md
+- [x] 02-04-PLAN.md — Aggregate orchestrator (touched-only) + orphan data branch + real subset backfill (self-verified) + PIPELINE.md
 
 ### Phase 3: Static Site Shell & Interactive Map
 **Goal**: A deployable Vite/TypeScript static site, Icelandic-branded with "Leitin að betra veðri", showing an interactive pan/zoom MapLibre map of Iceland with station markers displaying the selected period's historical averages at appropriate zoom density.
@@ -144,7 +144,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
-| 2. Derived Data Pipeline & Backfill | 3/4 | In Progress|  |
+| 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 0/TBD | Not started | - |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
