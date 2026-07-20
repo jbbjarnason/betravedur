@@ -25,6 +25,13 @@
  */
 .marker-pill--scored {
   border-left: 5px solid var(--pill-score, var(--hairline));
+  /* IN-01: the 5px left border vs the 1px on the other three sides widens the box 4px on the
+     left. The base pill centers on its station coordinate via translate(-50%, -50%), which would
+     otherwise shift a scored pill's visible content ~2px right of the true point (half the 4px
+     asymmetry). Nudge the translate 2px left so scored and muted pills anchor identically on
+     map.project([lon,lat]). Kept in the transform (not a margin) so it composes with the base
+     centering and never affects layout/hit-area. */
+  transform: translate(calc(-50% - 2px), -50%);
   /* Keep the pale low-end legible: a faint inner hairline outlines the whole pill so even a
      near-white --score-0/1 bar reads as an intentional colored edge, not a rendering artifact
      (Pitfall 3 floor). */
@@ -286,6 +293,14 @@
   border-radius: 6px;
   color: var(--ink);
   cursor: pointer;
+}
+
+/* App-wide focus convention: ink ring, 2px offset (matches row buttons, width buttons, the
+   explainer summary, selects). Without this the toggle fell back to the browser default ring,
+   which varies by browser/OS and breaks the design system's uniform focus treatment (UI-REVIEW). */
+.ranked-list__collapse:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .ranked-list__collapse svg {
