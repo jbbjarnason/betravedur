@@ -232,24 +232,80 @@
   background: var(--chart-precip);
 }
 
-/* ── Narrow screens (< 640px): functional over-map full-width overlay (Phase 7 polishes) ──
- * NOT a draggable bottom sheet — just a functional show/hide the close affordance dismisses.
- * The header + independently-scrolling figure body are structured so Phase 7 can promote this
- * to a bottom sheet without restructuring. */
+/* ── Drag handle (grabber): the sheet's drag/keyboard affordance (Phase 7 UX-03) ──────────────
+ * A native <button> (built in stationPanel.ts) rendered as the first child of the panel header on
+ * mobile. A short rounded --dominant grabber bar over --hairline, inside a ≥44px hit target. Only
+ * this element gets `touch-action: none` so the sheet drag never fights the browser's scroll — the
+ * body keeps its own overflow scroll. Hidden on desktop (the side panel has no drag). */
+.station-panel__handle {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  /* Promote the Phase-6 right-dock side panel to a bottom sheet: full-width, docked to the bottom
+     edge, sized to the EXPANDED snap height. The drag controller (bottomSheet.ts) translateY's it
+     to peek by default and between snaps on drag; the CSS transform below is the peek fallback for
+     a no-JS / pre-attach frame so the sheet never flashes fully-expanded. z-index 20 so the sheet
+     rises OVER the standing chrome (control bar z10) at expanded (UI-SPEC z-order). */
   .station-panel {
     left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
     width: auto;
     max-width: none;
+    height: clamp(70svh, 80svh, 85svh);
+    z-index: 20;
     border-left: 0;
-    border-radius: 0;
+    /* Round the TOP corners only — it reads as a sheet rising from the bottom edge. */
+    border-radius: 12px 12px 0 0;
+    /* Peek fallback (the JS controller owns the live transform; this is the pre-attach position so
+       the sheet starts at peek even before attachSheet runs). Peek reveals the header + a hint of
+       the first chart. */
+    transform: translateY(calc(100% - clamp(96px, 18svh, 140px)));
+    transition: transform 0.2s ease;
+    box-shadow: 0 -2px 12px rgba(31, 41, 51, 0.22);
+  }
+
+  /* The grabber: a native button reset + a centered rounded bar. ≥44px tall hit area (touch
+     target); touch-action:none so a vertical drag on it never scrolls the page/body instead. */
+  .station-panel__handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+  }
+  .station-panel__handle::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--dominant);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+  }
+  .station-panel__handle:active {
+    cursor: grabbing;
+  }
+  .station-panel__handle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 }
 
-/* Reduced motion: no panel open/close transition churn (the panel mounts/unmounts instantly). */
+/* Reduced motion: no panel open/close OR sheet-snap transition churn (instant snap under
+   prefers-reduced-motion — the drag controller restores the CSS transition, which is zeroed
+   here, so releases/keyboard toggles jump instantly). */
 @media (prefers-reduced-motion: reduce) {
   .station-panel,
-  .station-panel__close {
+  .station-panel__close,
+  .station-panel__handle {
     transition: none;
   }
 }
