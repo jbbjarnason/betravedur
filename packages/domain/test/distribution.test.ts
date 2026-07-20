@@ -123,6 +123,52 @@ describe("perDoyDistribution — per-doy 5-number summary", () => {
     expect((doy2 as { min?: number }).min).toBeUndefined();
   });
 
+  it("per-doy floor (WR-04): a doy backed by <3 qualifying-year values is a gap, not a degenerate box", () => {
+    // A 10-day window over 4 qualifying years (each covers ≥8/10 days → ≥80%, station passes the
+    // gate). doy 5 carries a temp in only ONE of the four years (null in the other three — each of
+    // those years still covers 9/10 = 90% ≥ 80% so they qualify). Without a per-doy floor that
+    // single value renders min==p10==p50==p90==max — a false-precision zero-width box. The per-doy
+    // MIN_PER_DOY gate must emit an explicit gap instead; the full-coverage doys still render.
+    const window10 = { startDoy: 1, endDoy: 10 };
+    const rows: DailyObservation[] = [];
+    for (const year of [2017, 2018, 2019, 2020]) {
+      for (let doy = 1; doy <= 10; doy++) {
+        const t = doy === 5 && year !== 2017 ? null : 10 + (year - 2017);
+        rows.push(obs(year, doy, { t }));
+      }
+    }
+    const res = perDoyDistribution(rows, window10, undefined, (o) => o.t);
+    expect(res.sufficient).toBe(true);
+    if (!res.sufficient) return;
+    const doy5 = res.perDoy.find((d) => d.doy === 5)!;
+    expect(doy5.missing).toBe(true);
+    // Not a degenerate single-sample box.
+    expect((doy5 as { min?: number; p50?: number; max?: number }).min).toBeUndefined();
+    // A full-coverage doy (4 values ≥ MIN_PER_DOY) still renders a real box.
+    const doy1 = res.perDoy.find((d) => d.doy === 1)!;
+    expect(doy1.missing).toBeFalsy();
+  });
+
+  it("per-doy floor (WR-04): a doy with exactly 2 qualifying values is a gap, 3 renders", () => {
+    // A 10-day window over 3 qualifying years. doy 4 carries temp in 2 years (2 values → below the
+    // floor), doy 6 carries temp in all 3 (3 values → at the floor, renders). Every year covers
+    // ≥8/10 days so all three qualify.
+    const window10 = { startDoy: 1, endDoy: 10 };
+    const rows: DailyObservation[] = [];
+    for (const year of [2018, 2019, 2020]) {
+      for (let doy = 1; doy <= 10; doy++) {
+        let t: number | null = 11 + (year - 2018);
+        if (doy === 4 && year === 2020) t = null; // doy 4 → only 2018,2019 (2 values)
+        rows.push(obs(year, doy, { t }));
+      }
+    }
+    const res = perDoyDistribution(rows, window10, undefined, (o) => o.t);
+    expect(res.sufficient).toBe(true);
+    if (!res.sufficient) return;
+    expect(res.perDoy.find((d) => d.doy === 4)!.missing).toBe(true);
+    expect(res.perDoy.find((d) => d.doy === 6)!.missing).toBeFalsy();
+  });
+
   it("wrap-around window: perDoy[0].doy is the window START doy, not numeric 1", () => {
     // Dec->Jan wrap: startDoy 364, endDoy 2 -> window order [364, 365, 1, 2].
     const wrap = { startDoy: 364, endDoy: 2 };
@@ -201,6 +247,27 @@ describe("perDoyPrecip — per-doy median precip total (honest missing)", () => 
     const doy5 = res.perDoy.find((d) => d.doy === 5)!;
     expect(doy5.missing).toBe(true);
     expect((doy5 as { value?: number }).value).toBeUndefined();
+  });
+
+  it("per-doy floor (WR-04): a doy with a single qualifying-year value is a gap, not a bar", () => {
+    // A 10-day window over 3 qualifying years; doy 5 carries rain in only ONE year → a single-year
+    // median is just that year's value (false precision). The per-doy floor must gap it out, while
+    // the full-coverage doys still render. Each year covers ≥8/10 days so all three qualify.
+    const window10 = { startDoy: 1, endDoy: 10 };
+    const rows: DailyObservation[] = [];
+    for (const year of [2018, 2019, 2020]) {
+      for (let doy = 1; doy <= 10; doy++) {
+        const r = doy === 5 && year !== 2018 ? null : 5;
+        rows.push(obs(year, doy, { r }));
+      }
+    }
+    const res = perDoyPrecip(rows, window10, undefined);
+    expect(res.sufficient).toBe(true);
+    if (!res.sufficient) return;
+    const doy5 = res.perDoy.find((d) => d.doy === 5)!;
+    expect(doy5.missing).toBe(true);
+    expect((doy5 as { value?: number }).value).toBeUndefined();
+    expect(res.perDoy.find((d) => d.doy === 1)!.missing).toBeFalsy();
   });
 
   it("returns { sufficient:false } when the r column is absent (AWS 'án úrkomu')", () => {

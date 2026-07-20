@@ -20,6 +20,17 @@ export interface YearRange {
   til: number;
 }
 
+/**
+ * Per-doy minimum qualifying-year observations before a box/bar is drawn (WR-04, honesty
+ * contract). The station-level N>=3 gate qualifies the STATION, but an individual doy inside
+ * the window can be backed by far fewer values (a year qualifies at 80% window coverage, so a
+ * given doy may be present in only one qualifying year). A single-value doy would render a
+ * degenerate min==p50==max box that falsely implies a distribution — RESEARCH Pitfall 7. A doy
+ * with fewer than MIN_PER_DOY qualifying values is emitted as an explicit gap instead, mirroring
+ * the station-level N>=3 floor.
+ */
+export const MIN_PER_DOY = 3;
+
 /** A per-doy 5-number summary box, or an explicit gap. */
 export type PerDoyBox =
   | { doy: number; missing?: false; min: number; max: number; p10: number; p50: number; p90: number }
@@ -116,7 +127,10 @@ export function perDoyDistribution(
   const perDoy: PerDoyBox[] = [];
   for (const doy of windowDays) {
     const vals = buckets.get(doy);
-    if (!vals || vals.length === 0) {
+    // Per-doy floor (WR-04): a doy backed by fewer than MIN_PER_DOY qualifying-year values is an
+    // explicit gap, NOT a degenerate zero-width box (min==p50==max) that would imply a
+    // distribution that does not exist for that day.
+    if (!vals || vals.length < MIN_PER_DOY) {
       perDoy.push({ doy, missing: true });
       continue;
     }
@@ -160,7 +174,9 @@ export function perDoyPrecip(
   const perDoy: PerDoyBar[] = [];
   for (const doy of windowDays) {
     const vals = buckets.get(doy);
-    if (!vals || vals.length === 0) {
+    // Per-doy floor (WR-04): a single-year median is just that year's value; require MIN_PER_DOY
+    // qualifying-year values before a bar is drawn, else render an explicit gap.
+    if (!vals || vals.length < MIN_PER_DOY) {
       perDoy.push({ doy, missing: true });
       continue;
     }
