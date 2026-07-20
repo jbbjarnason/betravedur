@@ -139,7 +139,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 07-01-PLAN.md — Trust-states foundation: Wave-0 test harness + freshness/bottom-sheet pure helpers + the three UX-05 state seams (loading / map-error / empty-stations)
-- [ ] 07-02-PLAN.md — Info/trust panel (UX-04) + attribution-solve-once: i button + native <dialog> ("ekki spá" + ATTRIBUTION + uppfært freshness) + first-visit localStorage; delete controls.css hacks for --attrib-safe-bottom
+- [x] 07-02-PLAN.md — Info/trust panel (UX-04) + attribution-solve-once: i button + native <dialog> ("ekki spá" + ATTRIBUTION + uppfært freshness) + first-visit localStorage; delete controls.css hacks for --attrib-safe-bottom
 - [ ] 07-03-PLAN.md — Mobile bottom sheet (UX-03): matchMedia-gated Pointer-Events drag controller + ranked/legend chips + responsive control bar + attribution reflow above the sheet peek
 **UI hint**: yes
 
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
 | 6. Station Chart Panel | 3/3 | Complete   | 2026-07-20 |
-| 7. Responsive UX & Trust States | 1/3 | In Progress|  |
+| 7. Responsive UX & Trust States | 2/3 | In Progress|  |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
