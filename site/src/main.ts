@@ -14,7 +14,13 @@ import "./styles/markers.css";
 import { renderHeader } from "./ui/header.js";
 import { initMap } from "./map/init.js";
 import { DEFAULT_WINDOW, type MarkerDatum } from "./data/types.js";
-import { loadStations, loadManifest, loadDerived, resolveDerivedFile } from "./data/load.js";
+import {
+  loadStations,
+  loadManifest,
+  loadDerived,
+  resolveDerivedFile,
+  type Manifest,
+} from "./data/load.js";
 import { installMarkerLayer, attachCompositeRenderer, renderComposite } from "./map/markers.js";
 import { createStore, type SelectionStore, type SelectionState } from "./state/store.js";
 import {
@@ -24,6 +30,7 @@ import {
   type StationCache,
   type StationCacheEntry,
 } from "./state/recompute.js";
+import { mountControlBar, type YearBounds } from "./ui/controlBar.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
@@ -32,13 +39,43 @@ const BASE = import.meta.env.BASE_URL;
 const RECOMPUTE_DEBOUNCE_MS = 120;
 
 /**
+ * The latest recomputed MarkerDatum[] — a module-level snapshot the control-bar N readout
+ * reads via the getLatestData getter. Updated on EVERY recompute (renderForState below), so
+ * the "meðaltal N ára" readout always reflects the frame the markers currently show (the
+ * concrete wiring mechanism chosen for the readout — a getter over module state, not an
+ * optional signal).
+ */
+let latestData: MarkerDatum[] = [];
+
+/**
+ * Derive the Frá/Til dropdown bounds from the manifest: min of every entry.from and max of
+ * every entry.to across manifest.stations (the per-station coverage high-water marks — the
+ * union that grows as Phase 8 backfills history). NOT a hardcoded year literal.
+ */
+function yearBoundsFromManifest(manifest: Manifest): YearBounds {
+  const froms: number[] = [];
+  const tos: number[] = [];
+  for (const entry of Object.values(manifest.stations ?? {})) {
+    if (typeof entry.from === "number") froms.push(entry.from);
+    if (typeof entry.to === "number") tos.push(entry.to);
+  }
+  const min = froms.length ? Math.min(...froms) : new Date().getUTCFullYear();
+  const max = tos.length ? Math.max(...tos) : new Date().getUTCFullYear();
+  return { min, max };
+}
+
+/**
  * Fetch every station's derived file ONCE at boot and return the {meta, file} pairs the
  * recompute cache is built from. Each station is guarded independently: a missing manifest
  * entry or a malformed/failed fetch degrades THAT station — its {meta} is returned with a
  * `file: null` sentinel so the caller emits a muted datum for it (never dropping it, never
  * white-screening the page). THIS is the sole network read — recompute never re-fetches.
  */
-async function loadStationFiles(): Promise<{ entries: StationCacheEntry[]; muted: MarkerDatum[] }> {
+async function loadStationFiles(): Promise<{
+  entries: StationCacheEntry[];
+  muted: MarkerDatum[];
+  manifest: Manifest;
+}> {
   const [stations, manifest] = await Promise.all([loadStations(BASE), loadManifest(BASE)]);
 
   const results = await Promise.all(
@@ -61,7 +98,7 @@ async function loadStationFiles(): Promise<{ entries: StationCacheEntry[]; muted
     if (r.file) entries.push({ meta: r.meta, file: r.file });
     else muted.push(mutedDatum(r.meta));
   }
-  return { entries, muted };
+  return { entries, muted, manifest };
 }
 
 /**
@@ -76,6 +113,7 @@ function renderForState(
   state: Readonly<SelectionState>,
 ): void {
   const data = [...recompute(cache, state), ...muted];
+  latestData = data; // snapshot for the control-bar N readout (updates on every recompute)
   installMarkerLayer(map, data);
   renderComposite(map);
 }
@@ -89,11 +127,16 @@ function renderForState(
 function wireMarkers(map: maplibregl.Map, store: SelectionStore): void {
   const install = async (): Promise<void> => {
     try {
-      const { entries, muted } = await loadStationFiles();
+      const { entries, muted, manifest } = await loadStationFiles();
       const cache = buildStationCache(entries);
 
       attachCompositeRenderer(map); // idempotent (WR-04) — attach once
-      renderForState(map, cache, muted, store.get()); // initial render at boot
+      renderForState(map, cache, muted, store.get()); // initial render at boot (fills latestData)
+
+      // Mount the bottom control bar now that bounds + the initial data snapshot exist.
+      // Controls write via store.set → the debounced subscriber below recomputes (no fetch);
+      // the readout reads the fresh latestData snapshot via the getter.
+      mountControlBar(store, yearBoundsFromManifest(manifest), () => latestData);
 
       let timer: ReturnType<typeof setTimeout> | undefined;
       store.subscribe((state) => {
