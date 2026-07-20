@@ -21,7 +21,17 @@ findings:
   warning: 4
   info: 3
   total: 8
-status: issues_found
+status: fixed
+fixed_at: 2026-07-20
+fix_commits:
+  CR-01: 66c7cc0
+  WR-01: 960ddd1
+  WR-02: 960ddd1
+  WR-03: 960ddd1
+  WR-04: e516ec3
+  IN-01: e516ec3
+  IN-02: e516ec3
+  IN-03: e516ec3
 ---
 
 # Phase 4: Code Review Report
@@ -42,6 +52,8 @@ The 4 pre-tracked items (async `window.__map` regression, attribution footer occ
 ## Critical Issues
 
 ### CR-01: Missing `p.has()` guard makes absent/empty `doy`/`fra`/`til` params silently override the fallback (Number(null)===0 trap)
+
+**FIXED (66c7cc0):** Added a `numParam()` presence+non-empty guard (treats `null` or empty-trimmed as absent, garbage NaN → fallback) applied to `doy`, `fra`, `til`, AND `st`. Regression tests cover `?w=14`-only, viewport-only, empty-string, and `?st=42`-only partial URLs restoring the fallback anchor + fallback year range (not Jan 1 / `[min,min]`).
 
 **File:** `site/src/state/url.ts:83-102`
 **Issue:**
@@ -77,6 +89,8 @@ if (yearFrom > yearTil) yearTil = yearFrom;
 
 ### WR-01: N-readout uses an unbounded, never-cleared `setTimeout(140)` per store change — timer pile-up and a fragile race against the 120ms recompute debounce
 
+**FIXED (960ddd1):** Replaced the timer with a `refreshReadout()` callback on the `ControlBarHandle`; main.ts's `renderForState` invokes it right after it updates `latestData`, so the readout reflects the same settled frame the markers show — no timer pile-up, no 140>120ms race.
+
 **File:** `site/src/ui/controlBar.ts:114-120`
 **Issue:**
 The readout subscriber schedules a fresh `setTimeout(..., 140)` on **every** store change and never clears the previous one. During a continuous scrubber drag (many `input` ticks) this spawns one timer per tick — all fire, all call `readoutText(getLatestData())`. The 140ms delay is a hand-tuned guess intended to land "just past" the 120ms recompute debounce so it reads settled `latestData`. This coupling is fragile: it hard-codes a `140 > RECOMPUTE_DEBOUNCE_MS(120)` assumption in a different module with no shared constant, so if the debounce is ever tuned upward the readout will silently read stale data. It also produces N transient readouts flickering stale intermediate values during a drag.
@@ -84,6 +98,8 @@ The readout subscriber schedules a fresh `setTimeout(..., 140)` on **every** sto
 **Fix:** Drive the readout from the same event that updates `latestData`, not from an independent timer. Simplest: have `renderForState` (main.ts) invoke a readout-refresh callback after it sets `latestData`, or expose a subscribe hook the control bar registers. If keeping a timer, at minimum store and `clearTimeout` it per subscription and derive the delay from the shared `RECOMPUTE_DEBOUNCE_MS` constant rather than the magic `140`.
 
 ### WR-02: `moveend` recompute subscriber re-renders markers on every pan/zoom though markers do not depend on the viewport
+
+**FIXED (960ddd1):** The debounced recompute subscriber now tracks a `(anchorDoy, widthDays, yearFrom, yearTil)` selection tuple and early-returns when it is unchanged, so a viewport-only pan/zoom skips recompute (the URL is still written by the separate URL-writer subscriber).
 
 **File:** `site/src/main.ts:187-190` + `172-175`
 **Issue:**
@@ -93,6 +109,8 @@ The `moveend` handler writes `{lng, lat, zoom}` into the store. That store chang
 
 ### WR-03: Boot `jumpTo` can emit a spurious `replaceState` when restored full-precision viewport differs from the map's post-jump camera in the last bits
 
+**FIXED (960ddd1):** The outbound `moveend` handler now early-returns when `viewportMatches(map, store.get())` is already true, so a boot/popstate `jumpTo` settle is a genuine no-op and emits no spurious `replaceState`.
+
 **File:** `site/src/main.ts:119-122, 187-190` + `state/url.ts:67`
 **Issue:**
 On a URL restore, `applyViewport` calls `map.jumpTo` with the full-precision clamped `lng/lat/zoom` from the parse. `jumpTo` fires `moveend`, whose handler reads `map.getCenter()` / `map.getZoom()` and writes them back. The written-back values are the map's own snapped camera values, which may differ from the stored full-precision values by sub-`1e-4` amounts. The store's no-op-skip compares with strict `===`, so those tiny differences are NOT treated as equal and the viewport `set` proceeds, firing a `replaceState` that overwrites the freshly restored history entry with re-serialized (`toFixed(4)`) coordinates. `viewportMatches` guards the *inbound* `jumpTo` (it early-returns if already matching) but does not guard the *outbound* `moveend`→`set`. Practically this is a single benign extra `replaceState` (no loop, no history flooding, values round-trip to 4dp), but it is an unintended write on every boot/popstate restore and undermines the "store→map only on boot/popstate" invariant the comment claims.
@@ -100,6 +118,8 @@ On a URL restore, `applyViewport` calls `map.jumpTo` with the full-precision cla
 **Fix:** In the `moveend` handler, skip the write when `viewportMatches(map, store.get())` is already true (the camera equals what the store holds to display precision), OR round the emitted viewport values with the same `toFixed(4)`/`toFixed(2)` precision the URL uses before `set`, so a jump-induced `moveend` is a genuine no-op the store skips.
 
 ### WR-04: Store no-op skip is shallow strict-equality only — a fresh viewport object with equal fields is fine, but any future nested/array field in SelectionState would defeat the skip and churn subscribers
+
+**FIXED (e516ec3):** Added a documented primitive-only invariant on the `SelectionState` interface warning that adding a non-primitive field requires making the `store.ts` no-op equality value-aware first (option b of the suggested fix). No over-engineering — the state is all-primitive today.
 
 **File:** `site/src/state/store.ts:79-84`
 **Issue:**
@@ -111,6 +131,8 @@ On a URL restore, `applyViewport` calls `map.jumpTo` with the full-precision cla
 
 ### IN-01: Redundant `d.n >= 3` filter in `readoutText` (already implied by `d.sufficient`)
 
+**FIXED (e516ec3):** Dropped the redundant clause — `readoutText` now filters on `d.sufficient` alone.
+
 **File:** `site/src/ui/controlBar.ts:32`
 **Issue:**
 `data.filter((d) => d.sufficient && d.n >= 3)` — `sufficient` is defined in `effectiveN` as exactly `qualifying.length >= 3`, i.e. `d.sufficient` already implies `d.n >= 3`. The extra clause is dead weight and, worse, subtly implies the two could disagree (they cannot, for producer-built data). Harmless but misleading.
@@ -118,12 +140,16 @@ On a URL restore, `applyViewport` calls `map.jumpTo` with the full-precision cla
 
 ### IN-02: `expandWindow` / `anchorToWindow` treat "1 month" as exactly 30 days, not calendar-accurate 28–31
 
+**RESOLVED (e516ec3):** Kept the fixed-30-day window (a documented product decision per the UI-SPEC) and added a clarifying comment on `WIDTHS` in `widthButtons.ts` noting it is intentional, not calendar-exact. No code behavior change.
+
 **File:** `site/src/ui/widthButtons.ts:10` + `site/src/data/window.ts:26-32`
 **Issue:**
 The "1 mánuður" button maps to `days: 30` and the window is a fixed 30-day doy span regardless of which month the anchor lands in (February would be 28/29, July 31). This is a deliberate product simplification (doy windows carry no month context), consistent with the domain's day-of-year model, and is internally coherent — but the label "1 mánuður" (one month) overstates precision for a fixed 30-day window. Flag for product awareness, not a code defect.
 **Fix:** None required if the 30-day approximation is intended; consider a tooltip or the label "~1 mánuður" if precision matters to users.
 
 ### IN-03: Scrubber `input` handler emits the raw range value without `foldDoy`, unlike every other emit path
+
+**RESOLVED (e516ec3):** Added a clarifying comment documenting that the native range's `min="1" max="365" step="1"` bounds already keep the value in 1..365 (DOM-bounded, safe), and folding here would disturb the live drag — with a note to route through `emit()` if the bounds/step ever change. No behavior change.
 
 **File:** `site/src/ui/scrubber.ts:179-185`
 **Issue:**

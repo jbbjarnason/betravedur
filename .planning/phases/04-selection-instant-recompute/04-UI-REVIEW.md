@@ -29,13 +29,23 @@ screenshots: captured (preview server at :4173; evidence/ screenshots + 1 fresh 
 
 ---
 
+## Fix Status (2026-07-20)
+
+All three priority fixes applied and verified by a fresh full E2E run (30/30 green, incl. the new attribution-visible assertion):
+
+| Finding | Status | Commit |
+|---------|--------|--------|
+| Attribution footer occluded (BLOCKER, licensing) | FIXED | edf4d2c |
+| Per-marker N not in pill aria-label (WARNING) | FIXED | bf42c2e |
+| Date readout format drift (WARNING) | FIXED | 78fc8fb |
+
 ## Top 3 Priority Fixes
 
-1. **Attribution footer occluded by the control bar** — licensing risk (CC BY 4.0 attribution is a legal requirement for OSM + Veðurstofa data); the MapLibre `.maplibregl-ctrl-bottom-right` group sits at `bottom: 0` inside the map canvas, directly behind the `position: fixed; bottom: 0` control bar. In the live screenshot the full attribution text is hidden under the bar. Fix: add `.maplibregl-ctrl-bottom-right { margin-bottom: <bar-height>px }` (dynamically or via a CSS custom property written by controlBar.ts) or switch to `padding-bottom` on `#map`. This is a one-liner CSS fix — it is NOT Phase 7 scope.
+1. **Attribution footer occluded by the control bar** — **FIXED (edf4d2c):** controls.css lifts `.maplibregl-ctrl-bottom-right/left` by `calc(var(--bar-height) + space-xs)`; controlBar.ts measures the bar and writes `--bar-height` on mount + resize (ResizeObserver). A new shell.spec E2E asserts the attribution control is not covered by the bar. Original finding below. — licensing risk (CC BY 4.0 attribution is a legal requirement for OSM + Veðurstofa data); the MapLibre `.maplibregl-ctrl-bottom-right` group sits at `bottom: 0` inside the map canvas, directly behind the `position: fixed; bottom: 0` control bar. In the live screenshot the full attribution text is hidden under the bar. Fix: add `.maplibregl-ctrl-bottom-right { margin-bottom: <bar-height>px }` (dynamically or via a CSS custom property written by controlBar.ts) or switch to `padding-bottom` on `#map`. This is a one-liner CSS fix — it is NOT Phase 7 scope.
 
-2. **Per-marker N coverage not associated with individual markers** — the spec requires "meðaltal {n} ára as text associated with the marker (inline in the pill ... or via the pill's aria-label / title + the global readout)". The current `aria-label` on each pill is only `datum.name` (e.g. "Reykjavík") — no N value is present. The global readout handles the aggregate but the per-station honesty signal is absent at the individual marker level. Fix: expand `aria-label` to `"${datum.name}: meðaltal ${datum.n} ára"` when `datum.sufficient`, or add a `title` attribute.
+2. **Per-marker N coverage not associated with individual markers** — **FIXED (bf42c2e):** each pill's `aria-label` is now `"${name}: meðaltal ${n} ára"` when sufficient, else `"${name}: ófullnægjandi gögn"`; a markers.spec E2E asserts it over every pill. Original finding below. — the spec requires "meðaltal {n} ára as text associated with the marker (inline in the pill ... or via the pill's aria-label / title + the global readout)". The current `aria-label` on each pill is only `datum.name` (e.g. "Reykjavík") — no N value is present. The global readout handles the aggregate but the per-station honesty signal is absent at the individual marker level. Fix: expand `aria-label` to `"${datum.name}: meðaltal ${datum.n} ára"` when `datum.sufficient`, or add a `title` attribute.
 
-3. **Date readout format diverges from spec punctuation** — the spec's Scrubber Anatomy section specifies `20.–26. júlí` (en-dash, no spaces, long month). The implementation renders `16. júl – 29. júl` (spaced en-dash, abbreviated month). Both forms are Icelandic-legible and readable, but the en-dash spacing is the spec's stated format and the long month form is explicitly shown in the spec example. Fix: update `windowLabel()` to use `doyLabel()` (already defined and unit-tested) instead of `doyLabelShort()`, and collapse to `${start}–${end}` (no spaces). Minor visual change only.
+3. **Date readout format diverges from spec punctuation** — **FIXED (78fc8fb):** `windowLabel()` now uses the long-month `doyLabel()` and collapses to `${start}–${end}` (no-space en-dash), matching the spec; the unused `doyLabelShort` helper was removed and the scrubber unit tests updated. Original finding below. — the spec's Scrubber Anatomy section specifies `20.–26. júlí` (en-dash, no spaces, long month). The implementation renders `16. júl – 29. júl` (spaced en-dash, abbreviated month). Both forms are Icelandic-legible and readable, but the en-dash spacing is the spec's stated format and the long month form is explicitly shown in the spec example. Fix: update `windowLabel()` to use `doyLabel()` (already defined and unit-tested) instead of `doyLabelShort()`, and collapse to `${start}–${end}` (no spaces). Minor visual change only.
 
 ---
 
@@ -167,7 +177,7 @@ screenshots: captured (preview server at :4173; evidence/ screenshots + 1 fresh 
 - Fix: `pill.setAttribute("aria-label", datum.sufficient ? \`${datum.name}: meðaltal ${datum.n} ára\` : \`${datum.name}: ófullnægjandi gögn\`)`
 - This is also a minor visual-information gap for sighted users comparing stations.
 
-**WARNING — readout update uses a fragile 140ms polling timeout:**
+**WARNING — readout update uses a fragile 140ms polling timeout: FIXED (960ddd1)** — the timer is replaced by a `refreshReadout()` callback main.ts invokes after each recompute (see code-review WR-01).
 
 - `controlBar.ts:117-119`: the global N readout is updated in a `setTimeout(140ms)` on each store change, polling past the 120ms recompute debounce to read `getLatestData()`. This is a timing assumption — if the recompute takes > 120ms (e.g. on slow hardware with many stations), the readout reads stale data.
 - The intent is sound but the mechanism is brittle. A cleaner approach: have `main.ts`'s recompute subscriber explicitly call a `setReadout(data)` callback rather than relying on a timer. Not a user-visible defect in practice on current hardware/station count.
