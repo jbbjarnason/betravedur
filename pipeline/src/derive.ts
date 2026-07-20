@@ -97,26 +97,40 @@ function indexFor(startYear: number, year: number, doy: number): number {
  * Encode normalized rows into the compact columnar derived shape.
  * Groups by calendar year × leap-folded doy; integer-quantizes each metric;
  * drops all-null columns; omits `r` for AWS and `dv` for SYNOP.
+ *
+ * `stationId` carries the TRUE station id so an empty station (all-404 backfill: no raw rows)
+ * still emits the correct `station` field instead of `0` — otherwise the derived payload would
+ * claim station 0 while its filename uses the real id, mislabeling the artifact (WR-05). When
+ * omitted (legacy callers/tests), the id is inferred from the first row and the empty case
+ * falls back to `0` as before.
  */
 export function encodeDerived(
   rows: DailyObservation[],
   type: StationType,
+  stationId?: number,
   quant: QuantSpec = DEFAULT_QUANT,
 ): DerivedFile {
   if (rows.length === 0) {
-    return { station: 0, type, startYear: 0, nYears: 0, quant, cols: {} };
+    return { station: stationId ?? 0, type, startYear: 0, nYears: 0, quant, cols: {} };
   }
 
   // Determine the calendar-year span. Feb-29 rows (doy null in domain) never
   // appear in normalized DailyObservation[] since doy is already leap-folded 1..365.
   let minYear = Infinity;
   let maxYear = -Infinity;
-  let station = rows[0]!.station;
+  // Prefer the explicit id; fall back to the first row's station for legacy callers.
+  const station = stationId ?? rows[0]!.station;
   for (const r of rows) {
     const y = Number(r.date.slice(0, 4));
     if (!Number.isInteger(y)) continue;
     if (y < minYear) minYear = y;
     if (y > maxYear) maxYear = y;
+  }
+  // Defensive: if every row's year was unparseable, minYear stays Infinity and nYears becomes
+  // NaN -> `new Array(NaN)` throws RangeError. Unreachable with normalized DailyObservation
+  // (dates validated upstream), but guard anyway (IN-01).
+  if (!Number.isFinite(minYear)) {
+    return { station, type, startYear: 0, nYears: 0, quant, cols: {} };
   }
   const startYear = minYear;
   const nYears = maxYear - minYear + 1;
