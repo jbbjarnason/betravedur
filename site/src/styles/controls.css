@@ -20,7 +20,6 @@
   align-items: center;
   gap: var(--space-md);
   min-height: 72px;
-  max-height: 96px;
   padding: var(--space-sm) var(--space-md);
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(8px);
