@@ -293,7 +293,11 @@ function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
     ariaLabel = `${datum.name}: meðaltal ${datum.n} ára`;
   }
   pill.setAttribute("aria-label", ariaLabel);
-  pill.tabIndex = -1; // not yet in the tab order (activated in Phase 6)
+  // Phase 6 activation: the pill enters the tab order so a keyboard user can select a station
+  // (Enter/Space) to open the station chart panel. The click/keyboard handler is NOT bound here
+  // (markers.ts stays store-free, RESEARCH Pattern 2) — main.ts delegates from #marker-overlay,
+  // reading the queryable data-station id, exactly like the ranked-row select seam.
+  pill.tabIndex = 0;
   pill.innerHTML = html;
 
   // Score channels (MAP-03): a SCORED pill (score !== null, sufficient ⇒ !muted) gains

@@ -263,6 +263,16 @@
   overflow: hidden; /* the inner list owns the scroll */
 }
 
+/* YIELD (Phase 6): while the station chart panel is open the ranked list hides (hide-not-destroy).
+   The `.ranked-list` rule above sets `display: flex`, which OVERRIDES the UA `[hidden] {display:none}`
+   rule — so a bare `hidden` attribute would NOT actually hide the panel. This explicit rule wins
+   (equal specificity, later in the cascade) and collapses the panel when yielded/hidden. The row
+   subscriptions and collapsed state survive (the DOM stays mounted, just display:none). */
+.ranked-list--yielded,
+.ranked-list[hidden] {
+  display: none;
+}
+
 .ranked-list__header {
   display: flex;
   align-items: center;

@@ -40,9 +40,10 @@ import {
 } from "./state/recompute.js";
 import { yearBounds, defaultSelection } from "./state/defaults.js";
 import { paramsToState } from "./state/url.js";
-import { writeUrl } from "./state/history.js";
+import { writeUrl, setDiscrete } from "./state/history.js";
 import { mountControlBar, type ControlBarHandle } from "./ui/controlBar.js";
 import { mountRankedList, type RankedListHandle } from "./ui/rankedList.js";
+import { mountStationPanel } from "./ui/stationPanel.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
@@ -204,6 +205,27 @@ function wireMarkers(map: maplibregl.Map): void {
       // list stays in lockstep with the markers (Pitfall 5). A row click writes stationId (below);
       // this mount does NOT fetch and does NOT touch the camera.
       rankedList = mountRankedList(document.body, store, () => latestData);
+
+      // Mount the station chart panel (Phase 6, CHART-01/03/04). It subscribes to the SAME
+      // `stationId` seam and opens/populates a right-side panel on select (yielding the ranked
+      // list), closing on deselect/close/Escape. It reads the boot cache + the latestData snapshot
+      // (NO fetch — E2E asserts zero /data/ requests on open). This mount does NOT touch the
+      // camera (the fly-to subscriber below owns that) and does NOT change the select seam.
+      mountStationPanel(store, cache, () => latestData, rankedList);
+
+      // Marker-click select seam (Phase 6): delegate clicks from the persistent #marker-overlay to
+      // the queryable data-station pill, reusing the Phase-4 discrete select seam (setDiscrete →
+      // pushState-marked stationId). markers.ts stays store-free (RESEARCH Pattern 2); the overlay
+      // node persists across composite re-renders, so a single delegated listener covers every
+      // (re)rendered pill without re-binding. This is the marker half of the "marker OR ranked-row
+      // click both set stationId" contract — the ranked-row half already lives in rankedList.ts.
+      const overlay = document.getElementById("marker-overlay");
+      overlay?.addEventListener("click", (ev) => {
+        const target = (ev.target as HTMLElement | null)?.closest<HTMLElement>("[data-station]");
+        if (!target) return;
+        const id = Number(target.dataset.station);
+        if (Number.isFinite(id)) setDiscrete(store, { stationId: id });
+      });
 
       // stationId → easeTo fly-to (RESEARCH Pattern 2 / Pitfall 4): a dedicated subscriber that
       // fires ONLY on a real change to a non-null stationId. It looks the station's lon/lat up in
