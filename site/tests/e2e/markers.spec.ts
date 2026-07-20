@@ -30,6 +30,17 @@ test.beforeEach(async ({ page }) => {
   page.on("pageerror", (err) => {
     throw err;
   });
+  // Phase 7 (UX-04) added a first-visit auto-open info-panel MODAL whose backdrop intercepts pointer
+  // events. Pre-seed the dismissed-hint flag so these prior-phase interaction tests boot with no
+  // modal in the way (the auto-open itself is covered by info.spec criterion 7). addInitScript must
+  // run BEFORE the navigation below to take effect.
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("bv:info-dismissed", "1");
+    } catch {
+      /* storage unavailable — the permalink/bare-visit guards still hold */
+    }
+  });
   await page.goto("/");
 });
 

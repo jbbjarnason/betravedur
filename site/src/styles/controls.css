@@ -242,57 +242,29 @@
   }
 }
 
-/* ── Attribution legibility (LICENSING — must not be occluded by the control bar) ──────────
- * The control bar is `position: fixed; bottom: 0; z-index: 10`, stacking over the MapLibre
- * attribution control which MapLibre positions at `bottom: 0` inside the map canvas (z-index 2).
- * Without an offset the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa credit is hidden
- * behind the bar — a licensing violation (attribution must be retained + legible).
+/* ── Attribution safe zone (Phase 7 — the attribution debt, solved ONCE) ─────────────────────
+ * SUPERSEDES the three incremental hacks that previously lived here (the bar-height margin lift,
+ * the viewport-fraction right-align width cap on the expanded credit, and the station-panel-open
+ * body-class margin push). Those were reactive per-surface patches; each new bottom surface (the
+ * mobile sheet is a new one) needed another.
  *
- * Lift the bottom attribution groups above the bar. controlBar.ts writes the bar's measured
- * height into `--bar-height` on mount + resize; the static fallback (100px) covers the desktop
- * bar (~88-96px) before/if that measurement is unavailable.
+ * The coherent rule: reserve ONE bottom band via `--attrib-safe-bottom` (defined in trust.css as
+ * the control-bar height baseline; Plan 03 raises it to the mobile sheet peek top). The MapLibre
+ * bottom controls clear that band with a single margin. controlBar.ts still writes `--bar-height`
+ * live on mount/resize — its consumer just moved to `--attrib-safe-bottom`.
  *
- * BLOCKER (licensing, UI-REVIEW): `--space-xs` (4px) was too small a gap. At widths ≥1024px the
- * MapLibre attribution auto-expands to its full text; the credit is left-aligned and wraps to
- * fill the full-width bottom-right container, so its wrapped lines slid LEFT into the bottom-left
- * legend's column and vertical band. The legend (z-index 10, rgba 0.92 surface) painted OVER the
- * credit, partially obscuring the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa attribution
- * — an attribution-legibility (licensing) violation. Two coordinated fixes:
- *   (1) lift the whole attribution group to `--space-lg` (24px) above the bar (was --space-xs);
- *   (2) CAP the expanded credit's width so its wrapping text stays in the RIGHT portion of the
- *       viewport, clear of the bottom-left legend column (legend: left --space-md + max-width
- *       320px ⇒ occupies up to ~336px on the left). Capping the credit to 60% and right-aligning
- *       it inside the right-anchored container keeps every wrapped line to the right of the
- *       legend, so the two never intersect at 1024/1280/1440 widths — the credit stays legible. */
+ * Why the deleted width-cap + panel-open push are no longer needed: the AttributionControl is
+ * `compact:true` (init.ts), so the always-visible credit is a small single-line `(i)` toggle in
+ * the bottom-right corner — it does not wrap into the bottom-left legend, and it clears the right-
+ * docked station panel without a per-state margin (the panel's own bottom edge sits above this
+ * safe band). CC BY 4.0 v4.0 + the OSM guidelines permit collapsing attribution behind an (i)
+ * button as long as the full credit is findable, and it is: the info panel (trust.css /
+ * infoPanel.ts) carries the complete CC BY 4.0 + OSM + Protomaps + Veðurstofa credit as the
+ * always-legible licensing backstop. (The station-panel-open body class stays harmless — nothing
+ * keys an attribution offset on it anymore.) */
 .maplibregl-ctrl-bottom-right,
 .maplibregl-ctrl-bottom-left {
-  margin-bottom: calc(var(--bar-height, 100px) + var(--space-lg));
-}
-
-/* Keep the expanded/auto-shown attribution credit in the RIGHT portion so its wrapped lines
- * never slide under the bottom-left legend. The container is right-anchored; capping the credit's
- * max-width + right-aligning the text holds it clear of the legend's left column (licensing). */
-.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib {
-  max-width: 60vw;
-  margin-left: auto; /* hug the right edge within the full-width container */
-  text-align: right;
-}
-.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib-inner {
-  text-align: right;
-}
-
-/* ── Attribution legibility while the station panel is open (LICENSING) ─────────────────────
- * The right-docked station panel (panel.css: position fixed; right:0; width:340px; z-index:10)
- * paints its rgba(255,255,255,0.92) glass surface OVER the bottom-right MapLibre attribution,
- * degrading the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa Íslands credit's contrast — an
- * attribution-legibility (licensing) violation, not a cosmetic one. mountStationPanel toggles a
- * `.panel-open` class on <body> on open/close; while open, push the whole bottom-right container
- * leftward by the panel width + a small gap (340px + 4px) so the credit stays clear of the panel.
- * (Phase 7's mobile bottom-sheet eliminates the right-panel overlap; this is the cheap desktop-now
- * fix.) The existing --bar-height bottom offset above is preserved by the shorthand-free
- * margin-right. */
-.panel-open .maplibregl-ctrl-bottom-right {
-  margin-right: 344px;
+  margin-bottom: calc(var(--attrib-safe-bottom, 0px) + var(--space-sm));
 }
 
 /* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */

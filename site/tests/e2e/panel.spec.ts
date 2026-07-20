@@ -59,6 +59,17 @@ test.beforeEach(async ({ page }) => {
   page.on("pageerror", (err) => {
     throw err;
   });
+  // Phase 7 (UX-04) added a first-visit auto-open info-panel MODAL whose backdrop intercepts pointer
+  // events (blocking marker/panel clicks). Pre-seed the dismissed-hint flag so these prior-phase
+  // interaction tests boot with no modal in the way (the auto-open itself is covered by info.spec
+  // criterion 7). addInitScript must run BEFORE the navigation below to take effect.
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("bv:info-dismissed", "1");
+    } catch {
+      /* storage unavailable — the permalink/bare-visit guards still hold */
+    }
+  });
   await page.goto("/");
 });
 
@@ -354,6 +365,16 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
       const page = await context.newPage();
       page.on("pageerror", (err) => {
         throw err;
+      });
+      // This test uses its OWN context/page (bypassing the shared beforeEach), so it must seed the
+      // Phase-7 info-panel dismissed flag itself — otherwise the first-visit auto-open modal's
+      // backdrop intercepts the marker click in openPanelViaMarker.
+      await page.addInitScript(() => {
+        try {
+          localStorage.setItem("bv:info-dismissed", "1");
+        } catch {
+          /* storage unavailable — the permalink/bare-visit guards still hold */
+        }
       });
       await page.goto("/");
       await waitForMarkers(page);

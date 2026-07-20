@@ -41,6 +41,17 @@ test.beforeEach(async ({ page }) => {
   page.on("pageerror", (err) => {
     throw err;
   });
+  // Phase 7 (UX-04) added a first-visit auto-open info-panel MODAL whose backdrop intercepts pointer
+  // events. Pre-seed the dismissed-hint flag so these responsive/attribution tests boot with no
+  // modal in the way (the auto-open itself is covered by info.spec criterion 7). addInitScript is
+  // set here so it applies to each test's own goto below.
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("bv:info-dismissed", "1");
+    } catch {
+      /* storage unavailable — the permalink/bare-visit guards still hold */
+    }
+  });
 });
 
 test("wave-0 smoke: preview build boots at desktop 1280, map style-loads, a pill renders, no pageerror", async ({

@@ -46,6 +46,8 @@ import { writeUrl, setDiscrete } from "./state/history.js";
 import { mountControlBar, type ControlBarHandle } from "./ui/controlBar.js";
 import { mountRankedList, type RankedListHandle } from "./ui/rankedList.js";
 import { mountStationPanel } from "./ui/stationPanel.js";
+import { mountInfoPanel, type InfoPanelHandle } from "./ui/infoPanel.js";
+import { newestDataDate, formatIcelandicDate } from "./data/freshness.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
@@ -80,6 +82,14 @@ let controlBar: ControlBarHandle | null = null;
  * latestData directly at mount via its getLatestData getter.
  */
 let rankedList: RankedListHandle | null = null;
+
+/**
+ * The mounted info/trust panel handle (UX-04). Mounted EARLY in boot() with `freshnessDate: null`
+ * so the top-right `i` button + the first-visit auto-open are present before any data loads (the
+ * auto-open must not wait on the network). Once the manifest resolves in wireMarkers.install(), the
+ * `uppfært {date}` line is filled via infoPanel.setFreshness(newestDataDate → formatIcelandicDate).
+ */
+let infoPanel: InfoPanelHandle | null = null;
 
 /**
  * Fetch every station's derived file ONCE at boot and return the {meta, file} pairs the
@@ -180,6 +190,13 @@ function wireMarkers(map: maplibregl.Map): void {
   const install = async (): Promise<void> => {
     try {
       const { entries, muted, manifest, stationCount } = await loadStationFiles();
+
+      // (UX-04 freshness) Fill the info panel's `uppfært {date}` line now that the manifest exists:
+      // newest per-station lastFetched → Icelandic human date (null → the line stays omitted, never
+      // "Invalid Date"). Set before the empty-stations early return so the credit/freshness are
+      // populated even on an empty deploy. The panel + first-visit auto-open already mounted in boot.
+      const iso = newestDataDate(manifest);
+      infoPanel?.setFreshness(iso ? formatIcelandicDate(iso) : null);
 
       // (UX-05 empty stations) stations.json parsed but empty ([]) → an explicit legible state over
       // the still-rendered basemap, instead of a blank map with no markers. Return early so no empty
@@ -346,6 +363,14 @@ function boot(): void {
   // Mount the score legend (SCORE-03) — static chrome, no store/data dependency, so it mounts
   // once here alongside the header. It docks bottom-left (score.css), above the control bar.
   mountLegend(document.body);
+
+  // (UX-04) Mount the info/trust `i` button + native <dialog> as static chrome — no data
+  // dependency, so it is present (and the first-visit panel can auto-open) before the manifest
+  // loads. The `uppfært {date}` freshness line is filled later via infoPanel.setFreshness() once
+  // the manifest resolves in wireMarkers.install(). The auto-open is permalink-guarded inside
+  // mountInfoPanel (suppressed when location.search carries a restored view), so a shared link is
+  // never blocked.
+  infoPanel = mountInfoPanel(document.body, { freshnessDate: null });
 
   // Expose the live map instance SYNCHRONOUSLY, immediately after initMap() — the map exists
   // here, before any data loads. Phase 3's shell.spec zoom test reads window.__map right after
