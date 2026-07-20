@@ -119,7 +119,11 @@ Plans:
   2. Charts use distribution semantics (min / typical range / max, not financial OHLC) with a plain-Icelandic reading key
   3. The panel shows daylight hours for the selected period
   4. When data is absent the panel shows "engin gögn fyrir þetta tímabil" instead of a blank or misleading chart
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Wave-0 foundation: pure percentile + perDoyDistribution domain helper, polar-safe daylightHours (suncalc), echarts/suncalc install, panel.spec skeleton + build-size chunk-split gate
+- [ ] 06-02-PLAN.md — Panel shell: stationId-seam subscriber, open/close + Escape, ranked-list yield/restore, daylight readout, per-/whole-station no-data states, chart-series tokens + panel.css (no fetch)
+- [ ] 06-03-PLAN.md — Lazy ECharts chart chunk: à-la-carte boxplot (temp/wind) + precip bars, reading keys, aria summaries, reduced-motion, dynamic-import code-split (echarts out of the entry bundle)
 **UI hint**: yes
 **Research flag**: ECharts percentile/box-plot configuration overriding OHLC defaults may need targeted research
 
@@ -159,6 +163,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
-| 6. Station Chart Panel | 0/TBD | Not started | - |
+| 6. Station Chart Panel | 0/3 | Planned | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
