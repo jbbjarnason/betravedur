@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-20T12:10:50.172Z"
+last_updated: "2026-07-20T12:21:43.938Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 ## Current Position
 
 Phase: 5 (Score Coloring & Ranking) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 88%
 | Phase 04 P02 | 15min | 3 tasks | 8 files |
 | Phase 04 P03 | 7.5min | 3 tasks | 11 files |
 | Phase 05 P01 | 8 | 3 tasks | 8 files |
+| Phase 05 P02 | 7min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Plan 04-02: bottom control bar — framework-free control builders (scrubber/width/year) store-agnostic, wired via controlBar to store.set; global meðaltal N ára readout reads a module-level latestData snapshot via a getLatestData getter (pinned, not optional); year bounds derived from manifest union; native range/select/button for free a11y; selection.spec proves width/scrubber/year recompute re-renders markers with ZERO /data/ requests + 500px stepper; controls.css uses 0 accent refs.
 - [Phase 04]: Plan 04-03: loop-proof state↔URL round-trip (write-always via writeUrl / read-on-popstate-only; NO isUpdating flag) + defensive paramsToState (clamp/fallback, never throws/NaN, T-04-05/06); data-derived defaultSelection (today's leap-folded doy, 1 vika, last-10 manifest-union years) REPLACES the Phase-3 fixed DEFAULT_WINDOW; map owns its viewport (moveend→store→replaceState, jumpTo only on boot/popstate); crafted-URL→exact-view restore proven E2E (16 tests). Phase 4 complete.
 - [Phase ?]: [Phase 05] Plan 05-01: MarkerDatum carries score:number|null + missingRain via domain combine(); rain gated on hasPrecipQual so rain-less AWS scores 'án úrkomu' renormalized (never dry-as-10); score:null ⇔ off-scale; pure scoreColor BuGn ramp (never accent red); Wave-0 score.spec skeleton green — MAP-03 data gate closed.
+- [Phase ?]: [Phase 05] Plan 05-02: score-colored markers — BuGn 4-6px left color-bar (inline --pill-score=scoreColor) over a --hairline floor (Pitfall 3, not a thin ring) + always-visible ink-on-white numeric badge (Icelandic comma); muted/null pills stay off-ramp (T-05-04). Bottom-left legend (BuGn scale + 0-10 ticks + verra/betra) with a native <details> explainer (úrkoma 40% / vindur 30% / hiti 30% + án-úrkomu renormalization, SCORE-03). RECONCILED ramp to BuGn end-to-end (--score-* = scoreColor sampled; UI-SPEC slate table superseded). MAP-03 + SCORE-03.
 
 ### Pending Todos
 
@@ -123,6 +125,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T12:10:50.167Z
+Last session: 2026-07-20T12:21:37.696Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None

@@ -105,7 +105,7 @@ Plans:
   3. An explainer ("hvernig er einkunnin reiknuð?") shows how the score combines temperature, precipitation, and wind
 **Plans**: 3 plans
 - [x] 05-01-PLAN.md — Data-layer score extension (MarkerDatum.score via combine()) + scoreColor BuGn helper + Wave-0 test scaffolds
-- [ ] 05-02-PLAN.md — Score-colored markers (ring/badge) + legend & transparent explainer
+- [x] 05-02-PLAN.md — Score-colored markers (ring/badge) + legend & transparent explainer
 - [ ] 05-03-PLAN.md — Ranked "Bestu staðir" list + row-click fly-to/select
 **UI hint**: yes
 
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
-| 5. Score Coloring & Ranking | 1/3 | In Progress|  |
+| 5. Score Coloring & Ranking | 2/3 | In Progress|  |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
