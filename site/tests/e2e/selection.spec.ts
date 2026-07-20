@@ -300,3 +300,153 @@ test("evidence: capture control-bar screenshots at default and after a year-rang
     fullPage: false,
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Plan 03 — URL-state slice (UX-02): the full selection is serialized to the URL and a copied
+// link restores the exact view; no-params yields the data-derived default; back-button popstate
+// reverts a discrete change; selection changes never full-reload the page.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+
+/** Read the manifest union year bounds (mirrors the app's yearBounds derivation). */
+async function manifestBounds(page: Page): Promise<{ min: number; max: number }> {
+  const res = await page.request.get("/betravedur/data/manifest.json");
+  const mj = (await res.json()) as { stations: Record<string, { from?: number; to?: number }> };
+  const froms = Object.values(mj.stations)
+    .map((e) => e.from)
+    .filter((n): n is number => typeof n === "number");
+  const tos = Object.values(mj.stations)
+    .map((e) => e.to)
+    .filter((n): n is number => typeof n === "number");
+  return { min: Math.min(...froms), max: Math.max(...tos) };
+}
+
+/** Today's leap-folded day-of-year (fixed non-leap month table, mirrors leapFoldedDoy). */
+function todayDoy(now = new Date()): number {
+  const CUM = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  const iso = now.toISOString().slice(0, 10);
+  const month = Number(iso.slice(5, 7));
+  const day = Number(iso.slice(8, 10));
+  if (month === 2 && day === 29) return 197; // Feb-29 fallback (matches defaultSelection)
+  return CUM[month]! + day;
+}
+
+test("criterion 12: interacting encodes the full selection into the URL query string (UX-02)", async ({
+  page,
+}) => {
+  await waitForMarkers(page);
+
+  // Discrete width click (pushState) + a scrubber move + a year change + a viewport nudge.
+  await page.locator(".width-group__btn").nth(2).click(); // 3 vikur → w=21
+  await page.evaluate(() => (window as any).__store.set({ anchorDoy: 42 }));
+  const from = page.locator("#year-from");
+  const opts = await from.locator("option").allInnerTexts();
+  await from.selectOption(opts[0]!); // earliest year
+  await page.evaluate(() => (window as any).__map.jumpTo({ center: [-18.5, 64.8], zoom: 6.5 }));
+  await page.waitForTimeout(400); // settle past debounce + moveend
+
+  const qs = new URL(page.url()).searchParams;
+  expect(qs.get("doy")).toBe("42");
+  expect(qs.get("w")).toBe("21");
+  expect(qs.has("fra")).toBe(true);
+  expect(qs.has("til")).toBe(true);
+  expect(qs.has("v")).toBe(true); // the compact lat,lng,zoom viewport param
+  const v = qs.get("v")!.split(",").map(Number);
+  expect(v).toHaveLength(3);
+  expect(Number.isFinite(v[0]!) && Number.isFinite(v[1]!) && Number.isFinite(v[2]!)).toBe(true);
+});
+
+test("criterion 13: a crafted URL restores the exact view (UX-02)", async ({ page }) => {
+  await page.goto("/?doy=30&w=30&fra=2015&til=2026&v=64.5,-20.0,7");
+  await waitForMarkers(page);
+
+  // Store state matches the params.
+  const s = await page.evaluate(() => (window as any).__store.get());
+  expect(s).toMatchObject({ anchorDoy: 30, widthDays: 30, yearFrom: 2015, yearTil: 2026 });
+
+  // Active width button = "1 mánuður" (30 days).
+  const pressed = page.locator('.width-group__btn[aria-pressed="true"]');
+  await expect(pressed).toHaveCount(1);
+  await expect(pressed).toHaveText("1 mánuður");
+
+  // Scrubber anchor restored.
+  const slider = page.getByRole("slider", { name: "Velja tímabil" });
+  expect(await slider.inputValue()).toBe("30");
+  await expect(slider).toHaveAttribute("aria-valuenow", "30");
+
+  // Frá/Til selects restored.
+  await expect(page.locator("#year-from")).toHaveValue("2015");
+  await expect(page.locator("#year-til")).toHaveValue("2026");
+
+  // Map framing restored (zoom close to 7).
+  const zoom = await page.evaluate(() => (window as any).__map.getZoom());
+  expect(zoom).toBeCloseTo(7, 0);
+});
+
+test("criterion 14: no-params load applies the data-derived default, NOT the old fixed window (SEL-02)", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await waitForMarkers(page);
+
+  const bounds = await manifestBounds(page);
+  const expFrom = Math.max(bounds.min, bounds.max - 9); // last 10 available years
+  const expDoy = todayDoy();
+
+  const s = await page.evaluate(() => (window as any).__store.get());
+  expect(s.yearTil).toBe(bounds.max);
+  expect(s.yearFrom).toBe(expFrom);
+  expect(s.widthDays).toBe(7); // 1 vika
+  expect(s.anchorDoy).toBe(expDoy); // today's doy, NOT a hardcoded value
+
+  // Exactly the "1 vika" width button is active.
+  const pressed = page.locator('.width-group__btn[aria-pressed="true"]');
+  await expect(pressed).toHaveCount(1);
+  await expect(pressed).toHaveText("1 vika");
+
+  // It is NOT the old fixed DEFAULT_WINDOW {startDoy:197, width:14}.
+  expect(!(s.anchorDoy === 197 && s.widthDays === 14)).toBe(true);
+});
+
+test("criterion 15: a selection change does not full-reload the page (instant)", async ({
+  page,
+}) => {
+  await waitForMarkers(page);
+  // Plant a sentinel on window; a full document reload would wipe it.
+  await page.evaluate(() => ((window as any).__sentinel = true));
+
+  await page.locator(".width-group__btn").nth(3).click(); // change width
+  await page.evaluate(() => (window as any).__store.set({ anchorDoy: 88 }));
+  await page.waitForTimeout(300);
+
+  const survived = await page.evaluate(() => (window as any).__sentinel === true);
+  expect(survived).toBe(true); // no reload → sentinel intact
+});
+
+test("back-button: popstate reverts a discrete width change (UX-02)", async ({ page }) => {
+  await page.goto("/?doy=100&w=7&fra=2017&til=2026");
+  await waitForMarkers(page);
+  expect(await page.evaluate(() => (window as any).__store.get().widthDays)).toBe(7);
+
+  // A discrete width click pushes a new history entry (w=30).
+  await page.locator(".width-group__btn").nth(3).click(); // "1 mánuður"
+  await page.waitForTimeout(200);
+  expect(await page.evaluate(() => (window as any).__store.get().widthDays)).toBe(30);
+  await expect(page.locator('.width-group__btn[aria-pressed="true"]')).toHaveText("1 mánuður");
+
+  // Back → popstate re-hydrates the previous (w=7) state.
+  await page.goBack();
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => (window as any).__store.get().widthDays)).toBe(7);
+  await expect(page.locator('.width-group__btn[aria-pressed="true"]')).toHaveText("1 vika");
+});
+
+test("evidence: crafted-URL restore screenshot (UX-02)", async ({ page }) => {
+  mkdirSync(EVIDENCE, { recursive: true });
+  await page.goto("/?doy=30&w=30&fra=2015&til=2026&v=64.5,-20.0,7");
+  await waitForMarkers(page);
+  await page.waitForTimeout(500);
+  await page.screenshot({
+    path: resolve(EVIDENCE, "04-03-url-restore.png"),
+    fullPage: false,
+  });
+});
