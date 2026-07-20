@@ -336,6 +336,14 @@ export function mountStationPanel(
    */
   const raiseAttribSafeBottom = (sheetEl: HTMLElement, translateY: number): void => {
     const visible = Math.max(0, sheetEl.offsetHeight - translateY);
+    // UI-REVIEW (attribution-at-expanded, licensing justification): at the EXPANDED snap the sheet
+    // covers most of the map, so raising --attrib-safe-bottom to the near-full sheet height can push
+    // the compact MapLibre (i) attribution control up against the sheet's own top edge. This is an
+    // accepted state under the UI-SPEC Attribution Solution: the CC BY 4.0 + OSM + Protomaps + Veðurstofa
+    // full credit is ALWAYS reachable and legible in the info panel (a modal, never occludable — the
+    // licensing backstop). At PEEK the compact credit sits cleanly above the peek edge; at EXPANDED
+    // the info-panel canonical credit satisfies the license, so we deliberately do NOT clamp the raise
+    // below the sheet header (which would re-expose the credit only by shrinking the reserved band).
     document.documentElement.style.setProperty("--attrib-safe-bottom", `${Math.round(visible)}px`);
   };
 
@@ -656,6 +664,11 @@ export function mountStationPanel(
         peekY,
         expandedY,
         onSnap: (y) => raiseAttribSafeBottom(section, y),
+        // IN-03: a mobile→desktop resize mid-open must drop the mobile px `--attrib-safe-bottom`
+        // so the trust.css desktop baseline (var(--bar-height…)) is restored — otherwise the last
+        // mobile value lingers on :root until the next open/close. The controller has already
+        // cleared the sheet's inline transform/transition (WR-01/WR-04) by the time this fires.
+        onLeaveMobile: () => resetAttribSafeBottom(),
       });
     }
 

@@ -42,6 +42,14 @@ export interface AttachSheetOptions {
   expandedY: number;
   /** Called with the settled translateY after every snap (drag release OR keyboard toggle). */
   onSnap?: (y: number) => void;
+  /**
+   * Called when the viewport crosses OUT of mobile (past 640px to desktop) while the sheet is
+   * open (WR-01/WR-04/IN-03). The controller has already cleared its own inline transform/
+   * transition and reset the drag state by the time this fires; the caller uses it to drop any
+   * CSS-variable state it raised for the sheet (e.g. reset `--attrib-safe-bottom` to the desktop
+   * baseline) so a mobile→desktop resize mid-open leaves a clean, CSS-owned state.
+   */
+  onLeaveMobile?: () => void;
 }
 
 /** Read the sheet's current translateY (px) from its inline transform; 0 when unset/none. */
@@ -81,9 +89,12 @@ export function attachSheet(
 ): () => void {
   // Desktop: the CSS @media owns the side-panel layout — wire nothing (no-op teardown).
   if (typeof matchMedia === "undefined" || !matchMedia(MOBILE_QUERY).matches) {
-    // The sheet still starts at peek visually via CSS; announce that top once so a caller that
-    // raises --attrib-safe-bottom on mount has nothing to do on desktop (guarded by MOBILE_QUERY
-    // in the caller too). Return a no-op teardown.
+    // WR-01 defensive clear: drop any stale inline mobile geometry so the desktop right-docked
+    // dock is CSS-owned. Without this, an inline `transform: translateY(peekY)` set on a prior
+    // mobile open (or a resize path) wins on specificity over the desktop `.station-panel` rule
+    // and pushes the panel off-screen. The sheet still starts at peek visually via CSS.
+    sheetEl.style.transform = "";
+    sheetEl.style.transition = "";
     return () => {};
   }
 
@@ -148,11 +159,30 @@ export function attachSheet(
     snapTo(toggleTarget(currentTranslateY(sheetEl), peekY, expandedY));
   };
 
+  // WR-01 / WR-04 / IN-03: re-evaluate the breakpoint AFTER attach. `attachSheet` is matchMedia-
+  // gated only at attach time, so nothing else notices a viewport crossing 640px while the sheet
+  // is open. When we leave mobile, a stale inline `transform: translateY(peekY)` would win over the
+  // desktop `.station-panel` rule and push the right-docked panel off-screen; a drag caught mid-
+  // flight would additionally leave `dragging=true` + `transition:"none"`, freezing the sheet.
+  // On the mobile→desktop crossing: reset the drag machine, drop the inline geometry so the desktop
+  // dock is CSS-owned, and notify the caller so it can reset any CSS-var state it raised (IN-03).
+  const mql = matchMedia(MOBILE_QUERY);
+  const onBreakpointChange = (): void => {
+    if (mql.matches) return; // still mobile (or entered mobile) — nothing to clean up here
+    // Left mobile → desktop. Reset the drag state machine (WR-04) and clear the inline geometry
+    // (WR-01) so the element returns to a clean CSS-owned state.
+    dragging = false;
+    sheetEl.style.transition = "";
+    sheetEl.style.transform = "";
+    opts.onLeaveMobile?.();
+  };
+
   handleEl.addEventListener("pointerdown", onDown);
   handleEl.addEventListener("pointermove", onMove);
   handleEl.addEventListener("pointerup", onUp);
   handleEl.addEventListener("pointercancel", onUp);
   handleEl.addEventListener("keydown", onKey);
+  mql.addEventListener("change", onBreakpointChange);
 
   return () => {
     handleEl.removeEventListener("pointerdown", onDown);
@@ -160,5 +190,6 @@ export function attachSheet(
     handleEl.removeEventListener("pointerup", onUp);
     handleEl.removeEventListener("pointercancel", onUp);
     handleEl.removeEventListener("keydown", onKey);
+    mql.removeEventListener("change", onBreakpointChange);
   };
 }
