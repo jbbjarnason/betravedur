@@ -242,6 +242,21 @@
   }
 }
 
+/* ── Attribution legibility (LICENSING — must not be occluded by the control bar) ──────────
+ * The control bar is `position: fixed; bottom: 0; z-index: 10`, stacking over the MapLibre
+ * attribution control which MapLibre positions at `bottom: 0` inside the map canvas (z-index 2).
+ * Without an offset the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa credit is hidden
+ * behind the bar — a licensing violation (attribution must be retained + legible).
+ *
+ * Lift the bottom attribution groups above the bar. controlBar.ts writes the bar's measured
+ * height into `--bar-height` on mount + resize; the static fallback (100px) covers the desktop
+ * bar (~88-96px) before/if that measurement is unavailable. `--space-xs` adds a small breathing
+ * gap so the credit clears the bar's top hairline. */
+.maplibregl-ctrl-bottom-right,
+.maplibregl-ctrl-bottom-left {
+  margin-bottom: calc(var(--bar-height, 100px) + var(--space-xs));
+}
+
 /* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */
 @media (prefers-reduced-motion: reduce) {
   .control-bar,

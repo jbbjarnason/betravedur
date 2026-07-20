@@ -97,6 +97,20 @@ export function mountControlBar(
   bar.appendChild(inner);
   document.body.appendChild(bar);
 
+  // Report the bar's measured height into --bar-height so controls.css can lift the MapLibre
+  // attribution above the bar (LICENSING: the CC BY 4.0 / OSM / Protomaps / Veðurstofa credit
+  // must stay legible). The bar height varies with content + breakpoint (~88-96px desktop,
+  // taller on the narrow two-row layout), so measure it live rather than hard-coding a value.
+  const reportBarHeight = (): void => {
+    document.documentElement.style.setProperty("--bar-height", `${bar.offsetHeight}px`);
+  };
+  reportBarHeight();
+  if (typeof ResizeObserver !== "undefined") {
+    new ResizeObserver(reportBarHeight).observe(bar);
+  } else {
+    window.addEventListener("resize", reportBarHeight);
+  }
+
   // Re-sync every control's DOM to the store on external changes (popstate restore / boot
   // hydration). The sync* methods set DOM WITHOUT firing their onChange callbacks, so this is a
   // pure URL→DOM mirror and never loops. Controls' own click/input already updated their DOM;
