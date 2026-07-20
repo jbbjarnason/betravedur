@@ -9,7 +9,9 @@
     ".": "./src/index.ts",
     "./derive": "./src/derive.ts",
     "./backfill": "./src/backfill.ts",
-    "./rawstore": "./src/rawstore.ts"
+    "./rawstore": "./src/rawstore.ts",
+    "./manifest": "./src/manifest.ts",
+    "./stations": "./src/stations.ts"
   },
   "dependencies": {
     "@betravedur/domain": "*",

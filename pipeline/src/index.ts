@@ -12,3 +12,5 @@ export {
   partitionPath,
   DEFAULT_ROOT,
 } from "./rawstore.js";
+export { contentHash, updateManifest, serializeManifest, readManifest, HASH_LEN } from "./manifest.js";
+export type { Manifest, ManifestEntry, HighWaterMarks } from "./manifest.js";
