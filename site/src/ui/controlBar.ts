@@ -10,7 +10,7 @@ import "../styles/controls.css";
 import { createScrubber } from "./scrubber.js";
 import { createWidthButtons } from "./widthButtons.js";
 import { createYearRange } from "./yearRange.js";
-import { markDiscrete } from "../state/history.js";
+import { setDiscrete } from "../state/history.js";
 import type { SelectionStore } from "../state/store.js";
 import type { MarkerDatum } from "../data/types.js";
 
@@ -88,8 +88,9 @@ export function mountControlBar(
     initialWidth: state.widthDays,
     onWidthChange: (days) => {
       scrubber.setWidth(days);
-      markDiscrete();
-      store.set({ widthDays: days });
+      // Arm pushState ONLY when the width actually changes — a re-press of the active width is a
+      // store no-op and must not leave the discrete flag dangling (WR-01, shared seam).
+      setDiscrete(store, { widthDays: days });
     },
   });
 
@@ -100,8 +101,8 @@ export function mountControlBar(
     initialFrom: state.yearFrom,
     initialTil: state.yearTil,
     onRangeChange: ({ from, til }) => {
-      markDiscrete();
-      store.set({ yearFrom: from, yearTil: til });
+      // Arm pushState ONLY when the range actually changes (WR-01, shared seam).
+      setDiscrete(store, { yearFrom: from, yearTil: til });
     },
   });
 

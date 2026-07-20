@@ -12,7 +12,7 @@
 // isUpdating flag — the write-always / read-on-popstate asymmetry makes a loop structurally
 // impossible.
 import { stateToParams } from "./url.js";
-import type { SelectionState } from "./store.js";
+import type { SelectionState, SelectionStore } from "./store.js";
 
 /** One-shot flag: true when the NEXT store change came from a discrete control (→ pushState). */
 let pendingDiscrete = false;
@@ -21,9 +21,34 @@ let pendingDiscrete = false;
  * Mark the next store change as discrete (width / year / station) so the URL writer uses
  * pushState (a back-button-revertable entry). Call immediately before the store.set. The flag
  * is auto-cleared by the writer, so it only ever affects the single change it precedes.
+ *
+ * WR-01 CAVEAT: on its own this can leave the flag dangling. If the store.set that follows is a
+ * no-op (every patched key already equals its current value), the store skips notification, the
+ * URL-writer subscriber never runs, and writeUrl (the only place the flag is cleared) never
+ * fires — so the flag stays armed and the NEXT genuinely-continuous change (a scrubber drag)
+ * wrongly pushState's. Prefer `setDiscrete(store, patch)` at call sites, which arms the flag
+ * ONLY when the patch will actually change state (so a re-select of the already-selected value
+ * never arms a dangling flag).
  */
 export function markDiscrete(): void {
   pendingDiscrete = true;
+}
+
+/**
+ * Discrete-change seam (WR-01): arm the discrete-history flag and apply `patch`, but ONLY arm
+ * the flag when `patch` will actually change the store — i.e. at least one patched key differs
+ * from the current snapshot. Re-selecting the already-selected station / width / year is a
+ * store no-op, so it must NOT arm the flag (otherwise the flag dangles and corrupts the next
+ * continuous change's history discipline). This is the shared fix for every discrete control
+ * (ranked-row re-click, width re-press, year re-select).
+ */
+export function setDiscrete(store: SelectionStore, patch: Partial<SelectionState>): void {
+  const current = store.get();
+  const changes = (Object.keys(patch) as (keyof SelectionState)[]).some(
+    (k) => patch[k] !== current[k],
+  );
+  if (changes) markDiscrete();
+  store.set(patch);
 }
 
 /**
