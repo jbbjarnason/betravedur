@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
-last_updated: "2026-07-20T07:05:53.569Z"
+last_updated: "2026-07-20T07:12:33.499Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 13
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 ## Current Position
 
 Phase: 2 (Derived Data Pipeline & Backfill) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 75%
 | Phase 1 P04 | 5 | 2 tasks | 4 files |
 | Phase 2 P01 | 20 | 2 tasks | 5 files |
 | Phase 02 P02 | 6min | 2 tasks | 11 files |
+| Phase 02 P03 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 02-01: derived encoding holds 1757 B/station-year gzip on a real 6-year Keflavik AWS fixture (<4 KB budget); nulls preserved (never 0), all-null columns dropped, AWS omits r / SYNOP omits dv.
 - [Phase ?]: Plan 02-02: backfill error-taxonomy — 413 unretried/halve, 502 backoff-then-halve, 503 propagates (never []), 404 empty-advance; ApiHttpError.status is the single branch point.
 - [Phase ?]: Plan 02-02: raw store persists exactly 10 DailyObservation fields via explicit fixed-order record build (no spread) => field-pruned AND byte-identical idempotent partitions; highWaterYear drives resume, wired now not in 02-04.
+- [Phase 02]: Plan 02-03: content-addressed manifest — contentHash = sha256(derivedBytes).slice(0,12); updateManifest is pure and rewrites a station's hashed filename derived/{station}.{hash}.json + high-water marks IFF its bytes change (returning-visitor cache deltas).
+- [Phase 02]: Plan 02-03: buildStationsJson gates the no-splice registry on >=3 qualifying years of REAL data via domain effectiveN (not start); decommissioned stations clearing the bar retained; entries built field-by-field (no spread).
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T07:05:31.863Z
+Last session: 2026-07-20T07:12:20.110Z
 Stopped at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
 Resume file: None
