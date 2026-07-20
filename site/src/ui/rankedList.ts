@@ -15,7 +15,7 @@
 //
 // The list SUBSCRIBES to the store only for the selected-row reciprocal highlight (stationId is
 // a primitive → the store's no-op-skip keeps this cheap, WR-04).
-import { markDiscrete } from "../state/history.js";
+import { setDiscrete } from "../state/history.js";
 import { formatScore } from "../map/markers.js";
 import type { SelectionStore } from "../state/store.js";
 import type { MarkerDatum } from "../data/types.js";
@@ -160,6 +160,9 @@ export function mountRankedList(
   };
 
   // ── Row builder ───────────────────────────────────────────────────────────────
+  // A row's identity is its immutable station id (li.dataset.station). refresh() reconciles by
+  // that key rather than rebuilding, so buildRow creates the stable skeleton once and
+  // updateRow mutates only the rank/score/badge that actually change between recomputes.
   const buildRow = (datum: MarkerDatum, rank: number): HTMLLIElement => {
     const li = document.createElement("li");
     li.className = "ranked-list__row";
@@ -173,54 +176,121 @@ export function mountRankedList(
 
     const rankEl = document.createElement("span");
     rankEl.className = "ranked-list__rank";
-    rankEl.textContent = `${rank}.`;
 
     // Station name via textContent only (T-05-05: never string-HTML injection —
     // the name is untrusted-by-default even though it originates from a committed data file).
     const nameEl = document.createElement("span");
     nameEl.className = "ranked-list__name";
-    nameEl.textContent = datum.name;
 
     btn.append(rankEl, nameEl);
 
-    // "án úrkomu" badge iff rain did not contribute to the (still-scored) score.
-    if (datum.missingRain) {
-      const badge = document.createElement("span");
-      badge.className = "ranked-list__badge";
-      badge.textContent = COPY.aununrkomu;
-      btn.appendChild(badge);
-    }
-
-    // Score: one-decimal Icelandic comma (reuses the marker-badge formatter). The `!` is safe —
-    // rankStations only yields score !== null rows.
+    // Score: one-decimal Icelandic comma (reuses the marker-badge formatter). Appended last so
+    // the optional "án úrkomu" badge (inserted by updateRow before it) always sits to its left.
     const scoreEl = document.createElement("span");
     scoreEl.className = "ranked-list__score";
-    scoreEl.textContent = formatScore(datum.score as number);
     btn.appendChild(scoreEl);
 
-    // Row click → Phase-4 select seam: mark discrete (pushState) THEN set stationId. The easeTo
-    // fly-to is main.ts's stationId subscriber (RESEARCH Pattern 2) — NOT here. No chart panel.
+    // Row click → Phase-4 select seam: discrete (pushState) set of stationId. setDiscrete arms
+    // the discrete-history flag ONLY when the station actually changes, so re-clicking the
+    // already-selected "best place" is a clean store no-op that never leaves the flag dangling
+    // (WR-01). The easeTo fly-to is main.ts's stationId subscriber (RESEARCH Pattern 2) — NOT
+    // here. No chart panel. The listener binds the immutable station id, so a reconciled row
+    // that survives a refresh keeps a correct handler (it never needs re-binding).
     btn.addEventListener("click", () => {
-      markDiscrete();
-      store.set({ stationId: datum.station });
+      setDiscrete(store, { stationId: datum.station });
     });
 
     li.appendChild(btn);
+    updateRow(li, datum, rank);
     return li;
   };
 
-  // ── Refresh: re-rank + rebuild rows (or render the empty state) ───────────────
+  /**
+   * Mutate an existing row's variable parts (rank, name, "án úrkomu" badge, score) in place.
+   * WR-02: reconcile-in-place keeps the row's <button> node identity stable, so a focused row
+   * (keyboard user) and the list scroll offset survive a recompute — a rebuild would discard the
+   * focused node (focus falls to <body>) and reset scroll. The station id never changes for a
+   * given row (rows are keyed by it), so only these fields are updated.
+   */
+  const updateRow = (li: HTMLLIElement, datum: MarkerDatum, rank: number): void => {
+    const btn = li.querySelector<HTMLButtonElement>("button")!;
+    const rankEl = btn.querySelector<HTMLElement>(".ranked-list__rank")!;
+    const nameEl = btn.querySelector<HTMLElement>(".ranked-list__name")!;
+    const scoreEl = btn.querySelector<HTMLElement>(".ranked-list__score")!;
+
+    const rankText = `${rank}.`;
+    if (rankEl.textContent !== rankText) rankEl.textContent = rankText;
+    if (nameEl.textContent !== datum.name) nameEl.textContent = datum.name;
+
+    // "án úrkomu" badge iff rain did not contribute to the (still-scored) score. Toggle it in
+    // place (add/remove) so the reconcile never rebuilds the row for a missingRain flip.
+    let badge = btn.querySelector<HTMLElement>(".ranked-list__badge");
+    if (datum.missingRain && !badge) {
+      badge = document.createElement("span");
+      badge.className = "ranked-list__badge";
+      badge.textContent = COPY.aununrkomu;
+      btn.insertBefore(badge, scoreEl); // keep the score last (rightmost)
+    } else if (!datum.missingRain && badge) {
+      badge.remove();
+    }
+
+    // Score: rankStations only yields score !== null rows, so the `as number` is sound.
+    const scoreText = formatScore(datum.score as number);
+    if (scoreEl.textContent !== scoreText) scoreEl.textContent = scoreText;
+  };
+
+  // ── Refresh: re-rank + reconcile rows in place (or render the empty state) ─────
+  // WR-02: instead of list.replaceChildren() (which discards keyboard focus + scroll on every
+  // recompute), diff the ranked set against the existing li[data-station] nodes: update the
+  // survivors in place, append the newcomers, remove the departed, and finally reorder so the
+  // DOM order matches the new ranking. A focused/scrolled row therefore survives a recompute.
   const refresh = (): void => {
     const ranked = rankStations(getLatestData());
-    list.replaceChildren();
     if (ranked.length === 0) {
+      list.replaceChildren();
       list.hidden = true;
       empty.hidden = false;
       return;
     }
     empty.hidden = true;
     list.hidden = false;
-    ranked.forEach((d, i) => list.appendChild(buildRow(d, i + 1)));
+
+    // Index the existing rows by station id.
+    const existing = new Map<string, HTMLLIElement>();
+    for (const li of list.querySelectorAll<HTMLLIElement>("li[data-station]")) {
+      existing.set(li.dataset.station as string, li);
+    }
+
+    // Update-or-create each ranked row and collect the desired node order.
+    const desired: HTMLLIElement[] = [];
+    const keep = new Set<string>();
+    ranked.forEach((d, i) => {
+      const key = String(d.station);
+      keep.add(key);
+      let li = existing.get(key);
+      if (li) {
+        updateRow(li, d, i + 1);
+      } else {
+        li = buildRow(d, i + 1);
+      }
+      desired.push(li);
+    });
+
+    // Remove departed rows (in the ranking last recompute, gone now).
+    for (const [key, li] of existing) {
+      if (!keep.has(key)) li.remove();
+    }
+
+    // Reorder in place to match the new ranking. insertBefore is a MOVE for an already-attached
+    // node (the node is NOT recreated), so a focused/scrolled survivor keeps its identity — and
+    // therefore its focus — even when its rank changes. Walk the desired order position by
+    // position: if the node currently at position i isn't the desired one, move the desired node
+    // into place before it. Nodes already in the right slot are left untouched (no-op moves).
+    desired.forEach((li, i) => {
+      const current = list.childNodes[i];
+      if (current !== li) list.insertBefore(li, current ?? null);
+    });
+
     applyHighlight();
   };
 

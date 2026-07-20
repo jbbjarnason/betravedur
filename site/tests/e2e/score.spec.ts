@@ -493,6 +493,63 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     }
   });
 
+  test("WR-02: keyboard focus on a ranked row SURVIVES a recompute (reconcile-in-place, no rebuild) [05-03]", async ({
+    page,
+  }) => {
+    // The ranked list reconciles rows by data-station on refresh() instead of replaceChildren(),
+    // so a focused row's <button> keeps its node identity across a recompute — focus (and scroll)
+    // are not dropped to <body>. Regression guard for WR-02.
+    await waitForMarkers(page);
+    const rows = await readRows(page);
+    expect(rows.length).toBeGreaterThanOrEqual(2);
+
+    // Focus a specific row's button by its immutable station id (survives reordering).
+    const targetStation = rows[rows.length - 1]!.station;
+    const targetBtn = page.locator(`${ROW}[data-station="${targetStation}"] button`);
+    await targetBtn.focus();
+    await expect(targetBtn).toBeFocused();
+
+    // Trigger a recompute that keeps this station scorable (a small anchor nudge). The row is
+    // updated in place, not rebuilt.
+    await page.evaluate(() => {
+      const store = (window as unknown as {
+        __store: { get(): { anchorDoy: number }; set(p: Record<string, unknown>): void };
+      }).__store;
+      const doy = store.get().anchorDoy;
+      store.set({ anchorDoy: doy === 200 ? 201 : 200 });
+    });
+    await page.waitForTimeout(400); // past the 120ms recompute debounce + render
+
+    // The SAME station's button is still the active element — focus was preserved across refresh.
+    const stillScorable = await page.locator(`${ROW}[data-station="${targetStation}"]`).count();
+    if (stillScorable > 0) {
+      const focusedStation = await page.evaluate(
+        () => (document.activeElement as HTMLElement | null)?.closest("li[data-station]")
+          ?.getAttribute("data-station") ?? null,
+      );
+      expect(focusedStation).toBe(targetStation);
+    }
+  });
+
+  test("WR-3 (a11y): a scored pill's aria-label includes the einkunn (score not color-only for screen readers) [05-02]", async ({
+    page,
+  }) => {
+    // color-not-sole-channel for AT users: a scored marker pill announces its score in the
+    // accessible name (`… einkunn 8,6`), even though the badge itself is aria-hidden.
+    await waitForMarkers(page);
+    const labels = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>("#marker-overlay [data-station]"))
+        .filter((pill) => pill.classList.contains("marker-pill--scored"))
+        .map((pill) => pill.getAttribute("aria-label") ?? ""),
+    );
+    expect(labels.length).toBeGreaterThanOrEqual(1);
+    for (const label of labels) {
+      // Scored pills carry both the coverage (meðaltal N ára) and the einkunn numeral.
+      expect(label).toMatch(/meðaltal \d+ ára/);
+      expect(label).toMatch(/einkunn \d{1,2},\d/);
+    }
+  });
+
   test("evidence: capture the ranked list + colored map (desktop + narrow) for self-inspection [05-03]", async ({
     page,
   }) => {
