@@ -23,7 +23,12 @@ import {
   resolveDerivedFile,
   type Manifest,
 } from "./data/load.js";
-import { installMarkerLayer, attachCompositeRenderer, renderComposite } from "./map/markers.js";
+import {
+  installMarkerLayer,
+  attachCompositeRenderer,
+  renderComposite,
+  setSelectedStation,
+} from "./map/markers.js";
 import { createStore, type SelectionState } from "./state/store.js";
 import {
   buildStationCache,
@@ -211,6 +216,11 @@ function wireMarkers(map: maplibregl.Map): void {
       store.subscribe((state) => {
         if (state.stationId === lastStationId) return; // not a station change → ignore
         lastStationId = state.stationId;
+        // Reciprocal marker highlight: update the selected pill's ring (applies on select AND
+        // deselect). renderComposite rebuilds the survivors from the current view — cheap, no
+        // recompute, no fetch. The easeTo below then re-renders again on moveend anyway.
+        setSelectedStation(state.stationId);
+        renderComposite(map);
         if (state.stationId === null) return; // deselection: nothing to fly to
         const target = latestData.find((d) => d.station === state.stationId);
         if (!target) return; // unknown/not-yet-rendered station → no-op (defensive)

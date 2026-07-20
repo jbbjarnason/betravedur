@@ -240,6 +240,26 @@ function ensureOverlay(map: maplibregl.Map): HTMLElement {
   return overlay;
 }
 
+/**
+ * The currently-selected station id (Phase-5 reciprocal highlight), or null. When a ranked-row
+ * (or, in Phase 6, a marker) selects a station, main.ts calls setSelectedStation() and re-renders;
+ * buildPill thickens THAT station's ring (`marker-pill--selected`) so the marker and the
+ * `--dominant`-filled ranked row stay visibly in sync. Module-level (not per-datum) because the
+ * survivor set is rebuilt from queryRenderedFeatures on every move/idle — a single source the
+ * next render reads. Selection is a pure highlight: it never enters the score/recompute path.
+ */
+let selectedStationId: number | null = null;
+
+/**
+ * Set the highlighted station and let the caller trigger a re-render (main.ts calls
+ * renderComposite right after). A no-op-return keeps a redundant set cheap. Exposed so the
+ * Phase-4 stationId subscriber can drive the reciprocal marker highlight without markers.ts
+ * importing the store.
+ */
+export function setSelectedStation(station: number | null): void {
+  selectedStationId = station;
+}
+
 /** Build one focus-ready pill element for a survivor datum. */
 function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
   const { html, muted } = formatCallout(datum);
@@ -277,6 +297,13 @@ function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
     badge.textContent = formatScore(datum.score);
     badge.setAttribute("aria-hidden", "true"); // coverage/name already in the pill aria-label
     pill.prepend(badge);
+  }
+
+  // Reciprocal highlight (Phase 5): the selected station's pill gets a thickened ring so it
+  // matches the --dominant-filled ranked row. Pure presentation — applies to muted pills too
+  // (a selected-but-unscorable station still visibly highlights), never touches the ramp.
+  if (selectedStationId !== null && datum.station === selectedStationId) {
+    pill.classList.add("marker-pill--selected");
   }
 
   const { x, y } = map.project([datum.lon, datum.lat]);
