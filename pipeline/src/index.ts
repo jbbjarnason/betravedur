@@ -10,10 +10,18 @@ export {
   readPartition,
   highWaterYear,
   partitionPath,
+  assertStationId,
+  assertYear,
   DEFAULT_ROOT,
 } from "./rawstore.js";
 export { contentHash, updateManifest, serializeManifest, readManifest, HASH_LEN } from "./manifest.js";
 export type { Manifest, ManifestEntry, HighWaterMarks } from "./manifest.js";
 export { buildStationsJson, serializeStationsJson } from "./stations.js";
 export type { StationEntry } from "./stations.js";
-export { aggregateStation, shipOutputs, main as aggregateMain } from "./aggregate.js";
+export {
+  aggregateStation,
+  aggregateAll,
+  countQualifyingYears,
+  shipOutputs,
+  main as aggregateMain,
+} from "./aggregate.js";

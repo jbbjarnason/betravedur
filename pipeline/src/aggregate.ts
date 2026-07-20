@@ -25,7 +25,7 @@ import {
   writeFileSync,
   existsSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import type {
   DailyObservation,
   StationMeta,
@@ -39,7 +39,12 @@ import {
   qualifyingYears,
 } from "@betravedur/domain";
 import { encodeDerived, decodeDerived } from "./derive.js";
-import { readPartition, highWaterYear, DEFAULT_ROOT } from "./rawstore.js";
+import {
+  readPartition,
+  highWaterYear,
+  assertStationId,
+  DEFAULT_ROOT,
+} from "./rawstore.js";
 import {
   contentHash,
   updateManifest,
@@ -55,6 +60,21 @@ import { buildStationsJson, serializeStationsJson } from "./stations.js";
  */
 export function shipOutputs(): string[] {
   return ["derived", "stations.json", "manifest.json"];
+}
+
+/**
+ * Assert `outPath` resolves to a location strictly under `root` before any write (CR-01,
+ * defense-in-depth). Even with the station-id guard, a manifest `file` field flowing from
+ * untrusted state could contain `..` segments; a resolved-prefix check makes the write
+ * refuse to escape the store root. The `+ sep` guard prevents a sibling like `rootEvil/`
+ * from matching a `root` prefix.
+ */
+function assertUnderRoot(root: string, outPath: string): void {
+  const resolvedRoot = resolve(root);
+  const resolvedOut = resolve(outPath);
+  if (resolvedOut !== resolvedRoot && !resolvedOut.startsWith(resolvedRoot + sep)) {
+    throw new Error(`refusing to write outside store root: ${outPath}`);
+  }
 }
 
 /** All calendar years present in the raw store for a station, ascending (empty when none). */
@@ -79,17 +99,32 @@ function readAllRaw(root: string, station: number): DailyObservation[] {
 }
 
 /**
- * Count qualifying years (>=3 gate feeds this) for a station over a REPRESENTATIVE window,
- * from decoded derived rows. The stations.json filter needs a qualifying-years count; we use a
- * full-summer window (the widest reliably-covered season) grouped by season-year so the count
- * reflects real data depth, not `start`. Temperature is the always-present metric (AWS + SYNOP).
+ * The station-inclusion window: a broad mid-year (summer) span used as the REPRESENTATIVE
+ * coverage gate for stations.json. Named constants (was bare 152/243/0.8, WR-03) so the policy
+ * is explicit and testable:
+ *   - SUMMER_WINDOW_START_DOY / SUMMER_WINDOW_END_DOY: leap-folded doy 152..243, i.e. ~Jun 1..
+ *     Aug 31 — the widest reliably-covered season for both AWS and SYNOP.
+ *   - SUMMER_WINDOW_MIN_COVERAGE: fraction of the ~92 window days that must carry a non-null `t`
+ *     for a season-year to qualify (matches the domain default; stated here for the rationale).
+ * Temperature is the always-present metric across station types, so it drives the gate.
  */
-function countQualifyingYears(rows: DailyObservation[]): number {
-  // A broad mid-year window: doy 152..243 (~Jun 1..Aug 31 in the leap-folded calendar).
-  const spec: WindowSpec = { startDoy: 152, endDoy: 243 };
+export const SUMMER_WINDOW_START_DOY = 152;
+export const SUMMER_WINDOW_END_DOY = 243;
+export const SUMMER_WINDOW_MIN_COVERAGE = 0.8;
+
+/**
+ * Count qualifying years (>=3 gate feeds this) for a station over the representative summer
+ * window, from decoded derived rows, grouped by season-year so the count reflects real data
+ * depth, not `start`.
+ */
+export function countQualifyingYears(rows: DailyObservation[]): number {
+  const spec: WindowSpec = {
+    startDoy: SUMMER_WINDOW_START_DOY,
+    endDoy: SUMMER_WINDOW_END_DOY,
+  };
   const windowDays = expandWindow(spec);
   const bySeason = groupBySeasonYear(rows, spec);
-  const qy = qualifyingYears(bySeason, windowDays, (o) => o.t);
+  const qy = qualifyingYears(bySeason, windowDays, (o) => o.t, SUMMER_WINDOW_MIN_COVERAGE);
   return qy.length;
 }
 
@@ -107,8 +142,10 @@ export function aggregateStation(
   type: StationType,
   manifest: Manifest,
 ): Manifest {
+  // Reject an invalid station id before it reaches any path (raw read OR derived write). CR-01.
+  assertStationId(station);
   const rows = readAllRaw(root, station);
-  const derived = encodeDerived(rows, type);
+  const derived = encodeDerived(rows, type, station);
   const bytes = JSON.stringify(derived, null, 2) + "\n";
   const hash = contentHash(bytes);
 
@@ -124,10 +161,50 @@ export function aggregateStation(
   // Touched-only: write the derived file only when the content hash changed (or is new).
   if (!existing || existing.hash !== hash) {
     const outPath = join(root, next.stations[station]!.file);
+    assertUnderRoot(root, outPath);
     mkdirSync(dirname(outPath), { recursive: true });
     writeFileSync(outPath, bytes);
   }
   return next;
+}
+
+/**
+ * Aggregate a list of station specs, persisting the manifest INCREMENTALLY after each station.
+ *
+ * WR-01 consistency: `aggregateStation` writes `derived/{station}.{hash}.json` as a side effect;
+ * if we only wrote `manifest.json` once after the whole loop, a mid-loop throw (a corrupt
+ * partition, a path error) would leave earlier stations' derived files on disk with the manifest
+ * never updated — orphaned files the manifest does not reference. Writing the manifest after
+ * EACH successful station (and once more in a `finally`) guarantees the manifest on disk always
+ * references every derived file already written: a partial run stays internally consistent, and
+ * the failure still propagates so the operator sees it.
+ *
+ * Returns the final manifest and the per-station qualifying-years counts (for stations.json).
+ */
+export function aggregateAll(
+  root: string,
+  manifestPath: string,
+  specs: { type: StationType; id: number }[],
+  initial: Manifest,
+): { manifest: Manifest; qualifyingCounts: Map<number, number>; completed: number[] } {
+  let manifest = initial;
+  const qualifyingCounts = new Map<number, number>();
+  const completed: number[] = [];
+  try {
+    for (const { type, id } of specs) {
+      manifest = aggregateStation(root, id, type, manifest);
+      const decoded = decodeDerived(encodeDerived(readAllRaw(root, id), type, id));
+      qualifyingCounts.set(id, countQualifyingYears(decoded));
+      completed.push(id);
+      // Persist progress after every station so derived files never outrun the manifest.
+      writeFileSync(manifestPath, serializeManifest(manifest));
+    }
+  } finally {
+    // Belt-and-suspenders: flush once more so even a throw between the last write and here
+    // leaves the manifest referencing every derived file written so far.
+    writeFileSync(manifestPath, serializeManifest(manifest));
+  }
+  return { manifest, qualifyingCounts, completed };
 }
 
 /**
@@ -159,13 +236,15 @@ export async function main(argv: string[]): Promise<void> {
     );
   }
 
-  // Aggregate each station; collect qualifying-years counts for the stations.json filter.
-  const qualifyingCounts = new Map<number, number>();
-  for (const { type, id } of specs) {
-    manifest = aggregateStation(root, id, type, manifest);
-    const decoded = decodeDerived(encodeDerived(readAllRaw(root, id), type));
-    qualifyingCounts.set(id, countQualifyingYears(decoded));
-  }
+  // Aggregate each station; the manifest is persisted incrementally so a mid-loop failure
+  // never orphans derived files (WR-01). A throw here propagates AFTER the manifest is flushed.
+  const { manifest: finalManifest, qualifyingCounts } = aggregateAll(
+    root,
+    manifestPath,
+    specs,
+    manifest,
+  );
+  manifest = finalManifest;
 
   // Regenerate stations.json from the no-splice registry (fetched at the edge in Plan 03 style).
   const { fetchStations } = await import("@betravedur/fetch");
@@ -173,7 +252,6 @@ export async function main(argv: string[]): Promise<void> {
   const registry: StationMeta[] = await fetchStations(ids);
   const entries = buildStationsJson(registry, qualifyingCounts);
 
-  writeFileSync(manifestPath, serializeManifest(manifest));
   writeFileSync(join(root, "stations.json"), serializeStationsJson(entries));
 
   const sizes = specs

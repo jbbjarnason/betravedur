@@ -23,12 +23,17 @@ import {
   qualifyingYears,
 } from "@betravedur/domain";
 import { upsertPartition } from "../src/rawstore.js";
-import { decodeDerived } from "../src/derive.js";
+import { decodeDerived, encodeDerived } from "../src/derive.js";
 import type { DerivedFile } from "../src/derive.js";
 import {
   aggregateStation,
+  aggregateAll,
+  countQualifyingYears,
   shipOutputs,
+  SUMMER_WINDOW_START_DOY,
+  SUMMER_WINDOW_END_DOY,
 } from "../src/aggregate.js";
+import { serializeManifest } from "../src/manifest.js";
 import type { Manifest } from "../src/manifest.js";
 import { leapFoldedDoy } from "@betravedur/domain";
 
@@ -105,15 +110,17 @@ function directSeasonMeans(rows: DailyObservation[], spec: WindowSpec): Map<numb
   return out;
 }
 
-describe("aggregate: full-chain raw -> derived -> decode -> domain", () => {
-  let root: string;
-  beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "betra-agg-"));
-  });
-  afterEach(() => {
-    rmSync(root, { recursive: true, force: true });
-  });
+// Module-scoped temp store, recreated per test, so both the original full-chain suite and the
+// added regression suites (WR-01/WR-05/CR-01) share the same fresh `root` fixture.
+let root: string;
+beforeEach(() => {
+  root = mkdtempSync(join(tmpdir(), "betra-agg-"));
+});
+afterEach(() => {
+  rmSync(root, { recursive: true, force: true });
+});
 
+describe("aggregate: full-chain raw -> derived -> decode -> domain", () => {
   // -- Test A: full-chain round-trip, non-wrapping AND wrapping windows --
   it("A: on-disk derived path equals direct domain path for non-wrapping and wrapping windows", () => {
     const years = [2018, 2019, 2020, 2021];
@@ -225,5 +232,146 @@ describe("aggregate: full-chain raw -> derived -> decode -> domain", () => {
     expect(ship).toContain("stations.json");
     expect(ship).toContain("manifest.json");
     expect(ship).not.toContain("raw");
+  });
+});
+
+/**
+ * Generate one row per calendar day in Jun 1..Aug 31 of `year`, keeping only the first
+ * `fraction` of the summer window's leap-folded days (so we can build a station that just
+ * qualifies vs. just misses the 80% coverage gate). `t` defaults present; pass `t: null` via
+ * `over` to make those days non-qualifying.
+ */
+function summerRows(
+  station: number,
+  year: number,
+  fraction: number,
+  over: Partial<DailyObservation> = {},
+): DailyObservation[] {
+  // All leap-folded doys in the summer window, in ascending order.
+  const windowDoys: number[] = [];
+  for (const [mm, days] of [["06", 30], ["07", 31], ["08", 31]] as const) {
+    for (let d = 1; d <= days; d++) {
+      const date = `${year}-${mm}-${String(d).padStart(2, "0")}`;
+      const doy = leapFoldedDoy(date);
+      if (doy === null) continue;
+      if (doy >= SUMMER_WINDOW_START_DOY && doy <= SUMMER_WINDOW_END_DOY) windowDoys.push(doy);
+    }
+  }
+  // Emit rows only for the first `fraction` of the window days (rounded), covering that many.
+  const keep = Math.floor(windowDoys.length * fraction);
+  const rows: DailyObservation[] = [];
+  let emitted = 0;
+  for (const [mm, days] of [["06", 30], ["07", 31], ["08", 31]] as const) {
+    for (let d = 1; d <= days; d++) {
+      if (emitted >= keep) break;
+      const date = `${year}-${mm}-${String(d).padStart(2, "0")}`;
+      const doy = leapFoldedDoy(date);
+      if (doy === null) continue;
+      if (doy < SUMMER_WINDOW_START_DOY || doy > SUMMER_WINDOW_END_DOY) continue;
+      rows.push(obs(station, date, over));
+      emitted++;
+    }
+    if (emitted >= keep) break;
+  }
+  return rows;
+}
+
+describe("WR-03: countQualifyingYears drives the summer-window >=80% gate on real daily rows", () => {
+  it("a station with 3 full-summer years just qualifies (>=3 qualifying years)", () => {
+    const rows: DailyObservation[] = [];
+    for (const y of [2018, 2019, 2020]) rows.push(...summerRows(AWS_STATION, y, 1.0));
+    // Each year covers 100% of the summer window -> all 3 qualify -> count 3 (the >=3 bar).
+    expect(countQualifyingYears(rows)).toBe(3);
+  });
+
+  it("a station just missing coverage in one year drops below the gate", () => {
+    const rows: DailyObservation[] = [];
+    // Two full years + one year at only ~50% summer coverage (below the 80% gate).
+    rows.push(...summerRows(AWS_STATION, 2018, 1.0));
+    rows.push(...summerRows(AWS_STATION, 2019, 1.0));
+    rows.push(...summerRows(AWS_STATION, 2020, 0.5));
+    // Only the two full years qualify -> below the >=3 bar.
+    expect(countQualifyingYears(rows)).toBe(2);
+  });
+
+  it("null-temperature summer days do NOT count toward coverage even when rows exist", () => {
+    // Three years present as ROWS but with t=null everywhere: coverage is 0, none qualify.
+    const rows: DailyObservation[] = [];
+    for (const y of [2018, 2019, 2020]) rows.push(...summerRows(AWS_STATION, y, 1.0, { t: null }));
+    expect(countQualifyingYears(rows)).toBe(0);
+  });
+
+  it("a station with rich WINTER data but sparse summer is excluded (documents the policy)", () => {
+    // Dense December/January coverage, but no summer rows at all -> summer gate fails.
+    const rows: DailyObservation[] = [];
+    for (const y of [2018, 2019, 2020, 2021]) {
+      for (let d = 1; d <= 28; d++) {
+        rows.push(obs(AWS_STATION, `${y}-12-${String(d).padStart(2, "0")}`));
+        rows.push(obs(AWS_STATION, `${y}-01-${String(d).padStart(2, "0")}`));
+      }
+    }
+    expect(countQualifyingYears(rows)).toBe(0);
+  });
+});
+
+describe("WR-05: empty-station derived payload carries the true station id, not 0", () => {
+  it("encodeDerived([], type, id) emits station=id (empty backfill)", () => {
+    const derived = encodeDerived([], "sj", AWS_STATION);
+    expect(derived.station).toBe(AWS_STATION);
+    expect(derived.nYears).toBe(0);
+  });
+
+  it("aggregateStation on a station with no raw data writes a file whose payload station matches the filename", () => {
+    let manifest: Manifest = { stations: {} };
+    // No upsert -> no raw partitions for this station: the empty path.
+    manifest = aggregateStation(root, SYNOP_STATION, "sk" as StationType, manifest);
+    const entry = manifest.stations[SYNOP_STATION]!;
+    expect(entry.file).toBe(`derived/${SYNOP_STATION}.${entry.hash}.json`);
+    const derived = JSON.parse(readFileSync(join(root, entry.file), "utf8")) as DerivedFile;
+    // The in-file station id matches the filename id — not 0.
+    expect(derived.station).toBe(SYNOP_STATION);
+  });
+});
+
+describe("CR-01: aggregate refuses to write outside the store root and rejects bad ids", () => {
+  it("aggregateStation rejects a negative / non-integer station id", () => {
+    const manifest: Manifest = { stations: {} };
+    expect(() => aggregateStation(root, -1, "sj" as StationType, manifest)).toThrow(
+      /invalid station id/,
+    );
+    expect(() => aggregateStation(root, 1.5, "sj" as StationType, manifest)).toThrow(
+      /invalid station id/,
+    );
+  });
+});
+
+describe("WR-01: aggregate keeps the manifest consistent on a mid-loop failure", () => {
+  it("persists the manifest for stations that succeeded before a later station throws", () => {
+    // Seed two good stations.
+    const years = [2018, 2019, 2020];
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, years));
+    upsertPartition(root, SYNOP_STATION, seedRows(SYNOP_STATION, years));
+
+    const manifestPath = join(root, "manifest.json");
+    // Third spec is an invalid id -> aggregateStation throws mid-loop (after two succeed).
+    const specs = [
+      { type: "sj" as StationType, id: AWS_STATION },
+      { type: "sk" as StationType, id: SYNOP_STATION },
+      { type: "sj" as StationType, id: -1 },
+    ];
+
+    expect(() => aggregateAll(root, manifestPath, specs, { stations: {} })).toThrow();
+
+    // Despite the throw, manifest.json on disk references BOTH stations that succeeded, and
+    // every derived file it references actually exists (no orphans).
+    const persisted = JSON.parse(readFileSync(manifestPath, "utf8")) as Manifest;
+    expect(persisted.stations[AWS_STATION]).toBeDefined();
+    expect(persisted.stations[SYNOP_STATION]).toBeDefined();
+    for (const id of [AWS_STATION, SYNOP_STATION]) {
+      const entry = persisted.stations[id]!;
+      expect(existsSync(join(root, entry.file))).toBe(true);
+    }
+    // Sanity: the persisted manifest serializes byte-identically to what serializeManifest emits.
+    expect(readFileSync(manifestPath, "utf8")).toBe(serializeManifest(persisted));
   });
 });
