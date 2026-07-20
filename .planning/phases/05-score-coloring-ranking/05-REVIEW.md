@@ -17,7 +17,14 @@ findings:
   warning: 2
   info: 3
   total: 5
-status: issues_found
+status: fixed
+fixed_at: 2026-07-20
+fixes:
+  WR-01: fixed (7b1145e, 248e91a)
+  WR-02: fixed (248e91a)
+  IN-01: fixed (eb08ae9)
+  IN-02: skipped (stale frame self-corrects — not worth churn)
+  IN-03: fixed (a003ee5, comment-only accuracy note)
 ---
 
 # Phase 5: Code Review Report
@@ -25,7 +32,12 @@ status: issues_found
 **Reviewed:** 2026-07-20T12:47:59Z
 **Depth:** standard
 **Files Reviewed:** 8
-**Status:** issues_found
+**Status:** fixed
+
+> **Fix pass (2026-07-20):** WR-01 fixed (`7b1145e`, `248e91a`), WR-02 fixed (`248e91a`),
+> IN-01 fixed (`eb08ae9`), IN-03 fixed (comment-only, `a003ee5`). IN-02 intentionally skipped
+> (stale frame self-corrects via the idle handler — not worth churn). Unit + `tsc --noEmit -p
+> site` (0 errors) + build + full E2E (50 passing) all green after the pass.
 
 ## Summary
 
@@ -67,6 +79,12 @@ Two WARNING-level issues and three INFO items remain, detailed below.
 
 ### WR-01: Re-selecting the already-selected ranked row leaves the discrete history flag dangling
 
+**STATUS: FIXED** (`7b1145e` shared seam + `248e91a` call site). Added a `setDiscrete(store, patch)`
+seam in `history.ts` that arms the discrete flag ONLY when the patch will actually change state,
+and routed the ranked-row click and controlBar width/year controls through it. Node-level
+regression test in `history.test.ts` reproduces the re-click → continuous-change sequence and
+asserts no spurious pushState.
+
 **File:** `site/src/ui/rankedList.ts:203-206` (root cause: `site/src/state/history.ts:25-41`, `site/src/state/store.ts:83-93`)
 **Issue:** The row-click handler calls `markDiscrete()` (sets the one-shot `pendingDiscrete = true`)
 and then `store.set({ stationId: datum.station })`. When the clicked station is ALREADY the
@@ -94,6 +112,11 @@ Or, more robustly, clear `pendingDiscrete` inside the store's no-op-skip path / 
 
 ### WR-02: Ranked-list `refresh()` rebuilds the whole `<ol>` on every recompute — drops keyboard focus and scroll position
 
+**STATUS: FIXED** (`248e91a`). `refresh()` now reconciles rows by immutable `data-station`:
+updates survivors in place, adds/removes the delta, and reorders via `insertBefore` moves so a
+focused/scrolled row keeps its node identity across a recompute. E2E in `score.spec.ts` asserts
+keyboard focus survives a recompute.
+
 **File:** `site/src/ui/rankedList.ts:213-225`
 **Issue:** `refresh()` calls `list.replaceChildren()` and rebuilds every `<li>` from scratch on
 each recompute (fired from `renderForState` on any selection-relevant change, debounced 120ms).
@@ -113,6 +136,10 @@ matching rebuilt row afterward.
 
 ### IN-01: Scored pill's 5px left border offsets the pill ~2px from its true station coordinate
 
+**STATUS: FIXED** (`eb08ae9`). Compensated the scored pill's `translate` by 2px
+(`translate(calc(-50% - 2px), -50%)`) so scored and muted pills anchor identically on
+`map.project([lon,lat])`, without touching layout or hit-area.
+
 **File:** `site/src/styles/score.css:26-32` (with `site/src/styles/markers.css` `.marker-pill` `transform: translate(-50%, -50%)`)
 **Issue:** `.marker-pill--scored` sets `border-left: 5px` while the other three sides keep the
 base `1px` (`markers.css`). The pill is centered on its coordinate via
@@ -126,6 +153,9 @@ and muted pills anchor identically.
 
 ### IN-02: `renderComposite` runs synchronously right after `setData`, drawing one stale frame
 
+**STATUS: SKIPPED** (self-corrects). The `idle` handler re-draws with fresh placement shortly
+after, so there is no persistent incorrectness — not worth the churn per the fix-scope decision.
+
 **File:** `site/src/main.ts:130-131`
 **Issue:** `renderForState` calls `installMarkerLayer(map, data)` (which `setData`s the GeoJSON
 source) and then `renderComposite(map)` on the very next line. `queryRenderedFeatures` reflects
@@ -138,6 +168,9 @@ incorrectness — but the synchronous call is effectively redundant and can flas
 handler, or `requestAnimationFrame` the composite draw so it reads post-`setData` placement.
 
 ### IN-03: `formatScore` clamp/`replace` guards a contract that upstream already guarantees (dead defensive branch)
+
+**STATUS: FIXED** (`a003ee5`, comment-only). Added a note clarifying the non-finite guard is
+unreachable hardening (not a live invariant); left the guard in place as intentional defense.
 
 **File:** `site/src/map/markers.ts:33-36`
 **Issue:** `formatScore` accepts `score: number` and defends against non-finite input
