@@ -15,6 +15,14 @@ export type {
 } from "./types.js";
 export { leapFoldedDoy, expandWindow, groupBySeasonYear } from "./window.js";
 export { qualifyingYears, effectiveN } from "./coverage.js";
+export { percentile, perDoyDistribution, perDoyPrecip } from "./distribution.js";
+export type {
+  YearRange,
+  PerDoyBox,
+  PerDoyBar,
+  DistributionResult,
+  PrecipResult,
+} from "./distribution.js";
 export { circularMeanDirection, scalarMeanSpeed } from "./wind.js";
 export { sumPerYearThenAverage } from "./precip.js";
 export { meanPerYearThenAverage } from "./meanPerYear.js";

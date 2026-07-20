@@ -185,20 +185,22 @@ describe("perDoyPrecip — per-doy median precip total (honest missing)", () => 
   });
 
   it("emits missing:true (never 0) for a doy with no qualifying rain", () => {
-    // Qualify 3 years on temp coverage-equivalent (rain present on doys 1 and 3),
-    // doy 2 has null rain everywhere -> explicit gap, never a zero bar.
+    // A 10-day window: rain present on 9 of 10 doys (90% coverage >= 0.8 so years qualify),
+    // but doy 5 has null rain in every qualifying year -> that doy is an explicit gap, never
+    // a zero bar. This isolates a per-doy missing bucket inside an otherwise-covered window.
+    const window10 = { startDoy: 1, endDoy: 10 };
     const rows: DailyObservation[] = [];
     for (const year of [2018, 2019, 2020]) {
-      rows.push(obs(year, 1, { r: 5 }));
-      rows.push(obs(year, 2, { r: null }));
-      rows.push(obs(year, 3, { r: 5 }));
+      for (let doy = 1; doy <= 10; doy++) {
+        rows.push(obs(year, doy, { r: doy === 5 ? null : 5 }));
+      }
     }
-    const res = perDoyPrecip(rows, WINDOW, undefined);
+    const res = perDoyPrecip(rows, window10, undefined);
     expect(res.sufficient).toBe(true);
     if (!res.sufficient) return;
-    const doy2 = res.perDoy.find((d) => d.doy === 2)!;
-    expect(doy2.missing).toBe(true);
-    expect((doy2 as { value?: number }).value).toBeUndefined();
+    const doy5 = res.perDoy.find((d) => d.doy === 5)!;
+    expect(doy5.missing).toBe(true);
+    expect((doy5 as { value?: number }).value).toBeUndefined();
   });
 
   it("returns { sufficient:false } when the r column is absent (AWS 'án úrkomu')", () => {
