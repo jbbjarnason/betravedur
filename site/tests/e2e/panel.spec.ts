@@ -108,7 +108,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 2: panel shows Hiti + Vindur figures with a <canvas> and a Úrkoma figure with a <canvas> [06-03]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -250,7 +250,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 11: chart tokens use --chart-*, NOT --accent or --score-* (distribution, not finance) [06-03]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -275,7 +275,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 12: under prefers-reduced-motion, ECharts instances are created with animation:false [06-03]",
     async ({ browser }) => {
       // A dedicated reduced-motion context.
@@ -313,7 +313,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 14: each chart figure exposes a text/aria-label distribution summary (canvas not sole carrier) [06-03]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -357,7 +357,7 @@ test.describe("build-size chunk-split gate (A4 — echarts out of the entry chun
       .map((f) => ({ name: f, source: readFileSync(resolve(ASSETS, f), "utf8") }));
   }
 
-  test.fixme(
+  test(
     "a distinct chartPanel-*.js chunk exists AND the entry chunk contains no echarts [06-03]",
     () => {
       const chunks = readJsChunks();
