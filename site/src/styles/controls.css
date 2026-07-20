@@ -1,0 +1,253 @@
+/*
+ * Bottom control-bar styling — Phase 4 UI-SPEC (Layout, Scrubber Anatomy, Width Segmented
+ * Buttons, Year-Range Selector, Accessibility). STRICTLY on the Phase 3 tokens from
+ * tokens.css — ink / muted-ink / white / dominant / hairline only.
+ *
+ * HARD CONSTRAINT: the accent token is never referenced in this file. Accent red is reserved to the
+ * temperature numeral (Phase 5 owns the score palette); control chrome stays chromatically
+ * neutral. Colour is never the sole channel: the active width button is fill + weight 600 +
+ * aria-pressed; the scrubber anchor is a shaped thumb + a text date readout.
+ */
+
+/* ── Bar surface: header treatment inverted (top hairline instead of bottom) ─────────── */
+.control-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 72px;
+  max-height: 96px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-stack);
+  color: var(--ink);
+}
+
+/* Centre the control row on very wide screens so the scrubber doesn't over-stretch. */
+.control-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ── Global meðaltal N ára readout (11px muted, left-aligned, always visible) ─────────── */
+.control-bar__readout {
+  flex: 0 0 auto;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 400;
+  color: var(--muted-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Scrubber block: grows to fill; readout above the native range track ──────────────── */
+.scrubber {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.scrubber__readout {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Native range restyled to the tokens: dominant unfilled track, ink filled window span
+ * painted via a background-gradient the JS updates as an inline custom property. */
+.scrubber__range {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 44px; /* 44px hit area; the visual track is 4px, centred */
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.scrubber__range:focus-visible {
+  outline: none;
+}
+
+.scrubber__range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.scrubber__range:focus-visible::-moz-range-track {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Track: 4px, radius 2px. Unfilled = --dominant; the selected window span is painted
+ * --ink via the --fill gradient variable the JS sets ("ink 0% a%, dominant a% b%, ..."). */
+.scrubber__range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--scrubber-fill, var(--dominant));
+}
+.scrubber__range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--scrubber-fill, var(--dominant));
+}
+
+/* Thumb: white 16px circle, hairline border + subtle shadow (marker-pill language). Ink,
+ * never accent. Vertically centres over the 4px track inside the 44px control height. */
+.scrubber__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px; /* (4px track - 16px thumb) / 2 */
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 1px 2px rgba(31, 41, 51, 0.18);
+}
+.scrubber__range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 1px solid var(--hairline);
+  box-shadow: 0 1px 2px rgba(31, 41, 51, 0.18);
+}
+
+/* Month tick labels: 12 lowercase Icelandic abbreviations at 11px muted. */
+.scrubber__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  line-height: 1.15;
+  color: var(--muted-ink);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+/* ── Narrow-screen stepper (hidden on wide screens; swapped in under ~640px) ──────────── */
+.scrubber__stepper {
+  display: none;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.scrubber__step {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.scrubber__step:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── Width segmented buttons: 4 native <button>s in one rounded --hairline container ───── */
+.width-group {
+  flex: 0 0 auto;
+  display: inline-flex;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.width-group__btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--space-md);
+  border: none;
+  border-left: 1px solid var(--hairline);
+  background: var(--secondary);
+  color: var(--muted-ink);
+  font-family: var(--font-stack);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.width-group__btn:first-child {
+  border-left: none;
+}
+.width-group__btn[aria-pressed="true"] {
+  background: var(--dominant); /* subtle inset fill — reads as pressed */
+  color: var(--ink);
+  font-weight: 600;
+}
+.width-group__btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── Year-range Frá / Til selects ─────────────────────────────────────────────────────── */
+.year-range {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.year-range__label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted-ink);
+}
+
+.year-range__select {
+  min-height: 44px;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.year-range__select:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── Narrow-screen collapse (< ~640px): swap the scrubber track for the stepper ────────── */
+@media (max-width: 640px) {
+  .control-bar__inner {
+    flex-wrap: wrap;
+  }
+  .scrubber__range,
+  .scrubber__ticks {
+    display: none;
+  }
+  .scrubber__stepper {
+    display: flex;
+  }
+}
+
+/* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */
+@media (prefers-reduced-motion: reduce) {
+  .control-bar,
+  .control-bar * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
