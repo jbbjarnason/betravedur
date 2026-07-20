@@ -21,6 +21,8 @@ function fullDatum(overrides: Partial<MarkerDatum> = {}): MarkerDatum {
     hasPrecip: true,
     n: 77,
     sufficient: true,
+    score: 7.4,
+    missingRain: false,
     priority: 0.19,
     ...overrides,
   };

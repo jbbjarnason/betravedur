@@ -25,6 +25,11 @@ import {
   effectiveN,
   circularMeanDirection,
   meanPerYearThenAverage,
+  sumPerYearThenAverage,
+  tempComponent,
+  rainComponent,
+  windComponent,
+  combine,
   type DailyObservation,
   type WindowSpec,
   type StationMeta,
@@ -127,6 +132,15 @@ export function computeMarkerDatum(
   // Wind speed: per-year scalar mean over qualifying years, equally weighted (WR-02).
   const meanWindSpeed = meanPerYearThenAverage(byYear, windowDays, qYears, (o) => o.f);
 
+  // Rain TOTAL (mm) for the window: sum the in-window daily `r` per qualifying year,
+  // then average those per-year sums across the qualifying years (the exact WINDOW-TOTAL
+  // that `rainComponent` — RAIN_ZERO_MM=60 — is calibrated for). The helper sums `o.r`
+  // internally over `windowDays` for the given qualifying years — it takes NO selector
+  // (RESEARCH A3's `o=>o.r` example is imprecise; the 3-arg signature is authoritative).
+  // Missing stays missing: null (never 0) when no qualifying years / no rain column, so
+  // combine() renormalizes ("án úrkomu") instead of scoring a dry station as rain 10/10.
+  const rainTotalMm = sumPerYearThenAverage(byYear, windowDays, qYears);
+
   // Wind direction: circular mean over the qualifying-year in-window samples only.
   const dirSamples = inWinQual
     .filter((r) => r.f != null && r.dv != null)
@@ -148,6 +162,30 @@ export function computeMarkerDatum(
   const windDir = sufficient && !dirVariable ? dir!.dirDeg : null;
   const hasPrecip = sufficient ? hasPrecipQual : false;
 
+  // Combined 0-10 score (MAP-03). Feed the three RAW window-metrics through the domain
+  // component curves — but ONLY when the coverage gate is met AND the metric is present.
+  // Pass `null` (never 0) for any absent metric so `combine()` renormalizes the weights
+  // over the present components ("án úrkomu"), rather than scoring a rain-less station as
+  // a dry 10/10 (RESEARCH Pitfall 2). When `sufficient === false` all three are null →
+  // `combine()` returns `score:null` (present.length === 0) — the station is off-scale.
+  // The score math lives entirely in @betravedur/domain; this only WIRES the inputs.
+  //
+  // RAIN NULLABILITY (RESEARCH A3, load-bearing): `sumPerYearThenAverage` returns 0 (NOT
+  // null) for a station that qualifies on temp but carries NO rain column — a rain-less
+  // AWS station would then feed `rainComponent(0) === 10` and be silently scored as a
+  // perfectly dry 10/10 (Pitfall 2). Gate the rain component on `hasPrecipQual` (rain
+  // actually recorded in-window), so a genuinely rain-less station passes `null` and is
+  // renormalized "án úrkomu" — never scored dry-as-10.
+  const tempScore = sufficient && meanTemp != null ? tempComponent(meanTemp) : null;
+  const rainScore =
+    sufficient && hasPrecipQual && rainTotalMm != null ? rainComponent(rainTotalMm) : null;
+  const windScore = sufficient && meanWindSpeed != null ? windComponent(meanWindSpeed) : null;
+  const { score, missingRain } = combine({
+    temp: tempScore,
+    rain: rainScore,
+    wind: windScore,
+  });
+
   return {
     station: meta.station,
     name: meta.name,
@@ -160,6 +198,8 @@ export function computeMarkerDatum(
     hasPrecip,
     n,
     sufficient,
+    score,
+    missingRain,
     priority: stationPriority(meta),
   };
 }

@@ -50,6 +50,24 @@ export interface MarkerDatum {
   /** True when n >= 3 (the domain display gate). */
   sufficient: boolean;
   /**
+   * Combined 0-10 weather score for the selected period, from the domain `combine()`
+   * over the temp/rain/wind component curves (Phase 5, MAP-03). ONE decimal, clamped
+   * [0,10]. `score === null` ⇔ the station is OFF the color scale and UNRANKED —
+   * either coverage is insufficient (`sufficient === false`, "ófullnægjandi gögn")
+   * or `combine()` had no contributing components. A rain-less (AWS) station is NOT
+   * null: rain is renormalized away and it is scored "án úrkomu" (see `missingRain`).
+   * Never NaN (the `combine()` contract) — a caller mapping to color branches on null
+   * first (muted state), so `scoreColor()` only ever receives a real number.
+   */
+  score: number | null;
+  /**
+   * Mirrors `combine().missingRain`: true when rain did NOT contribute to `score`
+   * (AWS station with no precip → "án úrkomu"). Note `missingRain === true` does
+   * NOT imply `score === null` — an án-úrkomu station is scored (temp+wind
+   * renormalized) and ranked; only an empty `contributing` set makes `score` null.
+   */
+  missingRain: boolean;
+  /**
    * Stable collision sort key for the map symbol layer (lower = higher priority,
    * wins collisions). Consumed by Plan 03's `symbol-sort-key`.
    */

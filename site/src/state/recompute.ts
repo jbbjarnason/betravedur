@@ -43,6 +43,12 @@ export function mutedDatum(meta: {
     hasPrecip: false,
     n: 0,
     sufficient: false,
+    // A muted station is off the color scale and unranked (Phase 5): score:null,
+    // missingRain:true keeps the muted shape in lockstep with the insufficient path
+    // in computeMarkerDatum (combine() over all-null components → score:null,
+    // missingRain:true). Never let the muted shape drift from the real one.
+    score: null,
+    missingRain: true,
     priority: 9999,
   };
 }

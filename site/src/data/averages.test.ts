@@ -12,6 +12,7 @@ import {
   type DerivedFile,
 } from "@betravedur/pipeline/derive";
 import type { DailyObservation, StationMeta } from "@betravedur/domain";
+import { rainComponent, tempComponent, windComponent, combine } from "@betravedur/domain";
 import { computeMarkerDatum } from "./averages.js";
 import { DEFAULT_WINDOW } from "./types.js";
 
@@ -305,5 +306,196 @@ describe("computeMarkerDatum — synthetic edge fixtures", () => {
     expect(d!.hasPrecip).toBe(false);
     // No NaN leaks anywhere numeric.
     expect(Number.isNaN(d!.tempC as number)).toBe(false);
+  });
+});
+
+// MAP-03 / RESEARCH A3: the score field on MarkerDatum. combine() over the temp/rain/wind
+// component curves (the math lives in @betravedur/domain — these tests pin the WIRING and,
+// load-bearingly, the RAIN UNITS: the value fed to rainComponent MUST be the window-total mm
+// across qualifying years, never a boolean and never a per-day mean).
+describe("computeMarkerDatum — score (MAP-03)", () => {
+  function synth(
+    station: number,
+    type: StationMeta["type"],
+    rows: DailyObservation[],
+  ): DerivedFile {
+    return encodeDerived(rows, type, station);
+  }
+
+  function row(
+    station: number,
+    date: string,
+    doy: number,
+    over: Partial<DailyObservation>,
+  ): DailyObservation {
+    return {
+      station,
+      date,
+      doy,
+      t: null,
+      tx: null,
+      tn: null,
+      f: null,
+      fx: null,
+      fg: null,
+      dv: null,
+      r: null,
+      ...over,
+    };
+  }
+
+  const synthMeta = (id: number, type: StationMeta["type"]): StationMeta => ({
+    station: id,
+    name: `Synthetic ${id}`,
+    type,
+    owner: "test",
+    lat: 65,
+    lon: -19,
+    ele: 0,
+    start: 2000,
+    ending: null,
+  });
+
+  const WINDOW_DAYS = DEFAULT_WINDOW.endDoy - DEFAULT_WINDOW.startDoy + 1; // 14
+
+  it("RAIN-UNIT PIN (A3): the rain fed to combine() is the mm WINDOW-TOTAL, not a per-day mean", () => {
+    // Three qualifying years. Each year: every in-window day carries r = 2mm and a fixed
+    // t/f so temp+wind are known too. Per-year rain WINDOW-TOTAL = 14 days * 2mm = 28mm;
+    // averaged across the three identical years = 28mm. That mm total (NOT the 2mm daily
+    // mean, NOT a boolean) is what rainComponent must see.
+    const DAILY_R = 2;
+    const T = 12; // tempComponent(12) — inside the ramp, a real non-flat value
+    const F = 4; // windComponent(4)
+    const rows: DailyObservation[] = [];
+    for (let y = 2000; y <= 2002; y++) {
+      for (let doy = DEFAULT_WINDOW.startDoy; doy <= DEFAULT_WINDOW.endDoy; doy++) {
+        rows.push(row(10, `${y}-07-16`, doy, { t: T, f: F, r: DAILY_R }));
+      }
+    }
+    const file = synth(10, "sk", rows);
+    const d = computeMarkerDatum(synthMeta(10, "sk"), file, DEFAULT_WINDOW);
+
+    expect(d.sufficient).toBe(true);
+    expect(d.missingRain).toBe(false); // rain contributed
+    expect(d.score).not.toBeNull();
+
+    // The window-TOTAL mm the score is built from:
+    const windowTotalMm = WINDOW_DAYS * DAILY_R; // 28
+    const expected = combine({
+      temp: tempComponent(T),
+      rain: rainComponent(windowTotalMm),
+      wind: windComponent(F),
+    });
+    expect(d.score).toBe(expected.score);
+
+    // And CRUCIALLY: distinct from what a per-day-MEAN mistake would produce. Feeding the
+    // 2mm daily mean into rainComponent gives a different (much higher) rain contribution.
+    const wrongMeanBased = combine({
+      temp: tempComponent(T),
+      rain: rainComponent(DAILY_R), // 2mm — the daily-mean bug
+      wind: windComponent(F),
+    });
+    expect(rainComponent(windowTotalMm)).not.toBeCloseTo(rainComponent(DAILY_R), 5);
+    expect(d.score).not.toBe(wrongMeanBased.score);
+  });
+
+  it("AWS án úrkomu: all r === null → rain renormalized away → score !== null, missingRain=true", () => {
+    // Rain-less station (AWS): temp + wind present, no precip column. combine() must
+    // renormalize over temp+wind → a real score, NOT null and NOT a dry 10/10.
+    const T = 11;
+    const F = 5;
+    const rows: DailyObservation[] = [];
+    for (let y = 2000; y <= 2002; y++) {
+      for (let doy = DEFAULT_WINDOW.startDoy; doy <= DEFAULT_WINDOW.endDoy; doy++) {
+        rows.push(row(11, `${y}-07-16`, doy, { t: T, f: F })); // r stays null
+      }
+    }
+    const file = synth(11, "sj", rows);
+    const d = computeMarkerDatum(synthMeta(11, "sj"), file, DEFAULT_WINDOW);
+
+    expect(d.sufficient).toBe(true);
+    expect(d.score).not.toBeNull();
+    expect(d.missingRain).toBe(true); // án úrkomu — scored, not dropped
+    // Exactly the renormalized temp+wind combine (rain null):
+    const expected = combine({
+      temp: tempComponent(T),
+      rain: null,
+      wind: windComponent(F),
+    });
+    expect(d.score).toBe(expected.score);
+    // A rain-less station must NOT be silently scored as if rain were a perfect 10.
+    const dryBug = combine({
+      temp: tempComponent(T),
+      rain: rainComponent(0), // 0mm → rain 10/10, the Pitfall-2 bug
+      wind: windComponent(F),
+    });
+    expect(d.score).not.toBe(dryBug.score);
+  });
+
+  it("SYNOP three-component: rain present → all three contribute, missingRain=false", () => {
+    const T = 13;
+    const F = 3;
+    const DAILY_R = 3; // → 42mm window total
+    const rows: DailyObservation[] = [];
+    for (let y = 2000; y <= 2002; y++) {
+      for (let doy = DEFAULT_WINDOW.startDoy; doy <= DEFAULT_WINDOW.endDoy; doy++) {
+        rows.push(row(12, `${y}-07-16`, doy, { t: T, f: F, r: DAILY_R }));
+      }
+    }
+    const file = synth(12, "sk", rows);
+    const d = computeMarkerDatum(synthMeta(12, "sk"), file, DEFAULT_WINDOW);
+
+    expect(d.sufficient).toBe(true);
+    expect(d.missingRain).toBe(false);
+    const expected = combine({
+      temp: tempComponent(T),
+      rain: rainComponent(WINDOW_DAYS * DAILY_R),
+      wind: windComponent(F),
+    });
+    expect(d.score).toBe(expected.score);
+    expect(d.score).not.toBeNull();
+  });
+
+  it("insufficient coverage (n<3) → all metrics null → score:null (off-scale)", () => {
+    // Only 2 fully-covered years → sufficient === false → every component null →
+    // combine() returns score:null (present.length === 0). NOT NaN, NOT 0.
+    const rows: DailyObservation[] = [];
+    for (let y = 2000; y <= 2001; y++) {
+      for (let doy = DEFAULT_WINDOW.startDoy; doy <= DEFAULT_WINDOW.endDoy; doy++) {
+        rows.push(row(13, `${y}-07-16`, doy, { t: 10, f: 4, r: 2 }));
+      }
+    }
+    const file = synth(13, "sk", rows);
+    const d = computeMarkerDatum(synthMeta(13, "sk"), file, DEFAULT_WINDOW);
+
+    expect(d.sufficient).toBe(false);
+    expect(d.score).toBeNull();
+    // missingRain mirrors combine() over the empty component set (present.length===0).
+    expect(d.missingRain).toBe(true);
+  });
+
+  it("score is always number|null, never NaN", () => {
+    const rows: DailyObservation[] = [];
+    for (let y = 2000; y <= 2002; y++) {
+      for (let doy = DEFAULT_WINDOW.startDoy; doy <= DEFAULT_WINDOW.endDoy; doy++) {
+        rows.push(row(14, `${y}-07-16`, doy, { t: 9, f: 6, r: 1 }));
+      }
+    }
+    const file = synth(14, "sk", rows);
+    const d = computeMarkerDatum(synthMeta(14, "sk"), file, DEFAULT_WINDOW);
+    expect(d.score === null || typeof d.score === "number").toBe(true);
+    if (d.score !== null) expect(Number.isNaN(d.score)).toBe(false);
+    // One-decimal contract delegated to combine(): value has at most one decimal place.
+    if (d.score !== null) expect(Math.round(d.score * 10) / 10).toBe(d.score);
+  });
+
+  it("real committed sample: SYNOP #1 and AWS #1350 both get a non-null score", () => {
+    const dSynop = computeMarkerDatum(meta(1), SYNOP_1, DEFAULT_WINDOW);
+    expect(dSynop.score).not.toBeNull();
+    expect(dSynop.missingRain).toBe(false); // SYNOP #1 has rain
+
+    const dAws = computeMarkerDatum(meta(1350), AWS_1350, DEFAULT_WINDOW);
+    expect(dAws.score).not.toBeNull(); // án úrkomu is still scored + ranked
+    expect(dAws.missingRain).toBe(true);
   });
 });
