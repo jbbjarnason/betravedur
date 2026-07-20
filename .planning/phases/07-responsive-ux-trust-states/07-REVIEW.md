@@ -17,7 +17,16 @@ findings:
   warning: 4
   info: 3
   total: 7
-status: issues_found
+status: fixed
+fixed_at: 2026-07-20
+fixed_commits:
+  WR-01: 55ea1fa
+  WR-02: d8b9fb4
+  WR-03: 33d3425
+  WR-04: 55ea1fa
+  IN-01: not-fixed (accepted frozen-geometry tradeoff — documented below)
+  IN-02: 9b827b6
+  IN-03: 55ea1fa
 ---
 
 # Phase 7: Code Review Report
@@ -25,7 +34,7 @@ status: issues_found
 **Reviewed:** 2026-07-20
 **Depth:** standard
 **Files Reviewed:** 8
-**Status:** issues_found
+**Status:** fixed (all 4 warnings + IN-02/IN-03 fixed; IN-01 accepted as documented tradeoff)
 
 ## Summary
 
@@ -59,6 +68,11 @@ max-selection that depends on an unenforced ISO-format-uniformity invariant** (W
 
 ### WR-01: Sheet inline `transform` persists when the viewport crosses 640px while the panel is open
 
+**FIXED** (commit `55ea1fa`): `attachSheet` now registers a `matchMedia(MOBILE_QUERY)` `change`
+listener that, on the mobile→desktop crossing, clears the inline `transform`/`transition` so the
+desktop dock is CSS-owned; the desktop early-return also defensively clears any stale inline
+geometry. Listener removed in teardown. Regression tests added in `bottomSheet.test.ts`.
+
 **File:** `site/src/ui/bottomSheet.ts:83-94`, `site/src/ui/stationPanel.ts:649-660`
 
 **Issue:** `attachSheet` is matchMedia-gated ONLY at attach time (per-open), and on the
@@ -90,6 +104,11 @@ remove that listener in `teardown()`.
 
 ### WR-02: `showModal()` called unguarded in the button-click and `setFreshness` paths, but guarded in auto-open
 
+**FIXED** (commit `d8b9fb4`): a single guarded `openDialog()` helper
+(`typeof dialog.showModal === "function" && !dialog.open`) is now used at all three call sites
+(button click, first-visit auto-open, `setFreshness` re-open). A runtime lacking
+`HTMLDialogElement.showModal` now no-ops everywhere instead of TypeError-ing on click/refresh.
+
 **File:** `site/src/ui/infoPanel.ts:277-279, 289, 302`
 
 **Issue:** The first-visit auto-open guards `typeof dialog.showModal === "function"` (line 289),
@@ -112,6 +131,11 @@ const openDialog = (): void => {
 ```
 
 ### WR-03: `newestDataDate` selects the max by lexicographic string compare, valid only under an unenforced ISO-format invariant
+
+**FIXED** (commit `33d3425`): selection is now by PARSED timestamp (`new Date(iso).getTime()`),
+tracking `newestT`/`newest` and keeping the original string only for the winner; unparseable entries
+are still skipped. A regression test with a mixed-precision/offset manifest (a `+02:00` entry that is
+string-greatest but chronologically earlier, plus a no-millis entry) asserts the true newest wins.
 
 **File:** `site/src/data/freshness.ts:44-51`
 
@@ -143,6 +167,12 @@ return newest;
 
 ### WR-04: A matchMedia-driven `pointercancel` mid-drag leaves `sheetEl.style.transition = "none"` and does not resolve to a snap
 
+**FIXED** (commit `55ea1fa`, with WR-01): the breakpoint-change listener resets the drag machine on
+the mobile→desktop crossing (`dragging = false; transition = ""; transform = ""`), so a resize during
+an active drag returns the sheet to a clean CSS-owned state instead of freezing it mid-drag with
+easing disabled. A regression test drives a pointerdown then a crossing and asserts the reset (and
+that a following pointermove is a no-op).
+
 **File:** `site/src/ui/bottomSheet.ts:105-141`
 
 **Issue:** `onDown` sets `sheetEl.style.transition = "none"` (line 116) for raw finger-follow and
@@ -169,6 +199,13 @@ so a resize during a drag returns the element to a clean CSS-owned state.
 
 ### IN-01: `onMove` clamps against `peekY`/`expandedY` captured at attach — a resize that changes `section.offsetHeight` desyncs the snap targets
 
+**NOT FIXED — accepted tradeoff.** The review itself rates this low impact (panel content is built
+once per open; mobile height is `clamp(70svh…)`). The dominant desync source — a mobile→desktop
+breakpoint crossing — is now handled by WR-01's teardown, which re-attaches on the next open with
+fresh geometry. A resize that stays within mobile and changes height mid-open remains geometry-
+frozen by design; recomputing `peekY` at pointer-release was declined to keep the snap math simple
+and avoid churn on the Phase-6 seam. Documented as an explicit frozen-geometry acceptance.
+
 **File:** `site/src/ui/stationPanel.ts:652-654`, `site/src/ui/bottomSheet.ts:90, 122-125`
 
 **Issue:** `peekY = section.offsetHeight - peekVisible` and `expandedY = 0` are computed ONCE at
@@ -180,6 +217,10 @@ height is `clamp(70svh…)`), but the snap math is geometry-frozen. Consider rec
 `sheetEl.offsetHeight` at pointer-release, or accept the frozen-geometry tradeoff explicitly.
 
 ### IN-02: `showEmptyState` and `showMapError` can both be present simultaneously (independent idempotence, no mutual exclusion)
+
+**FIXED** (commit `9b827b6`): `showMapError` now removes any existing `.bv-state--empty` overlay
+(error supersedes empty — the more actionable failure), and `showEmptyState` no-ops when a
+`.bv-state--error` is already present. At most one state card renders on the flex-centered host.
 
 **File:** `site/src/ui/states.ts:114-144`, `site/src/main.ts:205-208, 331-340`, `site/src/map/init.ts:58-61`
 
@@ -194,6 +235,11 @@ center` (trust.css:16-24), so two `.bv-state` cards overlap. This is a plausible
 in the common single-failure path, hence Info.
 
 ### IN-03: `raiseAttribSafeBottom` sets `--attrib-safe-bottom` in px but never re-runs on resize; combined with WR-01 it can strand the safe band
+
+**FIXED** (commit `55ea1fa`, with WR-01): `attachSheet` now takes an `onLeaveMobile` callback fired
+on the mobile→desktop crossing; `stationPanel` passes `resetAttribSafeBottom`, so the lingering
+mobile px value is dropped and the trust.css `var(--bar-height…)` desktop baseline is restored
+without waiting for the next open/close.
 
 **File:** `site/src/ui/stationPanel.ts:337-345, 658`
 
