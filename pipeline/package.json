@@ -11,7 +11,8 @@
     "./backfill": "./src/backfill.ts",
     "./rawstore": "./src/rawstore.ts",
     "./manifest": "./src/manifest.ts",
-    "./stations": "./src/stations.ts"
+    "./stations": "./src/stations.ts",
+    "./aggregate": "./src/aggregate.ts"
   },
   "dependencies": {
     "@betravedur/domain": "*",

@@ -16,3 +16,4 @@ export { contentHash, updateManifest, serializeManifest, readManifest, HASH_LEN 
 export type { Manifest, ManifestEntry, HighWaterMarks } from "./manifest.js";
 export { buildStationsJson, serializeStationsJson } from "./stations.js";
 export type { StationEntry } from "./stations.js";
+export { aggregateStation, shipOutputs, main as aggregateMain } from "./aggregate.js";
