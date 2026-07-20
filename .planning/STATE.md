@@ -95,7 +95,9 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- Phase 7 (UX-05): map-load error UI ("Ekki tókst að hlaða kortið" / "Reyndu að hlaða síðunni aftur.") — Phase 3 UI review flagged the map error path silently console.errors. Belongs to Phase 7's loading/empty/no-data states.
+- Phase 7 (UX-05): empty "Engar veðurstöðvar" state when stations.json is empty/404 — deferred from Phase 3 UI review; matters for full-dataset deploy.
+- Basemap: country renders both "ICELAND" and "Ísland" despite lang:"is" (Protomaps grayscale flavor limitation) — revisit at a future basemap refresh, not blocking.
 
 ### Blockers/Concerns
 
