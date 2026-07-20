@@ -17,7 +17,7 @@ findings:
   warning: 6
   info: 4
   total: 11
-status: issues_found
+status: fixed
 ---
 
 # Phase 2: Code Review Report
@@ -25,7 +25,28 @@ status: issues_found
 **Reviewed:** 2026-07-20T00:00:00Z
 **Depth:** standard
 **Files Reviewed:** 8
-**Status:** issues_found
+**Status:** fixed
+
+## Fix Status
+
+All 1 Critical + 6 Warnings addressed, plus IN-01 (cheap defensive guard). IN-02/IN-03/IN-04
+deferred as they expand scope (ship-step assertion, cross-package refactor, CLI progress
+reporting) — see per-finding notes. Regression tests added for every fix; full suite green
+(145 passed) and `pipeline` + `packages/fetch` typechecks clean.
+
+| Finding | Status | Commit(s) |
+|---------|--------|-----------|
+| CR-01 | Fixed | `26f5a39` (rawstore guards), `ab034e7` (aggregate root-containment) |
+| WR-01 | Fixed | `ab034e7` |
+| WR-02 | Fixed | `25b7119` |
+| WR-03 | Fixed | `ab034e7` |
+| WR-04 | Fixed | `7e7f177` |
+| WR-05 | Fixed | `e5c41f8` (encode param), `ab034e7` (aggregate wiring) |
+| WR-06 | Fixed | `26f5a39` |
+| IN-01 | Fixed | `e5c41f8` |
+| IN-02 | Deferred | out of scope (belongs to Phase-8 ship step) |
+| IN-03 | Deferred | out of scope (cross-package `@betravedur/domain` refactor) |
+| IN-04 | Deferred | out of scope (CLI progress reporting) |
 
 ## Summary
 
@@ -48,6 +69,8 @@ hardcoded secrets were found; raw data is architecturally prevented from shippin
 ## Critical Issues
 
 ### CR-01: Station/year values are interpolated into filesystem paths without validation (path traversal)
+
+**Fixed:** `26f5a39` + `ab034e7` — added `assertStationId`/`assertYear` guards at every rawstore boundary (partitionPath/readPartition/upsertPartition incl. empty-rows path/highWaterYear), an `assertUnderRoot` resolved-prefix check before the aggregate `writeFileSync`, and a station-id assert entering `aggregateStation`. Regression tests cover `../evil`, `-1`, `1.5`, `NaN`, `Infinity`.
 
 **File:** `pipeline/src/rawstore.ts:42-44`, and callers `pipeline/src/aggregate.ts:61-70,116-127`
 
@@ -81,6 +104,8 @@ Apply the same guard to `year` in `partitionPath`, and in `aggregate.ts` verify 
 
 ### WR-01: Aggregate partial failure orphans derived files and leaves manifest stale
 
+**Fixed:** `ab034e7` — new `aggregateAll` persists `manifest.json` after each successful station and once more in a `finally`, so a mid-loop throw always leaves the manifest referencing every derived file already written. Test injects an invalid id mid-loop and asserts no orphans.
+
 **File:** `pipeline/src/aggregate.ts:164-177`
 
 **Issue:** `main` writes `derived/{station}.{hash}.json` inside `aggregateStation` (line 128)
@@ -98,6 +123,8 @@ no partial derived files. At minimum, wrap the loop so a failure still writes th
 the stations that succeeded.
 
 ### WR-02: `backfillStation` return value disagrees with what a resume computes after trailing no-data years
+
+**Fixed:** `25b7119` — `backfillStation` now returns `deps.highWaterYear(id)` (the actual last year with data on disk), falling back to the last attempted year only when the store is empty. Tests cover the trailing-404 and all-empty cases.
 
 **File:** `pipeline/src/backfill.ts:114-122`
 
@@ -118,6 +145,8 @@ and is advisory only. Prefer deriving it from the store so it matches resume.
 
 ### WR-03: stations.json inclusion gate uses a hardcoded 92-day summer window that no test exercises
 
+**Fixed:** `ab034e7` — extracted `152`/`243`/`0.8` into named exported constants (`SUMMER_WINDOW_START_DOY`/`END_DOY`/`MIN_COVERAGE`), exported `countQualifyingYears`, and added tests driving the real 92-day ≥80% gate on daily-row fixtures: a station that just qualifies (3 full summers), one that just misses (a year at ~50%), a null-temp year, and a winter-rich/summer-sparse station (documenting the policy that it is excluded).
+
 **File:** `pipeline/src/aggregate.ts:87-94`
 
 **Issue:** `countQualifyingYears` gates map inclusion on a fixed `{startDoy:152,endDoy:243}`
@@ -135,6 +164,8 @@ coverage into named constants with a rationale, and consider whether a single su
 the right universal gate (vs. any window a station qualifies for).
 
 ### WR-04: Redundant re-read + double-encode of every station in aggregate `main`
+
+**Fixed:** `7e7f177` — added `aggregateStationWithDerived` returning both the manifest and the `DerivedFile` it already computed; the CLI loop decodes that once instead of re-reading + re-encoding. `aggregateStation` is preserved (delegates) for backward compatibility.
 
 **File:** `pipeline/src/aggregate.ts:165-167`
 
@@ -156,6 +187,8 @@ qualifyingCounts.set(id, countQualifyingYears(decodeDerived(derived)));
 
 ### WR-05: `encodeDerived` on an empty station emits `station: 0`, silently mislabeling the file
 
+**Fixed:** `e5c41f8` + `ab034e7` — `encodeDerived` now takes an optional `stationId` threaded from `aggregateStation`/`main`, so the empty-station derived payload carries the true id (matching its filename), not `0`. Test asserts the in-file station matches the filename.
+
 **File:** `pipeline/src/derive.ts:106-108`, consumed at `pipeline/src/aggregate.ts:110-113`
 
 **Issue:** When `rows.length === 0`, `encodeDerived` returns `{ station: 0, ... }`. In
@@ -169,6 +202,8 @@ station 0. Any client keying on the in-file `station` would mis-attribute the da
 inferring from `rows[0]`), so the empty case still emits the correct id.
 
 ### WR-06: `readPartition` does an unguarded `JSON.parse` per line — one corrupt byte crashes the whole run
+
+**Fixed:** `26f5a39` — `readPartition` now catches parse errors per line, skips the offending line with a diagnosable warning identifying the partition and line number (mirroring `readManifest`), and counts skips. Corrupt-line regression test added.
 
 **File:** `pipeline/src/rawstore.ts:86-90`
 
@@ -187,6 +222,8 @@ does not silently take down an unrelated station's aggregation.
 
 ### IN-01: `encodeDerived` can produce `NaN` length if every row has an unparseable year
 
+**Fixed:** `e5c41f8` — added the `if (!Number.isFinite(minYear))` guard returning an empty derived file before the `new Array(nYears*365)` allocation.
+
 **File:** `pipeline/src/derive.ts:114-123`
 
 **Issue:** If `rows.length > 0` but every row fails `Number.isInteger(y)` (line 117), `minYear`
@@ -197,6 +234,8 @@ upstream), but there is no defensive guard.
 **Fix:** After the min/max scan, guard `if (!Number.isFinite(minYear)) return { station, type, startYear: 0, nYears: 0, quant, cols: {} };`.
 
 ### IN-02: `raw/` non-shipping is a documented convention, not an enforced invariant
+
+**Deferred:** out of scope — the assertion belongs to the Phase-8 ship step, which does not exist yet.
 
 **File:** `pipeline/src/aggregate.ts:56-58`
 
@@ -211,6 +250,8 @@ descendant rather than relying on `shipOutputs()` being used correctly.
 
 ### IN-03: Magic day-of-year constants duplicated across derive.ts and window.ts
 
+**Deferred:** out of scope — single-sourcing the cumulative-days table requires exporting new API from `@betravedur/domain` (a cross-package change beyond this fix pass). The `152`/`243` window bounds in aggregate.ts were named as part of WR-03.
+
 **File:** `pipeline/src/derive.ts:28-30` (and `152`/`243` in `aggregate.ts:89`)
 
 **Issue:** `CUMULATIVE_DAYS_BEFORE_MONTH` is copy-pasted from `packages/domain/src/window.ts:7-21`.
@@ -222,6 +263,8 @@ bare magic numbers.
 and import it in derive.ts, so the inverse pair is single-sourced.
 
 ### IN-04: `main` CLI errors surface only via `process.exitCode = 1` with no partial-progress report
+
+**Deferred:** out of scope — CLI progress reporting is an operator-ergonomics enhancement, not a correctness fix. (`aggregateAll` now tracks a `completed` list, so the wiring for this exists when it is picked up.)
 
 **File:** `pipeline/src/aggregate.ts:188-193`, `pipeline/src/backfill.ts:152-157`
 
