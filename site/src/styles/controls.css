@@ -250,11 +250,35 @@
  *
  * Lift the bottom attribution groups above the bar. controlBar.ts writes the bar's measured
  * height into `--bar-height` on mount + resize; the static fallback (100px) covers the desktop
- * bar (~88-96px) before/if that measurement is unavailable. `--space-xs` adds a small breathing
- * gap so the credit clears the bar's top hairline. */
+ * bar (~88-96px) before/if that measurement is unavailable.
+ *
+ * BLOCKER (licensing, UI-REVIEW): `--space-xs` (4px) was too small a gap. At widths ≥1024px the
+ * MapLibre attribution auto-expands to its full text; the credit is left-aligned and wraps to
+ * fill the full-width bottom-right container, so its wrapped lines slid LEFT into the bottom-left
+ * legend's column and vertical band. The legend (z-index 10, rgba 0.92 surface) painted OVER the
+ * credit, partially obscuring the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa attribution
+ * — an attribution-legibility (licensing) violation. Two coordinated fixes:
+ *   (1) lift the whole attribution group to `--space-lg` (24px) above the bar (was --space-xs);
+ *   (2) CAP the expanded credit's width so its wrapping text stays in the RIGHT portion of the
+ *       viewport, clear of the bottom-left legend column (legend: left --space-md + max-width
+ *       320px ⇒ occupies up to ~336px on the left). Capping the credit to 60% and right-aligning
+ *       it inside the right-anchored container keeps every wrapped line to the right of the
+ *       legend, so the two never intersect at 1024/1280/1440 widths — the credit stays legible. */
 .maplibregl-ctrl-bottom-right,
 .maplibregl-ctrl-bottom-left {
-  margin-bottom: calc(var(--bar-height, 100px) + var(--space-xs));
+  margin-bottom: calc(var(--bar-height, 100px) + var(--space-lg));
+}
+
+/* Keep the expanded/auto-shown attribution credit in the RIGHT portion so its wrapped lines
+ * never slide under the bottom-left legend. The container is right-anchored; capping the credit's
+ * max-width + right-aligning the text holds it clear of the legend's left column (licensing). */
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib {
+  max-width: 60vw;
+  margin-left: auto; /* hug the right edge within the full-width container */
+  text-align: right;
+}
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib-inner {
+  text-align: right;
 }
 
 /* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */

@@ -88,6 +88,78 @@ test("attribution: the credit control is NOT occluded by the bottom control bar 
   expect(attribBox!.y + attribBox!.height).toBeLessThanOrEqual(barBox!.y + 1);
 });
 
+test("attribution: the credit control is NOT occluded by the bottom-left legend when it WRAPS at ≥1024px (licensing)", async ({
+  page,
+}) => {
+  // BLOCKER regression guard (UI-REVIEW): at widths ≥1024px the MapLibre attribution expands to
+  // its full text and wraps to multiple lines. Previously the attribution was lifted only
+  // --space-xs (4px) above the bar while the bottom-left legend floor sat at --space-lg (24px),
+  // so the wrapped attribution rose INTO the legend's band and the legend's rgba(0.92) surface
+  // slid over the credit — degrading legibility of the CC BY 4.0 / OpenStreetMap credit. The fix
+  // lifts the attribution to --space-lg so its box never intersects the legend at 1024/1280/1440.
+  //
+  // This test explicitly EXPANDS the attribution (forcing the wrap case the earlier assertion
+  // missed) and asserts the attribution box does not intersect the legend box at each width.
+  const widths = [1024, 1280, 1440];
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/");
+
+    // The legend and control bar mount after the initial marker render.
+    const bar = page.locator(".control-bar");
+    await bar.waitFor({ state: "visible", timeout: 20_000 });
+    const legend = page.locator('.score-legend, [aria-label="Skýring á einkunn"]').first();
+    await legend.waitFor({ state: "visible", timeout: 20_000 });
+
+    // The AttributionControl is added bottom-RIGHT (map/init.ts); the legend is a fixed panel
+    // bottom-LEFT. The margin-bottom lift in controls.css covers BOTH bottom groups, so lifting
+    // the attribution to --space-lg keeps it clear of the legend floor even when it wraps.
+    // NOTE: the `.maplibregl-ctrl-bottom-right` CONTAINER spans the full viewport width, so we
+    // must measure the actual credit element (`.maplibregl-ctrl-attrib`), whose box is the real
+    // painted, right-aligned credit — that is what can slide under the legend.
+    const container = page.locator(".maplibregl-ctrl-bottom-right").first();
+    await expect(container).toBeVisible({ timeout: 20_000 });
+    const attrib = page.locator(".maplibregl-ctrl-attrib").first();
+
+    // Force the attribution to its FULL (wrapping, multi-line) text — the wrap case the earlier
+    // one-line assertion missed. MapLibre's compact control expands via the toggle button; some
+    // builds render expanded already, so this is best-effort and idempotency-safe.
+    const isShown = await attrib.evaluate(
+      (el) => el.classList.contains("maplibregl-compact-show") || !el.classList.contains("maplibregl-compact"),
+    ).catch(() => false);
+    if (!isShown) {
+      const toggle = page.locator(".maplibregl-ctrl-attrib-button");
+      if (await toggle.count()) {
+        await toggle.first().click({ trial: false }).catch(() => undefined);
+      }
+    }
+
+    // Let the ResizeObserver-driven --bar-height write + attribution expansion + layout settle.
+    await page.waitForTimeout(400);
+
+    // Measure the ACTUAL painted credit box (right-aligned, wrapped) vs the legend box.
+    const attribBox = await attrib.boundingBox();
+    const legendBox = await legend.boundingBox();
+    expect(attribBox, `attribution box at ${width}px`).not.toBeNull();
+    expect(legendBox, `legend box at ${width}px`).not.toBeNull();
+
+    // Axis-aligned bounding-box intersection test: the two boxes must NOT overlap. A 1px
+    // tolerance absorbs sub-pixel rounding on shared edges.
+    const a = attribBox!;
+    const l = legendBox!;
+    const overlaps =
+      a.x < l.x + l.width - 1 &&
+      a.x + a.width > l.x + 1 &&
+      a.y < l.y + l.height - 1 &&
+      a.y + a.height > l.y + 1;
+    expect(
+      overlaps,
+      `attribution [${a.x},${a.y},${a.width}x${a.height}] must not intersect legend ` +
+        `[${l.x},${l.y},${l.width}x${l.height}] at ${width}px (licensing legibility)`,
+    ).toBe(false);
+  }
+});
+
 test("interactivity: zooming in raises the map zoom level", async ({ page }) => {
   await page.goto("/");
   await page.locator("canvas.maplibregl-canvas").waitFor({ state: "visible", timeout: 15_000 });
