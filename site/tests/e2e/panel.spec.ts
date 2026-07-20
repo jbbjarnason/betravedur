@@ -92,7 +92,7 @@ test("wave-0 smoke: preview build boots, map style-loads, a pill renders, no pag
 // The comment on each names the plan that will un-fixme and implement it.
 // ---------------------------------------------------------------------------
 test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Visual Criteria)", () => {
-  test.fixme(
+  test(
     "criterion 1: clicking a station opens a station-panel (aria-label = station name) [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -124,7 +124,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 3: the three exact reading-key sentences are present as DOM text [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -137,7 +137,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 4: a Dagsbirta label + a value matching /\\d+,\\d+\\s*klst\\./ [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -149,7 +149,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 5: a no-data station shows 'engin gögn fyrir þetta tímabil' (text), no populated canvas [06-02/06-03]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -170,27 +170,28 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
-    "criterion 6: an án-úrkomu station renders temp+wind canvases but a precip no-gauge message [06-02/06-03]",
+  test(
+    "criterion 6 (text portion): an án-úrkomu station shows the precip no-gauge message [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
-      // Open a station known to lack a precip gauge (AWS). 06-02/06-03 will pick a concrete
-      // fixture station id; here we assert the invariant on whichever station lacks precip.
+      // Open the first rendered station. If it lacks a precip gauge (AWS "án úrkomu"), the precip
+      // figure must show the no-gauge message. The temp/wind CANVAS assertions belong to 06-03
+      // (charts do not exist in this wave — the sufficient slots show the `hleð riti…` stub); this
+      // wave gates only the text-portion invariant (CHART-04 honesty), per 06-02-PLAN.
       await openPanelViaMarker(page);
       const panel = page.locator(PANEL);
       const precipFigure = panel.locator("figure").filter({ hasText: "Úrkoma" });
-      const isAnUrkomu = (await precipFigure.getByText("engin úrkomumæling á þessari stöð").count()) > 0;
+      const isAnUrkomu =
+        (await precipFigure.getByText("engin úrkomumæling á þessari stöð").count()) > 0;
       test.skip(!isAnUrkomu, "opened station has a precip gauge");
-      // Temp + wind canvases still render for an án-úrkomu station.
-      await expect(panel.locator("figure").filter({ hasText: "Hiti" }).locator("canvas")).toBeVisible();
-      await expect(panel.locator("figure").filter({ hasText: "Vindur" }).locator("canvas")).toBeVisible();
-      // The precip figure shows the no-gauge message INSTEAD of a bar canvas.
+      // The precip figure shows the no-gauge message (never a blank bar canvas / zero bars).
       await expect(precipFigure).toContainText("engin úrkomumæling á þessari stöð");
+      // No chart canvas in this wave (06-03 mounts ECharts; the no-gauge figure never gets one).
       expect(await precipFigure.locator("canvas").count()).toBe(0);
     },
   );
 
-  test.fixme(
+  test(
     "criterion 7: close (aria-label 'Loka') removes the panel, clears URL 'st', restores the ranked list [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -206,7 +207,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 8: the ranked 'Bestu staðir' list is hidden/yielded while the panel is open [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -218,7 +219,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 9: Escape closes the panel (panel gone, 'st' cleared, ranked list restored) [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
@@ -232,8 +233,8 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
-    "criterion 10: opening the panel fires ZERO data/ network requests (the echarts JS chunk is allowed) [06-03]",
+  test(
+    "criterion 10: opening the panel fires ZERO data/ network requests (the echarts JS chunk is allowed) [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
       let dataRequests = 0;
@@ -299,7 +300,7 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     },
   );
 
-  test.fixme(
+  test(
     "criterion 13: every Icelandic-formatted panel number uses a comma decimal, never a '.' [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
