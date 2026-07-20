@@ -69,7 +69,11 @@ Plans:
   2. Station markers show historical averages for the current period: temperature, wind speed + direction arrow, and a precipitation indicator
   3. Marker density adapts to zoom so stations become readable rather than overlapping as the user zooms in
   4. The site is fully static (Vite/TS build), Icelandic-only, carries the slogan in the branding, and builds and deploys to GitHub Pages
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Foundation slice: site/ Vite+TS workspace, committed PMTiles Iceland basemap + sample data, MapLibre map + Icelandic header/slogan + CC BY 4.0 attribution, preview-build E2E gate (MAP-01, UX-01, SITE-01)
+- [ ] 03-02-PLAN.md — Data layer (TDD): manifest hashed-filename resolution + decodeDerived → domain averages → MarkerDatum (án úrkomu / breytileg átt / ófullnægjandi gögn) (MAP-02)
+- [ ] 03-03-PLAN.md — Marker render slice: symbol-layer collision + hybrid white-pill composite at zoom-adaptive density + full 11-criterion UI-SPEC E2E gate (MAP-02, MAP-04)
 **UI hint**: yes
 
 ### Phase 4: Selection & Instant Recompute
@@ -145,7 +149,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
-| 3. Static Site Shell & Interactive Map | 0/TBD | Not started | - |
+| 3. Static Site Shell & Interactive Map | 0/3 | Not started | - |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
