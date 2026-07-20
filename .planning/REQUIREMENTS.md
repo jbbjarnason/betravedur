@@ -26,10 +26,10 @@
 
 ### Selection
 
-- [ ] **SEL-01**: User can select a time-of-year window of 1 week, 2 weeks, 3 weeks, or 1 month
-- [ ] **SEL-02**: User can select the baseline year range the averages are computed over (e.g. 2010–2015)
-- [ ] **SEL-03**: Every displayed average shows how many years it is actually based on ("meðaltal N ára"), where N derives from real data coverage, not the picker range
-- [ ] **SEL-04**: Changing period or year range recomputes and recolors the map instantly client-side (no page reload, no network fetch)
+- [x] **SEL-01**: User can select a time-of-year window of 1 week, 2 weeks, 3 weeks, or 1 month
+- [x] **SEL-02**: User can select the baseline year range the averages are computed over (e.g. 2010–2015)
+- [x] **SEL-03**: Every displayed average shows how many years it is actually based on ("meðaltal N ára"), where N derives from real data coverage, not the picker range
+- [x] **SEL-04**: Changing period or year range recomputes and recolors the map instantly client-side (no page reload, no network fetch)
 
 ### Score & Ranking
 
@@ -94,10 +94,10 @@ Which phases cover which requirements.
 | MAP-04 | Phase 3 | Complete |
 | UX-01 | Phase 3 | Complete |
 | SITE-01 | Phase 3 | Complete |
-| SEL-01 | Phase 4 | Pending |
-| SEL-02 | Phase 4 | Pending |
-| SEL-03 | Phase 4 | Pending |
-| SEL-04 | Phase 4 | Pending |
+| SEL-01 | Phase 4 | Complete |
+| SEL-02 | Phase 4 | Complete |
+| SEL-03 | Phase 4 | Complete |
+| SEL-04 | Phase 4 | Complete |
 | UX-02 | Phase 4 | Pending |
 | MAP-03 | Phase 5 | Pending |
 | SCORE-02 | Phase 5 | Pending |
