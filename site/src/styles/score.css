@@ -445,3 +445,122 @@
   line-height: 1.4;
   color: var(--muted-ink);
 }
+
+/* ── Mobile chips: ranked "Bestu staðir" + legend "Einkunn" (< 640px) ─────────────────────────
+ * The two chip toggles use the SAME chrome — a compact glass pill in ink/dominant/hairline tokens
+ * only (NEVER the reserved accent, score-ramp, or chart-series families as chrome). Hidden on
+ * desktop; on mobile they replace
+ * the standing panels so the map is not permanently crowded (UI-SPEC Responsive region table).
+ * ≥44px pressable (touch-target rule, verified at 390px). */
+.ranked-list__chip,
+.score-legend__chip {
+  display: none; /* desktop: the full list/legend shows, the chip is inert */
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.ranked-list__chip:hover,
+.score-legend__chip:hover {
+  background: var(--dominant);
+}
+.ranked-list__chip:focus-visible,
+.score-legend__chip:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  /* ── Ranked list → chip + overlay ──────────────────────────────────────────
+   * The section becomes a self-sizing chip anchored top-left (clear of the top-right info button);
+   * the header + body are hidden until the chip is tapped. Tapping shows the body as an overlay
+   * card over the map (fixed, below the header band, above markers). */
+  .ranked-list {
+    top: calc(56px + var(--space-sm));
+    left: var(--space-md);
+    right: auto;
+    bottom: auto;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--space-md));
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .ranked-list__chip {
+    display: inline-flex;
+  }
+  /* The header (title + collapse chevron) is redundant on mobile — the chip owns the label. */
+  .ranked-list__header {
+    display: none;
+  }
+  /* The list body is an overlay card, hidden until the chip is open. */
+  .ranked-list__body {
+    display: none;
+    position: fixed;
+    top: calc(56px + var(--space-sm) + 44px + var(--space-xs));
+    left: var(--space-md);
+    width: min(320px, calc(100vw - 2 * var(--space-md)));
+    max-height: 60svh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+  }
+  .ranked-list--chip-open .ranked-list__body {
+    display: block;
+  }
+
+  /* ── Legend → chip + popover ────────────────────────────────────────────────
+   * The bottom-left legend collapses to a chip; its body opens as a popover over the map. The chip
+   * sits in the bottom-left safe band (clear of the control bar + attribution). */
+  .score-legend {
+    left: var(--space-md);
+    bottom: calc(var(--attrib-safe-bottom, var(--bar-height, 100px)) + var(--space-sm));
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--space-md));
+    padding: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 0;
+    box-shadow: none;
+  }
+  .score-legend__chip {
+    display: inline-flex;
+  }
+  /* The legend body is a popover above the chip, hidden until the chip is open. */
+  .score-legend__body {
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: calc(44px + var(--space-xs));
+    width: min(320px, calc(100vw - 2 * var(--space-md)));
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+  }
+  .score-legend--chip-open .score-legend__body {
+    display: block;
+  }
+}

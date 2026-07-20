@@ -34,6 +34,7 @@ import {
 } from "@betravedur/domain";
 import { anchorToWindow } from "../data/window.js";
 import { daylightHours, type DaylightResult } from "../data/daylight.js";
+import { attachSheet, MOBILE_QUERY } from "./bottomSheet.js";
 import type { SelectionStore } from "../state/store.js";
 import type { StationCache } from "../state/recompute.js";
 import type { RankedListHandle } from "./rankedList.js";
@@ -42,6 +43,7 @@ import type { MarkerDatum } from "../data/types.js";
 /** Copy — UI-SPEC Copywriting Contract, final Icelandic strings (verbatim). */
 const COPY = {
   close: "Loka",
+  dragHandle: "Stækka eða minnka spjald",
   daylightLabel: "Dagsbirta",
   daylightUnit: "klst.",
   chartTitles: { temp: "Hiti", wind: "Vindur", precip: "Úrkoma" },
@@ -320,6 +322,27 @@ export function mountStationPanel(
   // Every ECharts instance mounted for the CURRENT panel (CR-01). Disposed on close AND before
   // every re-open so no instance/canvas/ResizeObserver leaks across station-to-station switches.
   let liveCharts: DisposableChart[] = [];
+  // The bottom-sheet drag controller teardown (mobile only). Attached per-open (Pitfall 1 — the
+  // panel rebuilds every open), removed in teardown() next to disposeCharts(). null on desktop.
+  let detachSheet: (() => void) | null = null;
+
+  /**
+   * Raise the attribution safe-zone (--attrib-safe-bottom) to the sheet's current VISIBLE height
+   * so the CC BY 4.0 + OSM credit stays legible above the sheet peek on mobile (the Plan-02
+   * attribution-solve-once contract). `translateY` is the sheet's top offset from the bottom-docked
+   * expanded box: visible height = sheetHeight - translateY, i.e. how far the sheet rises above the
+   * viewport bottom. The MapLibre bottom controls already clear `--attrib-safe-bottom + --space-sm`.
+   * Mobile-only (guarded by the caller); on desktop the safe-zone stays at the control-bar baseline.
+   */
+  const raiseAttribSafeBottom = (sheetEl: HTMLElement, translateY: number): void => {
+    const visible = Math.max(0, sheetEl.offsetHeight - translateY);
+    document.documentElement.style.setProperty("--attrib-safe-bottom", `${Math.round(visible)}px`);
+  };
+
+  /** Reset the attribution safe-zone to its control-bar baseline (trust.css :root default). */
+  const resetAttribSafeBottom = (): void => {
+    document.documentElement.style.removeProperty("--attrib-safe-bottom");
+  };
 
   /** Dispose + clear every tracked chart handle (CR-01). Idempotent. */
   const disposeCharts = (): void => {
@@ -345,6 +368,14 @@ export function mountStationPanel(
     // CR-01: dispose every ECharts instance BEFORE the host DOM is removed so no instance (its
     // canvas, render loop, global-registry entry) or ResizeObserver outlives the panel node.
     disposeCharts();
+    // Pitfall 1: detach the bottom-sheet drag controller (mobile) — the panel rebuilds per open,
+    // so its listeners must be removed here alongside the charts.
+    if (detachSheet) {
+      detachSheet();
+      detachSheet = null;
+    }
+    // Restore the attribution safe-zone to its control-bar baseline (the sheet no longer raises it).
+    resetAttribSafeBottom();
     panel.remove();
     panel = null;
     rankedList.setYielded(false);
@@ -387,6 +418,16 @@ export function mountStationPanel(
     section.className = "station-panel";
     section.setAttribute("aria-label", name); // aria-label = the station name (criterion 1)
     section.tabIndex = -1;
+
+    // ── Drag handle (mobile sheet grabber) — CSS hides it on desktop ─────────
+    // A native <button> so it is focusable + keyboard-operable (Enter/Space toggles peek↔expanded
+    // via attachSheet). It is the FIRST child of the panel (above the header) so it reads as the
+    // sheet's top grabber. On desktop `.station-panel__handle { display:none }` hides it entirely.
+    const handle = document.createElement("button");
+    handle.type = "button";
+    handle.className = "station-panel__handle";
+    handle.setAttribute("aria-label", COPY.dragHandle);
+    section.appendChild(handle);
 
     // ── Header: name + close ─────────────────────────────────────────────────
     const header = document.createElement("header");
@@ -566,6 +607,10 @@ export function mountStationPanel(
         return;
       }
       if (ev.key !== "Tab") return;
+      // Non-modal mobile sheet (RESEARCH anti-pattern): do NOT trap focus on mobile — the map must
+      // stay keyboard/pointer reachable above the sheet. The desktop side panel keeps its Tab-cycle
+      // trap (it is a modal-like right-dock overlay). Only cycle focus when NOT in sheet mode.
+      if (typeof matchMedia !== "undefined" && matchMedia(MOBILE_QUERY).matches) return;
       const focusables = Array.from(
         section.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
@@ -591,6 +636,29 @@ export function mountStationPanel(
 
     document.body.appendChild(section);
     panel = section;
+
+    // ── Bottom-sheet drag controller (mobile only) ───────────────────────────
+    // Attach AFTER append so offsetHeight is measurable (the CSS @media sizes the sheet to the
+    // expanded snap). Compute the two snap points in translateY terms:
+    //   expandedY = 0            (sheet fully up — its whole box visible)
+    //   peekY     = height - peekVisible   (only the peek band shows above the viewport bottom)
+    // peekVisible mirrors the CSS `clamp(96px, 18svh, 140px)` peek height so JS + CSS agree. The
+    // controller is matchMedia-gated internally, so on desktop this is a no-op teardown (the CSS
+    // @media owns the side-panel layout). onSnap raises --attrib-safe-bottom to the sheet top so
+    // the credit stays legible above the peek (Plan-02 contract) — mobile only.
+    const isMobile = typeof matchMedia !== "undefined" && matchMedia(MOBILE_QUERY).matches;
+    if (isMobile) {
+      // Use globalThis.innerHeight — a local `window` (WindowSpec) const shadows the global here.
+      const peekVisible = Math.min(140, Math.max(96, 0.18 * globalThis.innerHeight));
+      const expandedY = 0;
+      const peekY = Math.max(0, section.offsetHeight - peekVisible);
+      detachSheet = attachSheet(section, handle, {
+        peekY,
+        expandedY,
+        onSnap: (y) => raiseAttribSafeBottom(section, y),
+      });
+    }
+
     // Yield the ranked list (hide-not-destroy) while the panel is open (criterion 8).
     rankedList.setYielded(true);
     // Attribution legibility (UI licensing): push the bottom-right MapLibre credit clear of the

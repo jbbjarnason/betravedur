@@ -84,6 +84,21 @@ export function mountRankedList(
   section.className = "ranked-list";
   section.setAttribute("aria-label", COPY.title);
 
+  // ── Mobile chip (< 640px): a compact toggle labeled "Bestu staðir" ───────────────
+  // On mobile the right-docked list would crowd the map, so it collapses to a chip that toggles
+  // the list body as an overlay (UI-SPEC Responsive region table). CSS hides this chip on desktop
+  // (the full list shows) and hides the header on mobile (the chip owns the label). A native
+  // <button> → free keyboard/focus; the accessible name IS the label so getByRole("button",
+  // { name: "Bestu staðir" }) resolves it (criterion 5). ≥44px hit target (score.css).
+  const bodyId = "ranked-list-body";
+  const chip = document.createElement("button");
+  chip.type = "button";
+  chip.className = "ranked-list__chip";
+  chip.textContent = COPY.title; // accessible name = "Bestu staðir"
+  chip.setAttribute("aria-controls", bodyId);
+  chip.setAttribute("aria-expanded", "false");
+  section.appendChild(chip);
+
   // ── Header: title + collapse toggle ──────────────────────────────────────────
   const header = document.createElement("header");
   header.className = "ranked-list__header";
@@ -140,10 +155,23 @@ export function mountRankedList(
 
   const body = document.createElement("div");
   body.className = "ranked-list__body";
+  body.id = bodyId;
   body.append(list, empty);
 
   section.append(header, body);
   parent.appendChild(section);
+
+  // ── Mobile chip toggle: open/close the list overlay (< 640px) ─────────────────
+  // A `.ranked-list--chip-open` class on the section drives the CSS that shows the body as an
+  // overlay when the chip is tapped. On desktop the chip is `display:none` (CSS) so this state is
+  // inert. The chip stays collapsed while the sheet is open (setYielded hides the whole section).
+  const setChipOpen = (open: boolean): void => {
+    chip.setAttribute("aria-expanded", open ? "true" : "false");
+    section.classList.toggle("ranked-list--chip-open", open);
+  };
+  chip.addEventListener("click", () => {
+    setChipOpen(chip.getAttribute("aria-expanded") !== "true");
+  });
 
   // ── Collapse toggle ───────────────────────────────────────────────────────────
   let collapsed = false;
@@ -316,6 +344,9 @@ export function mountRankedList(
   const setYielded = (yielded: boolean): void => {
     section.hidden = yielded;
     section.classList.toggle("ranked-list--yielded", yielded);
+    // While the station sheet is open the ranked chip stays COLLAPSED (only one station-focused
+    // surface is expanded at a time — the mobile analog of the desktop ranked-list yield).
+    if (yielded) setChipOpen(false);
   };
 
   applyCollapse();

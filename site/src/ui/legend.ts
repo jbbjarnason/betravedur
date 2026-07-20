@@ -37,6 +37,20 @@ export function buildLegend(): HTMLElement {
   // Labelled region so assistive tech announces it as the score key.
   section.setAttribute("aria-label", "Skýring á einkunn");
 
+  // ── Mobile chip (< 640px): a compact "Einkunn" toggle over the permanently-open legend ──────
+  // On desktop the legend is a standing bottom-left panel; on mobile it collapses to a chip that
+  // toggles the legend body as a popover so it doesn't fight the sheet (UI-SPEC Responsive table).
+  // A native <button> whose accessible name IS "Einkunn" (getByRole button name resolves it,
+  // criterion 5). CSS hides the chip on desktop and the body on mobile-until-open. ≥44px (score.css).
+  const bodyId = "score-legend-body";
+  const chip = document.createElement("button");
+  chip.type = "button";
+  chip.className = "score-legend__chip";
+  chip.textContent = "Einkunn"; // accessible name = "Einkunn"
+  chip.setAttribute("aria-controls", bodyId);
+  chip.setAttribute("aria-expanded", "false");
+  section.appendChild(chip);
+
   // Title.
   const title = document.createElement("h2");
   title.className = "score-legend__title";
@@ -85,7 +99,16 @@ export function buildLegend(): HTMLElement {
 
   details.append(summary, body);
 
-  section.append(title, ramp, ticks, captions, rule, details);
+  // The legend content lives in a body container so the mobile chip can toggle it as a popover
+  // (the chip's aria-controls target). On desktop CSS shows it as the standing panel; on mobile it
+  // is hidden until the chip is tapped. The `title` stays inside so the desktop panel keeps its
+  // "Einkunn" heading; on mobile the chip carries the label and the heading is CSS-hidden.
+  const legendBody = document.createElement("div");
+  legendBody.className = "score-legend__body";
+  legendBody.id = bodyId;
+  legendBody.append(title, ramp, ticks, captions, rule, details);
+
+  section.append(legendBody);
   return section;
 }
 
@@ -95,5 +118,15 @@ export function buildLegend(): HTMLElement {
  * boot (it has no data dependency to re-drive).
  */
 export function mountLegend(parent: HTMLElement): void {
-  parent.appendChild(buildLegend());
+  const section = buildLegend();
+  // Wire the mobile chip toggle: tapping "Einkunn" opens/closes the legend popover (< 640px). A
+  // `.score-legend--chip-open` class on the section drives the CSS that reveals the body over the
+  // map. On desktop the chip is `display:none`, so this state is inert.
+  const chip = section.querySelector<HTMLButtonElement>(".score-legend__chip");
+  chip?.addEventListener("click", () => {
+    const open = chip.getAttribute("aria-expanded") !== "true";
+    chip.setAttribute("aria-expanded", open ? "true" : "false");
+    section.classList.toggle("score-legend--chip-open", open);
+  });
+  parent.appendChild(section);
 }

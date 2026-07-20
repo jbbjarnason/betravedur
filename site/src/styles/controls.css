@@ -232,6 +232,9 @@
 @media (max-width: 640px) {
   .control-bar__inner {
     flex-wrap: wrap;
+    /* Tighter gutter so the width group + year selects fit one row at 390 without overflow. */
+    gap: var(--space-sm);
+    row-gap: var(--space-sm);
   }
   .scrubber__range,
   .scrubber__ticks {
@@ -240,11 +243,36 @@
   .scrubber__stepper {
     display: flex;
   }
+  /* The stepper block takes a full row (it wraps the readout above), then the width group + year
+     selects share the next row. Each child may shrink/wrap so nothing overflows innerWidth
+     (criterion 3). The width group + year range can wrap onto their own line if the row is tight. */
+  .scrubber {
+    flex: 1 1 100%;
+  }
+  .width-group,
+  .year-range {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  /* Let the width buttons shrink their horizontal padding on very narrow rows (still ≥44px tall,
+     touch-target preserved) so four buttons + the year selects never push past 390px. */
+  .width-group__btn {
+    padding: 0 var(--space-sm);
+  }
+  /* Allow the year selects to shrink rather than force the row wider than the viewport. */
+  .year-range__select {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  /* The global "meðaltal N ára" readout may wrap instead of forcing a nowrap overflow at 390. */
+  .control-bar__readout {
+    white-space: normal;
+  }
 }
 
 /* ── Attribution safe zone (Phase 7 — the attribution debt, solved ONCE) ─────────────────────
  * SUPERSEDES the three incremental hacks that previously lived here (the bar-height margin lift,
- * the viewport-fraction right-align width cap on the expanded credit, and the station-panel-open
+ * the viewport-fraction right-align width cap on the expanded credit, and the station-side-panel
  * body-class margin push). Those were reactive per-surface patches; each new bottom surface (the
  * mobile sheet is a new one) needed another.
  *
@@ -253,15 +281,15 @@
  * bottom controls clear that band with a single margin. controlBar.ts still writes `--bar-height`
  * live on mount/resize — its consumer just moved to `--attrib-safe-bottom`.
  *
- * Why the deleted width-cap + panel-open push are no longer needed: the AttributionControl is
- * `compact:true` (init.ts), so the always-visible credit is a small single-line `(i)` toggle in
- * the bottom-right corner — it does not wrap into the bottom-left legend, and it clears the right-
- * docked station panel without a per-state margin (the panel's own bottom edge sits above this
- * safe band). CC BY 4.0 v4.0 + the OSM guidelines permit collapsing attribution behind an (i)
- * button as long as the full credit is findable, and it is: the info panel (trust.css /
- * infoPanel.ts) carries the complete CC BY 4.0 + OSM + Protomaps + Veðurstofa credit as the
- * always-legible licensing backstop. (The station-panel-open body class stays harmless — nothing
- * keys an attribution offset on it anymore.) */
+ * Why the deleted width-cap + side-panel body-class push are no longer needed: the
+ * AttributionControl is `compact:true` (init.ts), so the always-visible credit is a small
+ * single-line `(i)` toggle in the bottom-right corner — it does not wrap into the bottom-left
+ * legend, and it clears the right-docked station panel without a per-state margin (the panel's own
+ * bottom edge sits above this safe band). CC BY 4.0 v4.0 + the OSM guidelines permit collapsing
+ * attribution behind an (i) button as long as the full credit is findable, and it is: the info
+ * panel (trust.css / infoPanel.ts) carries the complete CC BY 4.0 + OSM + Protomaps + Veðurstofa
+ * credit as the always-legible licensing backstop. (The old body-class hook stays harmless —
+ * nothing keys an attribution offset on it anymore.) */
 .maplibregl-ctrl-bottom-right,
 .maplibregl-ctrl-bottom-left {
   margin-bottom: calc(var(--attrib-safe-bottom, 0px) + var(--space-sm));
