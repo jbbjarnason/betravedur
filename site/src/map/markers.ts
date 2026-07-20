@@ -137,6 +137,10 @@ export function formatCallout(d: MarkerDatum): { html: string; muted: boolean } 
   }
 
   // Wind — rotated arrow + speed, or the variable-direction label.
+  // IN-01: for data from computeMarkerDatum, `windDir === null` is already implied by
+  // `windVariable` (the producer sets them together). The `|| d.windDir === null` is a
+  // deliberate defensive belt-and-braces for externally-constructed data — it guarantees
+  // we never call windArrowSvg(null) even if a future producer sets one without the other.
   if (d.windVariable || d.windDir === null) {
     const speed =
       d.windSpeed !== null

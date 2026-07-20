@@ -48,8 +48,12 @@ const VARIABLE_DIRECTION_FLOOR = 0.5;
 function stationPriority(meta: StationMeta): number {
   // Type rank: SYNOP (sk) and climate (vf) are the "major" manned stations.
   const typeRank = meta.type === "sk" || meta.type === "vf" ? 0 : 1;
-  // Earlier start = deeper record = higher priority; normalize into a small band.
-  const startPenalty = (meta.start ?? 9999) / 10000; // ~0.19–0.20 for 1900s–2000s
+  // Earlier start = deeper record = higher priority; normalize into a small band
+  // (~0.19–0.20 for 1900s–2000s starts). IN-02: a MISSING `start` falls back to
+  // 9999/10000 ≈ 1.0 — nearly a full unit worse than any real start within the same
+  // typeRank, so unknown record depth deterministically sorts LAST within its rank
+  // (the intended "we can't vouch for its history, rank it lowest" behavior).
+  const startPenalty = (meta.start ?? 9999) / 10000;
   // Lower station id breaks remaining ties (stable, tiny contribution).
   const idPenalty = (meta.station ?? 0) / 1_000_000;
   return typeRank * 1000 + startPenalty + idPenalty;

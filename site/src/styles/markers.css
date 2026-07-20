@@ -14,7 +14,10 @@
   inset: 0;
   z-index: 5; /* above canvas (0), below header (10) */
   pointer-events: none;
-  overflow: hidden;
+  /* IN-03: visible (not hidden) so a pill anchored within ~half a pill-width of the map
+     edge isn't clipped by the overlay bounds. The map container already clips to the
+     canvas, and the overlay is pointer-events:none, so nothing intercepts clicks. */
+  overflow: visible;
 }
 
 /*
@@ -34,7 +37,7 @@
   color: var(--ink);
   border: 1px solid var(--hairline);
   border-radius: 8px;
-  padding: 4px 8px;
+  padding: var(--space-xs) var(--space-sm); /* 4px 8px, on the spacing scale */
   box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
 
   /* Compact tabular numerals so values don't jitter at zoom-density changes. */
@@ -73,6 +76,9 @@
 .marker-pill .marker-wind {
   display: inline-flex;
   align-items: center;
+  /* Intentional sub-token gap: 2px (below --space-xs / 4px) is a deliberate exception
+     to keep the arrow glyph tight against its speed numeral so they read as one unit,
+     distinct from the --space-xs gap that separates temp ↔ wind ↔ precip on the pill. */
   gap: 2px;
   color: var(--ink);
 }
