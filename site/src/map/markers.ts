@@ -233,7 +233,14 @@ function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
   pill.type = "button";
   pill.className = muted ? "marker-pill marker-pill--muted" : "marker-pill";
   pill.dataset.station = String(datum.station);
-  pill.setAttribute("aria-label", `${datum.name}`);
+  // Per-marker honest coverage (UI-SPEC meðaltal N ára): surface THIS station's qualifying-year
+  // count in the pill's aria-label so a screen-reader user on an individual marker hears its
+  // coverage, not just the name. N reflects the station's own qualifying years (MarkerDatum.n),
+  // never the picker span; insufficient stations carry the ófullnægjandi gögn honesty signal.
+  pill.setAttribute(
+    "aria-label",
+    datum.sufficient ? `${datum.name}: meðaltal ${datum.n} ára` : `${datum.name}: ófullnægjandi gögn`,
+  );
   pill.tabIndex = -1; // not yet in the tab order (activated in Phase 6)
   pill.innerHTML = html;
 
