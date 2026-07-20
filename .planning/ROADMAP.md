@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Derived Data Pipeline & Backfill** - Backfill history and precompute compact per-station derived files the browser can aggregate, kept within Pages limits (completed 2026-07-20)
 - [x] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages (completed 2026-07-20)
 - [x] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state (completed 2026-07-20)
-- [ ] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer
+- [x] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer (completed 2026-07-20)
 - [ ] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling
 - [ ] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout
 - [ ] **Phase 8: Nightly Pipeline & Repo Hardening** - Idempotent nightly GitHub Actions cron that fetches, appends, aggregates, and deploys, with monitoring and bounded repo growth
@@ -106,7 +106,7 @@ Plans:
 **Plans**: 3 plans
 - [x] 05-01-PLAN.md — Data-layer score extension (MarkerDatum.score via combine()) + scoreColor BuGn helper + Wave-0 test scaffolds
 - [x] 05-02-PLAN.md — Score-colored markers (ring/badge) + legend & transparent explainer
-- [ ] 05-03-PLAN.md — Ranked "Bestu staðir" list + row-click fly-to/select
+- [x] 05-03-PLAN.md — Ranked "Bestu staðir" list + row-click fly-to/select
 **UI hint**: yes
 
 ### Phase 6: Station Chart Panel
@@ -158,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
-| 5. Score Coloring & Ranking | 2/3 | In Progress|  |
+| 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
