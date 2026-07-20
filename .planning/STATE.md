@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-07-20T10:08:06.894Z"
+last_updated: "2026-07-20T10:23:48.732Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 ## Current Position
 
 Phase: 4 (Selection & Instant Recompute) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [█████████░] 86%
 | Phase 03 P02 | 5 | 2 tasks | 6 files |
 | Phase 03 P03 | 7min | 2 tasks | 5 files |
 | Phase 04 P01 | 4 min | 3 tasks | 9 files |
+| Phase 04 P02 | 15min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,7 @@ Recent decisions affecting current work:
 - [Phase 03]: Plan 03-02: pure Node-free client data slice — resolveDerivedFile reads manifest.stations[id].file (hashed name, null on unknown/malformed, never throws); computeMarkerDatum decodes via @betravedur/pipeline/derive then runs domain math into MarkerDatum with án úrkomu (hasPrecip=false, still emitted), breytileg átt (dir null or resultantSpeed<0.5), and ófullnægjandi gögn (N<3 → tempC null); DEFAULT_WINDOW {197,210} is the single fixed-period source until Phase 4.
 - [Phase ?]: [Phase 03] Plan 03-03: hybrid marker system — invisible MapLibre symbol layer owns native zoom-adaptive collision (text-allow-overlap:false + symbol-sort-key + text-opacity:0); rich white-pill callouts drawn ONLY for post-collision queryRenderedFeatures survivors into a single reused #marker-overlay (no maplibregl.Marker, grep-gated); accent red reserved to temp numeral; insufficient stations emitted muted (ófullnægjandi gögn) not filtered; pills are focus-ready <button data-station> skeletons, NO click handler (Phase-6 seam); all 11 UI-SPEC criteria green on preview build — MAP-02, MAP-04, Phase 3 complete.
 - [Phase 04]: [Phase 04] Plan 04-01: SelectionState SoT = vanilla observable store (Object.freeze + Set<Listener> + no-op-skip, zero deps); anchorToWindow -> wrap-aware WindowSpec (anchor=start); computeMarkerDatum yearRange filters season-year keys before effectiveN so N is honest qualifying-years-in-range; boot caches derived files once, debounced 120ms store subscriber recomputes over cache with NO fetch (SEL-04); window.__store exposed; temporary bootstrap default left for Plan 03. — Phase-4 core: the load-bearing selection + instant-recompute slice Plans 02/03 and Phase 5/6 build on.
+- [Phase 04]: Plan 04-02: bottom control bar — framework-free control builders (scrubber/width/year) store-agnostic, wired via controlBar to store.set; global meðaltal N ára readout reads a module-level latestData snapshot via a getLatestData getter (pinned, not optional); year bounds derived from manifest union; native range/select/button for free a11y; selection.spec proves width/scrubber/year recompute re-renders markers with ZERO /data/ requests + 500px stepper; controls.css uses 0 accent refs.
 
 ### Pending Todos
 
@@ -117,6 +119,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T10:07:40.640Z
+Last session: 2026-07-20T10:22:07.537Z
 Stopped at: Completed 04-01-PLAN.md
 Resume file: None

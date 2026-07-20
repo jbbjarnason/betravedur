@@ -90,7 +90,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 04-01-PLAN.md — Foundation slice: observable selection store + anchorToWindow + computeMarkerDatum yearRange param + boot-cache recompute (no fetch) + window.__store (SEL-01/02/03/04)
-- [ ] 04-02-PLAN.md — Bottom control bar: scrubber + width buttons + Frá/Til dropdowns + meðaltal N ára readout wired to the store, no-network recompute E2E (SEL-01/02/03/04)
+- [x] 04-02-PLAN.md — Bottom control bar: scrubber + width buttons + Frá/Til dropdowns + meðaltal N ára readout wired to the store, no-network recompute E2E (SEL-01/02/03/04)
 - [ ] 04-03-PLAN.md — URL state: loop-proof round-trip + defensive clamp + union year bounds + default selection + viewport sync + crafted-URL restore E2E (UX-02, SEL-02)
 **UI hint**: yes
 
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
-| 4. Selection & Instant Recompute | 1/3 | In Progress|  |
+| 4. Selection & Instant Recompute | 2/3 | In Progress|  |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
