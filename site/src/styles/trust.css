@@ -144,6 +144,16 @@
   color: var(--ink);
   font-family: var(--font-stack);
 }
+/* UI-REVIEW: lay the OPEN dialog out as a flex column so the Loka close button centres under the
+   card content instead of hugging the left edge (a bare block <button> flows to the inline-start).
+   Scoped to `[open]` so a CLOSED <dialog> keeps the UA `display:none` — an unconditional
+   `display:flex` on `.info-panel` would override that and leave the dialog permanently visible
+   (it broke the Escape-to-close + auto-open E2E). The prose paragraphs stay full-width via the
+   flex default (align-items: stretch); the close button aligns via its own `align-self`. */
+.info-panel[open] {
+  display: flex;
+  flex-direction: column;
+}
 .info-panel::backdrop {
   /* A light wash (never a heavy dim — this is informational, not destructive). */
   background: rgba(31, 41, 51, 0.18);
@@ -158,9 +168,12 @@
   color: var(--ink);
 }
 
-/* Trust lead — the #1 message: Section-title 14px 600 ink, its own line, --space-sm breathing. */
+/* Trust lead — the #1 message: Section-title 14px 600 ink, its own line, --space-sm breathing.
+   UI-REVIEW: was --space-lg (24px), which read as a section break and de-emphasized the lead's
+   relationship to the prose below; the UI-SPEC declares --space-sm (8px) so the bold line leads
+   INTO the "Kortið sýnir…" body rather than standing off as a heading. */
 .info-panel__lead {
-  margin: 0 0 var(--space-lg);
+  margin: 0 0 var(--space-sm);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
@@ -195,8 +208,12 @@
   color: var(--muted-ink);
 }
 
-/* Close — ≥44px hit target, ink focus ring, subtle --hairline outline (never accent/destructive). */
+/* Close — ≥44px hit target, ink focus ring, subtle --hairline outline (never accent/destructive).
+   UI-REVIEW: `align-self: center` centres it under the card in the flex-column .info-panel (it no
+   longer hugs the left edge); a small top margin separates it from the freshness/attribution block. */
 .info-panel__close {
+  align-self: center;
+  margin-top: var(--space-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
