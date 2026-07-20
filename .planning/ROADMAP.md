@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages (completed 2026-07-20)
 - [x] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state (completed 2026-07-20)
 - [x] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer (completed 2026-07-20)
-- [ ] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling
+- [x] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling (completed 2026-07-20)
 - [ ] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout
 - [ ] **Phase 8: Nightly Pipeline & Repo Hardening** - Idempotent nightly GitHub Actions cron that fetches, appends, aggregates, and deploys, with monitoring and bounded repo growth
 
@@ -123,7 +123,7 @@ Plans:
 Plans:
 - [x] 06-01-PLAN.md — Wave-0 foundation: pure percentile + perDoyDistribution domain helper, polar-safe daylightHours (suncalc), echarts/suncalc install, panel.spec skeleton + build-size chunk-split gate
 - [x] 06-02-PLAN.md — Panel shell: stationId-seam subscriber, open/close + Escape, ranked-list yield/restore, daylight readout, per-/whole-station no-data states, chart-series tokens + panel.css (no fetch)
-- [ ] 06-03-PLAN.md — Lazy ECharts chart chunk: à-la-carte boxplot (temp/wind) + precip bars, reading keys, aria summaries, reduced-motion, dynamic-import code-split (echarts out of the entry bundle)
+- [x] 06-03-PLAN.md — Lazy ECharts chart chunk: à-la-carte boxplot (temp/wind) + precip bars, reading keys, aria summaries, reduced-motion, dynamic-import code-split (echarts out of the entry bundle)
 **UI hint**: yes
 **Research flag**: ECharts percentile/box-plot configuration overriding OHLC defaults may need targeted research
 
@@ -163,6 +163,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
-| 6. Station Chart Panel | 2/3 | In Progress|  |
+| 6. Station Chart Panel | 3/3 | Complete   | 2026-07-20 |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
