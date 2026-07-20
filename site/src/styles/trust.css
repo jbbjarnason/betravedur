@@ -84,3 +84,147 @@
     animation: none;
   }
 }
+
+/* ── Attribution safe zone (Phase 7 — solve the recurring attribution debt ONCE) ─────────────
+ * Supersedes the three incremental hacks that lived in controls.css (the `--bar-height +
+ * --space-lg` lift, the `max-width:60vw` right-align cap, and the `.panel-open { margin-right:
+ * 344px }` push). One coherent custom property reserves a bottom band the MapLibre bottom
+ * controls clear; controls.css keys its single margin rule on it. `--bar-height` is still written
+ * live by controlBar.ts (its own consumer just moved here). Because the AttributionControl is
+ * `compact:true`, the always-visible credit is a small single-line `(i)` toggle — CC BY 4.0 v4.0
+ * + OSM guidance permit collapsing attribution behind an (i) button as long as the full credit is
+ * findable, and it is: the info panel above carries the complete credit as the licensing backstop.
+ * Plan 03 raises `--attrib-safe-bottom` to the mobile sheet peek top; this file owns the desktop
+ * baseline (the control-bar height). */
+:root {
+  --attrib-safe-bottom: var(--bar-height, 100px);
+}
+
+/* ── Info "i" button: persistent top-right, in the 56px header band (z10, clears the wordmark) ──
+ * Transparent → --dominant on hover; the standard 2px ink focus ring. NEVER accent. The 24×24
+ * glyph sits inside a ≥44px hit target (min-width/height 44px). Ink stroke on the glyph. */
+.info-button {
+  position: fixed;
+  top: 6px; /* vertically centres the 44px target in the 56px header band */
+  right: var(--space-md);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink); /* the glyph strokes/fills currentColor = ink; never accent */
+  cursor: pointer;
+}
+.info-button:hover {
+  background: var(--dominant);
+}
+.info-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── Info panel <dialog>: same glass surface as header/bar/legend/panel; centered modal ──────── */
+.info-panel {
+  max-width: min(420px, calc(100vw - 2 * var(--space-md)));
+  max-height: calc(100svh - 2 * var(--space-lg));
+  overflow-y: auto;
+  margin: auto; /* centre the modal in the viewport */
+  padding: var(--space-md);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(31, 41, 51, 0.22);
+  color: var(--ink);
+  font-family: var(--font-stack);
+}
+.info-panel::backdrop {
+  /* A light wash (never a heavy dim — this is informational, not destructive). */
+  background: rgba(31, 41, 51, 0.18);
+}
+
+/* Title — Section-title 14px 600, subordinate to the wordmark (not the 20px display role). */
+.info-panel__title {
+  margin: 0 0 var(--space-sm);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Trust lead — the #1 message: Section-title 14px 600 ink, its own line, --space-sm breathing. */
+.info-panel__lead {
+  margin: 0 0 var(--space-lg);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Prose (what it shows / how to read) — Body 14px 400 ink, section rhythm via --space-lg. */
+.info-panel__prose {
+  margin: 0 0 var(--space-lg);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Attribution + freshness — Muted small 11px 400. --space-sm between them, --space-lg above. */
+.info-panel__attribution {
+  margin: 0 0 var(--space-sm);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--muted-ink);
+}
+.info-panel__attribution a {
+  color: var(--ink);
+}
+.info-panel__freshness {
+  margin: 0 0 var(--space-lg);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--muted-ink);
+}
+
+/* Close — ≥44px hit target, ink focus ring, subtle --hairline outline (never accent/destructive). */
+.info-panel__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.info-panel__close:hover {
+  background: var(--dominant);
+}
+.info-panel__close:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .info-panel,
+  .info-button {
+    transition: none;
+    animation: none;
+  }
+}
