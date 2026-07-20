@@ -1,4 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
+import { mkdirSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const EVIDENCE = resolve(
+  HERE,
+  "..",
+  "..",
+  "..",
+  ".planning",
+  "phases",
+  "05-score-coloring-ranking",
+  "evidence",
+);
 
 // Phase 5 (Score Coloring & Ranking) E2E — the WAVE-0 SKELETON.
 //
@@ -72,23 +87,174 @@ test("wave-0 smoke: preview build boots, map style-loads, a pill renders, no pag
 // The comment on each names the plan that will un-fixme and implement it.
 // ---------------------------------------------------------------------------
 test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Visual Criteria)", () => {
-  // 05-02 (marker coloring + legend + explainer):
-  test.fixme(
-    "criterion 1: markers carry a score-ramp ring color AND a numeric score badge (/\\d,\\d/) [05-02]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 2: changing scrubber/width/year recolors >=1 marker with ZERO network requests [05-02]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 3: legend region (Einkunn / aria-label 'Skýring á einkunn') with a color scale + 'verra'/'betra' [05-02]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 4: 'hvernig er einkunnin reiknuð?' expands (aria-expanded=true) revealing 'úrkoma 40%'/'vindur 30%'/'hiti 30%' [05-02]",
-    async () => {},
-  );
+  // 05-02 (marker coloring + legend + explainer): IMPLEMENTED.
+
+  test("criterion 1: markers carry a score-ramp left-bar color AND a numeric score badge (/\\d,\\d/) [05-02]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+
+    // At least one scored pill carries the marker-pill--scored class + an inline --pill-score
+    // that is a real ramp color (not the --hairline fallback), AND a visible badge matching
+    // the Icelandic comma format — the required non-color channel.
+    const scored = page.locator(`${PILL}.marker-pill--scored`);
+    expect(await scored.count()).toBeGreaterThanOrEqual(1);
+
+    const first = scored.first();
+    const pillScore = await first.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue("--pill-score").trim(),
+    );
+    expect(pillScore).not.toBe("");
+    // A real BuGn ramp color resolves to an rgb()/hex value, never the transparent hairline.
+    expect(pillScore.toLowerCase()).not.toContain("rgba(31, 41, 51, 0.1");
+
+    const badgeText = await first.locator(".marker-score-badge").innerText();
+    expect(badgeText).toMatch(/\d,\d/);
+    // The score badge is distinct from the temperature ° value.
+    expect(badgeText).not.toContain("°");
+  });
+
+  test("criterion 2 (+11): changing the selection recolors/re-badges >=1 marker with ZERO /data/ requests [05-02]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+
+    // Snapshot the current badge values keyed by station.
+    const readBadges = (): Promise<Record<string, string>> =>
+      page.evaluate(() => {
+        const out: Record<string, string> = {};
+        for (const pill of document.querySelectorAll<HTMLElement>(
+          "#marker-overlay [data-station]",
+        )) {
+          const badge = pill.querySelector<HTMLElement>(".marker-score-badge");
+          if (badge) out[pill.dataset.station ?? ""] = badge.textContent ?? "";
+        }
+        return out;
+      });
+    const before = await readBadges();
+
+    // Count any /data/ request fired during the interaction (criterion 11: no new fetch).
+    let dataRequests = 0;
+    page.on("request", (req) => {
+      if (req.url().includes("/data/")) dataRequests++;
+    });
+
+    // Drive a year-range change through the store (widens the baseline → recomputes scores).
+    await page.evaluate(() => {
+      const store = (window as unknown as {
+        __store: {
+          get(): { yearFrom: number; yearTil: number };
+          set(p: Record<string, unknown>): void;
+        };
+      }).__store;
+      const s = store.get();
+      // Widen the range so at least one station's mean (hence score) shifts.
+      store.set({ yearFrom: Math.max(1949, s.yearFrom - 20) });
+    });
+    // Let the debounced recompute (120ms) + idle re-render settle.
+    await page.waitForTimeout(600);
+
+    const after = await readBadges();
+
+    // At least one station present in both frames changed its badge value.
+    const changed = Object.keys(before).some(
+      (st) => st in after && after[st] !== before[st],
+    );
+    expect(changed).toBe(true);
+
+    // No /data/ fetch fired during the recolor (pure client-side read of the store).
+    expect(dataRequests).toBe(0);
+  });
+
+  test("criterion 3: legend region (aria-label 'Skýring á einkunn') with a color scale + 'verra'/'betra' [05-02]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+
+    const legend = page.locator('[aria-label="Skýring á einkunn"]');
+    await expect(legend).toBeVisible();
+    await expect(legend.locator(".score-legend__title")).toHaveText("Einkunn");
+    // A rendered color-scale element with a real gradient background.
+    const ramp = legend.locator(".score-legend__ramp");
+    await expect(ramp).toBeVisible();
+    const bg = await ramp.evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(bg).toContain("gradient");
+    // Endpoint captions in plain Icelandic.
+    await expect(legend).toContainText("verra");
+    await expect(legend).toContainText("betra");
+  });
+
+  test("criterion 4: 'hvernig er einkunnin reiknuð?' expands (aria-expanded/open) revealing the 40/30/30 weights [05-02]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+
+    const details = page.locator(".score-explainer");
+    const summary = details.locator("summary");
+    await expect(summary).toHaveText("hvernig er einkunnin reiknuð?");
+
+    // Collapsed by default.
+    expect(await details.evaluate((el) => (el as HTMLDetailsElement).open)).toBe(false);
+
+    // Activate the disclosure (native <details> — click toggles open + the equivalent of
+    // aria-expanded=true).
+    await summary.click();
+    expect(await details.evaluate((el) => (el as HTMLDetailsElement).open)).toBe(true);
+
+    // The revealed body carries the exact weight text.
+    const body = await details.locator(".score-explainer__body").innerText();
+    expect(body).toContain("úrkoma 40%");
+    expect(body).toContain("vindur 30%");
+    expect(body).toContain("hiti 30%");
+    // And the án-úrkomu renormalization note.
+    expect(body).toContain("án úrkomu");
+  });
+
+  test("criterion 14: every rendered score badge matches /^\\d{1,2},\\d$/ (Icelandic comma) [05-02]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const badges = await page
+      .locator("#marker-overlay [data-station] .marker-score-badge")
+      .allInnerTexts();
+    expect(badges.length).toBeGreaterThanOrEqual(1);
+    for (const b of badges) {
+      expect(b.trim()).toMatch(/^\d{1,2},\d$/);
+    }
+  });
+
+  test("evidence: capture the colored markers + legend for self-inspection [05-02]", async ({
+    page,
+  }) => {
+    mkdirSync(EVIDENCE, { recursive: true });
+    await waitForMarkers(page);
+
+    // Frame the SW sample stations (Reykjavík #1, Keflavík #1350) so the colored bars + badges
+    // + the legend are all in view.
+    await page.evaluate(() => {
+      (window as unknown as { __map: { fitBounds: (b: number[][], o: unknown) => void } }).__map.fitBounds(
+        [
+          [-22.7, 63.9],
+          [-21.8, 64.2],
+        ],
+        { padding: 120, duration: 0 },
+      );
+    });
+    await page.waitForFunction(
+      () => document.querySelectorAll("#marker-overlay [data-station]").length > 0,
+      { timeout: 5_000 },
+    );
+    await page.waitForTimeout(800);
+
+    // Expand the explainer so the screenshot proves it reveals the weights.
+    await page.locator(".score-explainer summary").click();
+    await page.waitForTimeout(200);
+
+    await page.screenshot({
+      path: resolve(EVIDENCE, "05-02-colored-markers-legend.png"),
+      fullPage: false,
+    });
+  });
 
   // 05-03 (ranked "Bestu staðir" panel):
   test.fixme(
@@ -115,8 +281,10 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     "criterion 10: clicking a row moves the map (easeTo) + sets URL 'st' param, opening NO chart panel [05-03]",
     async () => {},
   );
+  // criterion 11 (coloring half — no /data/ fetch on a selection change) is asserted in
+  // "criterion 2 (+11)" above (05-02); the ranking half is added with the list in 05-03.
   test.fixme(
-    "criterion 11: none of the coloring/ranking interactions fire a network request [05-02/05-03]",
+    "criterion 11: none of the RANKING interactions fire a network request [05-03]",
     async () => {},
   );
   test.fixme(
@@ -127,8 +295,10 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     "criterion 13: collapse toggle flips aria-expanded, hides/shows the list, keeps the map band visible [05-03]",
     async () => {},
   );
+  // criterion 14 (marker-badge half) is asserted above (05-02); the ranked-ROW score format
+  // is added with the list in 05-03.
   test.fixme(
-    "criterion 14: every rendered score matches the Icelandic one-decimal comma format /^\\d{1,2},\\d$/ [05-02/05-03]",
+    "criterion 14: every ranked-ROW score matches the Icelandic one-decimal comma format /^\\d{1,2},\\d$/ [05-03]",
     async () => {},
   );
 });

@@ -31,7 +31,7 @@ created: 2026-07-20
 | Property | Value |
 |----------|-------|
 | Tool | none — vanilla TypeScript + Vite (MapLibre GL JS), continued from Phase 3/4. No shadcn/Radix; no React component kit. |
-| Preset | not applicable — plain CSS + CSS custom properties. New score-ramp tokens go in `tokens.css`; new legend + ranked-panel CSS lives in a new `site/src/styles/panels.css` imported alongside the existing `tokens.css` / `markers.css` / `controls.css`. |
+| Preset | not applicable — plain CSS + CSS custom properties. New score-ramp tokens go in `tokens.css` and are the **BuGn ramp** sampled from `scoreColor()` in `site/src/styles/score.css` (the marker left-bar/badge + legend panel live in `score.css`, imported alongside the existing `tokens.css` / `markers.css` / `controls.css`). *(05-03 adds the ranked-panel CSS; see that plan.)* |
 | Component library | none — hand-authored DOM/CSS. Native `<button>` for the legend expander + panel collapse toggle + list rows; native `<details>`/`<summary>` is the preferred substrate for the explainer (built-in expand/collapse + keyboard for free). List uses an `<ol>` for ordered semantics. |
 | Icon library | Inline SVG only (continued). New glyphs this phase: a small chevron/caret for the collapse + explainer disclosure. No new icon font. |
 | Font | Reuse Phase 3 system stack `var(--font-stack)`. Icelandic glyph coverage already verified. No new webfont. |
@@ -78,35 +78,44 @@ created: 2026-07-20
 
 **Existing Phase 3/4 color roles reused verbatim.** The ONLY new tokens are the score ramp. Accent red (`--accent`) **remains reserved to the temperature numeral** — the score ramp is a chromatically distinct blue→teal→green family and **must not** reuse or approach the accent red.
 
-### New tokens — sequential score-color ramp
+### New tokens — sequential score-color ramp (BuGn — RECONCILED in 05-02)
 
-A **colorblind-safe SEQUENTIAL ramp** keyed to the 0–10 score. Low = muted cool slate; high = vivid green ("gott veður = grænt"). It is **NOT** a red–green diverging scale (accent red is reserved AND red–green is colorblind-hostile). The ramp is **monotonic in luminance** (dark→light as score rises), so it survives grayscale — a built-in backup for the color-not-sole-channel rule — and moves along a blue→teal→green hue axis that protanopia/deuteranopia/tritanopia all preserve.
+> **RECONCILIATION NOTE (05-02, superseding the original slate table):** the authoritative ramp
+> shipped in code is the **ColorBrewer BuGn** ramp (cool light blue → vivid dark green), pinned by
+> `scoreColor()` (`site/src/map/score-color.ts`) + its boundary tests in 05-01. The earlier
+> 11-stop **slate → yellow-green** table below (`#5B6B7A … #84A81F`) is **SUPERSEDED and NOT used** —
+> both the legend swatches AND the per-marker color read from the BuGn `--score-*` tokens in
+> `tokens.css`, which are `scoreColor()` sampled at each integer stop. The values below are the
+> **shipped BuGn tokens**.
 
-| Token | Score | Hex | Notes |
-|-------|-------|-----|-------|
-| `--score-0` | 0 | `#5B6B7A` | muted slate (low, cool, desaturated) |
-| `--score-1` | 1 | `#516F82` | |
-| `--score-2` | 2 | `#457489` | |
-| `--score-3` | 3 | `#347B8B` | |
-| `--score-4` | 4 | `#1F8389` | deep teal |
-| `--score-5` | 5 | `#0E8A82` | |
-| `--score-6` | 6 | `#159079` | |
-| `--score-7` | 7 | `#33966A` | |
-| `--score-8` | 8 | `#4E9C58` | green |
-| `--score-9` | 9 | `#6BA23F` | |
-| `--score-10` | 10 | `#84A81F` | vivid yellow-green (highest / most vivid — "grænt") |
+A **colorblind-safe SEQUENTIAL ramp** keyed to the 0–10 score. Low = pale cool blue; high = vivid dark green ("gott veður = grænt"). It is **NOT** a red–green diverging scale (accent red is reserved AND red–green is colorblind-hostile). The ramp is **monotonic in luminance** (light→dark as score rises), so it survives grayscale — a built-in backup for the color-not-sole-channel rule — and moves along a blue→teal→green hue axis that protanopia/deuteranopia/tritanopia all preserve.
 
-- **Colorblind-safety (verified):** the ramp is strictly increasing in WCAG relative luminance (0.141 → 0.330), so under any dichromatic simulation the ordering is still readable as a light/dark gradient. Hue never crosses the red–green confusion axis (no reds/magentas), so protanopes/deuteranopes read it. Accent red `#C0392B` (relLum 0.143) is hue-distinct (warm red vs cool blue–green) from every ramp stop — a marker's red temp numeral can never be confused with its score ring.
-- **Score binning:** the continuous 0–10 score maps to the ramp by rounding to the nearest integer stop for the discrete legend swatches; the **marker ring** may either snap to the nearest stop or interpolate — Claude's discretion, but the legend and marker must agree at the labeled stops.
+| Token | Score | Hex (shipped, BuGn) | Notes |
+|-------|-------|---------------------|-------|
+| `--score-0` | 0 | `#edf8fb` | pale blue (low) — needs the --hairline floor to read (Pitfall 3) |
+| `--score-1` | 1 | `#ddf2f1` | |
+| `--score-2` | 2 | `#ccece6` | |
+| `--score-3` | 3 | `#b3e2d8` | |
+| `--score-4` | 4 | `#99d8c9` | teal |
+| `--score-5` | 5 | `#80cdb7` | |
+| `--score-6` | 6 | `#66c2a4` | |
+| `--score-7` | 7 | `#49b282` | |
+| `--score-8` | 8 | `#2ca25f` | green |
+| `--score-9` | 9 | `#168846` | |
+| `--score-10` | 10 | `#006d2c` | vivid dark green (highest — "grænt") |
+
+- **Colorblind-safety:** BuGn is a published ColorBrewer colorblind-safe sequential scheme; it is monotonic in luminance so under any dichromatic simulation the ordering is still readable as a light/dark gradient, and its blue→teal→green hue axis never crosses the red–green confusion axis. The reserved temperature red `#C0392B` is hue-distinct (warm red vs cool blue–green) from every ramp stop — a marker's red temp numeral can never be confused with its score bar.
+- **Pale-low-end mitigation (Pitfall 3):** because the BuGn low end is near-white, the marker color is applied as a **4–6px left color bar** (not a thin 2px ring) over a 1px `--hairline` floor, and the legend ramp bar carries a 1px `--hairline` border — so `--score-0/1` still read as an intentional colored edge.
+- **Score binning:** the marker **interpolates** the continuous 0–10 score via `scoreColor()`; the legend swatches use the same `scoreColor()`-sampled `--score-*` tokens, so the legend and marker agree exactly at the labeled stops.
 
 ### How the ramp applies (marker)
 
 The neutral Phase 3/4 white pill becomes score-colored **on two channels, never overwriting the white body or the red temperature**:
 
-| Channel | Spec |
+| Channel | Spec (RECONCILED in 05-02) |
 |---------|------|
-| **Score ring / border** | The pill's 1px `--hairline` border is replaced by a **2px ring in the station's score-ramp color** (`--score-{n}`). The white body, red temp, ink wind, and shadow are unchanged. The ring reads against both the white pill (contrast ≥2.76:1 for every stop) and the muted `--dominant` basemap (≥2.31:1) — perceptible as an essential boundary because it is paired with the numeric badge (never the sole channel). |
-| **Score badge** | A small chip appended to the pill (leading edge, before the temperature, or trailing — Claude's discretion; must not displace the temp/wind/precip order's readability). The badge shows the **numeric score** (`7,8`) at Compact-value 13px Semibold, **ink `#1F2933` on a white chip** (13:1 — legibility never depends on the ramp), with a 2px `--score-{n}` ring so it doubles as a color key. **The numeral is the required non-color channel; the ring color is the redundant channel.** |
+| **Score left-bar** | The scored pill keeps its 1px `--hairline` box border (the floor) and gains a **4–6px LEFT COLOR BAR in the station's score-ramp color** (`var(--pill-score)` = `scoreColor(datum.score)`), plus an inset 1px `--hairline` outline. *(A thin 2px full ring was rejected: the pale BuGn low end lacks contrast as a hairline ring — Pitfall 3. A chunky left bar reads against both the white pill and the muted `--dominant` basemap.)* The white body, red temp, ink wind, and shadow are unchanged. Perceptible as an essential boundary because it is paired with the numeric badge (never the sole channel). |
+| **Score badge** | A small chip **prepended** to the pill (leading edge, before the temperature). The badge shows the **numeric score** (`7,8`) at Compact-value 13px Semibold, **ink `#1F2933` on a white chip** (13:1 — legibility never depends on the ramp), with a 2px `var(--pill-score)` ring so it doubles as a color key. **The numeral is the required non-color channel; the ring color is the redundant channel.** |
 
 > **Why the numeral is on white, not on the ramp fill:** a filled-ramp badge would force a per-stop text-color crossover (white text legible only for scores 0–6, ink text only for 7–10, with score 6 marginal either way). Keeping the numeral ink-on-white makes score legibility ramp-independent and AA-safe at every stop. The ramp does its job as the **ring** channel on both the pill and the badge.
 

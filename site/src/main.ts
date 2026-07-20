@@ -11,7 +11,9 @@
  */
 import "./styles/tokens.css";
 import "./styles/markers.css";
+import "./styles/score.css";
 import { renderHeader } from "./ui/header.js";
+import { mountLegend } from "./ui/legend.js";
 import { initMap } from "./map/init.js";
 import { type MarkerDatum } from "./data/types.js";
 import {
@@ -236,6 +238,10 @@ function boot(): void {
 
   renderHeader(headerMount);
   const map = initMap(mapMount);
+
+  // Mount the score legend (SCORE-03) — static chrome, no store/data dependency, so it mounts
+  // once here alongside the header. It docks bottom-left (score.css), above the control bar.
+  mountLegend(document.body);
 
   // Expose the live map instance SYNCHRONOUSLY, immediately after initMap() — the map exists
   // here, before any data loads. Phase 3's shell.spec zoom test reads window.__map right after
