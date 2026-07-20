@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: executing
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-20T12:37:06.995Z"
+last_updated: "2026-07-20T14:12:31.470Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 20
+  completed_plans: 18
   percent: 63
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** A visitor picks a time-of-year period and instantly sees, on a map, where in Iceland the weather has historically been best — backed by real Veðurstofan station history.
-**Current focus:** Phase 5 — Score Coloring & Ranking
+**Current focus:** Phase 6 — Station Chart Panel
 
 ## Current Position
 
-Phase: 5 (Score Coloring & Ranking) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 6 (Station Chart Panel) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [██████████] 100%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Progress: [██████████] 100%
 | Phase 05 P01 | 8 | 3 tasks | 8 files |
 | Phase 05 P02 | 7min | 3 tasks | 9 files |
 | Phase 05 P03 | 12 | 3 tasks | 6 files |
+| Phase 06 P01 | 8min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 05] Plan 05-01: MarkerDatum carries score:number|null + missingRain via domain combine(); rain gated on hasPrecipQual so rain-less AWS scores 'án úrkomu' renormalized (never dry-as-10); score:null ⇔ off-scale; pure scoreColor BuGn ramp (never accent red); Wave-0 score.spec skeleton green — MAP-03 data gate closed.
 - [Phase ?]: [Phase 05] Plan 05-02: score-colored markers — BuGn 4-6px left color-bar (inline --pill-score=scoreColor) over a --hairline floor (Pitfall 3, not a thin ring) + always-visible ink-on-white numeric badge (Icelandic comma); muted/null pills stay off-ramp (T-05-04). Bottom-left legend (BuGn scale + 0-10 ticks + verra/betra) with a native <details> explainer (úrkoma 40% / vindur 30% / hiti 30% + án-úrkomu renormalization, SCORE-03). RECONCILED ramp to BuGn end-to-end (--score-* = scoreColor sampled; UI-SPEC slate table superseded). MAP-03 + SCORE-03.
 - [Phase ?]: Plan 05-03: ranked Bestu staðir panel (SCORE-02) complete — sorted-desc list, row-click easeTo/select via Phase-4 st seam, reciprocal marker+row highlight, no chart panel; all 14 UI-SPEC criteria green; Phase 5 complete.
+- [Phase 06]: [Phase 06] Plan 06-01: per-doy distribution foundation — percentile (type-7) + perDoyDistribution + perDoyPrecip in @betravedur/domain operating on DECODED DailyObservation[] (not DerivedFile) so the domain stays zero-dep; reshape mirrors computeMarkerDatum (qualifyingYears 0.8 + effectiveN N>=3) so panel coverage honesty == map; precip = per-doy MEDIAN total, empty bucket -> {missing:true} explicit gap never a zero box/bar. daylightHours polar-safe via suncalc 2.0.1 (branch alwaysUp/alwaysDown then null sunrise/sunset -> sun noon-altitude), no NaN at Iceland solstices. echarts 6.1.0 + suncalc 2.0.1 pinned exact in site, no @types stubs, no postinstall. panel.spec skeleton: 14 UI-SPEC criteria fixme + build-size chunk-split gate. tsc 0 errors, full unit+E2E green.
 
 ### Pending Todos
 
@@ -127,6 +129,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T12:37:06.991Z
+Last session: 2026-07-20T14:09:14.949Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None

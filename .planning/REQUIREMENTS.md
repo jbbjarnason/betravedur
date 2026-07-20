@@ -39,10 +39,10 @@
 
 ### Station Detail
 
-- [ ] **CHART-01**: Clicking a station opens a chart panel: candlestick-style distribution charts for temperature and wind per day across the chosen years, precipitation as bars
-- [ ] **CHART-02**: Charts use distribution semantics (min/typical range/max — not financial OHLC) with a plain-Icelandic reading key
-- [ ] **CHART-03**: Panel shows daylight hours for the selected period (astronomical computation)
-- [ ] **CHART-04**: Panel handles missing data explicitly ("engin gögn fyrir þetta tímabil") instead of blank charts
+- [x] **CHART-01**: Clicking a station opens a chart panel: candlestick-style distribution charts for temperature and wind per day across the chosen years, precipitation as bars
+- [x] **CHART-02**: Charts use distribution semantics (min/typical range/max — not financial OHLC) with a plain-Icelandic reading key
+- [x] **CHART-03**: Panel shows daylight hours for the selected period (astronomical computation)
+- [x] **CHART-04**: Panel handles missing data explicitly ("engin gögn fyrir þetta tímabil") instead of blank charts
 
 ### UX & Site
 
@@ -102,10 +102,10 @@ Which phases cover which requirements.
 | MAP-03 | Phase 5 | Complete |
 | SCORE-02 | Phase 5 | Complete |
 | SCORE-03 | Phase 5 | Complete |
-| CHART-01 | Phase 6 | Pending |
-| CHART-02 | Phase 6 | Pending |
-| CHART-03 | Phase 6 | Pending |
-| CHART-04 | Phase 6 | Pending |
+| CHART-01 | Phase 6 | Complete |
+| CHART-02 | Phase 6 | Complete |
+| CHART-03 | Phase 6 | Complete |
+| CHART-04 | Phase 6 | Complete |
 | UX-03 | Phase 7 | Pending |
 | UX-04 | Phase 7 | Pending |
 | UX-05 | Phase 7 | Pending |
