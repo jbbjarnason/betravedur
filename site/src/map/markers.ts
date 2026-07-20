@@ -73,16 +73,23 @@ export function toFeatureCollection(data: MarkerDatum[]): MarkerFeatureCollectio
 }
 
 /**
- * Inline wind-arrow SVG rotated to `windDir`.
+ * Inline wind-arrow SVG rotated to point the direction the wind blows TOWARD.
  *
- * WIND CONVENTION (documented per UI-SPEC): the arrow points the direction the wind blows
- * TOWARD. `windDir` is the circular-mean direction in compass degrees (0 = North, clockwise);
- * an SVG `rotate(deg)` about the glyph centre maps 0° to the upward-pointing base arrow, so a
- * compass bearing rotates the arrow to point that way. Keep this consistent with any later
+ * WIND CONVENTION (PINNED — locked by the windArrowSvg test in markers.test.ts):
+ *   `windDir` (from Veðurstofan `dv`, Icelandic *vindátt*) is the direction the wind blows
+ *   FROM — standard meteorological convention. Live-verified in 01-RESEARCH.md: the sample
+ *   AWS row `dv:151.0, dv_txt:"SSE"` (SSE ≈ 157.5°) shows the numeric and its compass label
+ *   agree on the SOURCE direction, confirming dv = direction FROM.
+ *   DECISION (trip-planner intuition "which way is it blowing"): the arrow points the direction
+ *   the wind blows TOWARD, so we rotate by `dv + 180`. E.g. a north wind (dv=0, blowing FROM the
+ *   north) renders an arrow pointing SOUTH (180°).
+ * `windDir` is in compass degrees (0 = North, clockwise); an SVG `rotate(deg)` about the glyph
+ * centre maps 0° to the upward (North-pointing) base arrow. Keep this consistent with any later
  * wind rose.
  */
 function windArrowSvg(windDir: number): string {
-  const deg = ((windDir % 360) + 360) % 360;
+  // +180: dv is the FROM direction (met convention); the arrow points TOWARD.
+  const deg = (((windDir + 180) % 360) + 360) % 360;
   // Base arrow points UP (toward North / 0°); rotate about the 12×12 centre.
   return (
     `<svg class="marker-wind-arrow" width="12" height="12" viewBox="0 0 12 12" ` +

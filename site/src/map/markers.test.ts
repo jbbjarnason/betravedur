@@ -71,8 +71,40 @@ describe("formatCallout", () => {
     expect(html).toContain("5"); // integer speed
     expect(html).toMatch(/m\/s/);
     expect(html).toContain("marker-wind-arrow"); // the SVG arrow is present
-    expect(html).toMatch(/rotate\(90/); // rotated to windDir
+    // WR-03: dv is the FROM direction; arrow points TOWARD → rotate(dv + 180).
+    // An easterly wind (dv=90, blowing FROM the east) points WEST → rotate(270).
+    expect(html).toMatch(/rotate\(270/);
     expect(html).not.toContain("breytileg átt");
+  });
+
+  // WR-03: LOCK the wind FROM/TOWARD convention so a future refactor can't silently
+  // introduce a 180°-wrong arrow (the invisible-in-review pitfall). dv (Veðurstofan
+  // vindátt) is the direction the wind blows FROM; our arrow points TOWARD = dv + 180.
+  describe("wind arrow FROM/TOWARD convention (WR-03 lock)", () => {
+    const rotationOf = (dv: number): number => {
+      const { html } = formatCallout(
+        fullDatum({ windDir: dv, windVariable: false, windSpeed: 3 }),
+      );
+      const m = html.match(/rotate\((\d+(?:\.\d+)?)/);
+      if (!m) throw new Error(`no rotate() found in: ${html}`);
+      return Number(m[1]);
+    };
+
+    it("north wind (dv=0, blows FROM north) → arrow points SOUTH (rotate 180)", () => {
+      expect(rotationOf(0)).toBe(180);
+    });
+
+    it("south wind (dv=180, blows FROM south) → arrow points NORTH (rotate 0)", () => {
+      expect(rotationOf(180)).toBe(0);
+    });
+
+    it("east wind (dv=90, blows FROM east) → arrow points WEST (rotate 270)", () => {
+      expect(rotationOf(90)).toBe(270);
+    });
+
+    it("west wind (dv=270, blows FROM west) → arrow points EAST (rotate 90)", () => {
+      expect(rotationOf(270)).toBe(90);
+    });
   });
 
   it("shows 'breytileg átt' and NO arrow when the wind is variable", () => {
