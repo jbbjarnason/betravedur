@@ -136,7 +136,11 @@ Plans:
   1. On a phone the station detail appears as a bottom sheet; on desktop it appears as a side panel, and the map remains usable at both sizes
   2. An info panel explains "sögulegt meðaltal, ekki spá" and shows Veðurstofan attribution plus data currency ("uppfært í nótt")
   3. Map and panels show clear loading, empty, and no-data states rather than blank or broken screens
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 07-01-PLAN.md — Trust-states foundation: Wave-0 test harness + freshness/bottom-sheet pure helpers + the three UX-05 state seams (loading / map-error / empty-stations)
+- [ ] 07-02-PLAN.md — Info/trust panel (UX-04) + attribution-solve-once: i button + native <dialog> ("ekki spá" + ATTRIBUTION + uppfært freshness) + first-visit localStorage; delete controls.css hacks for --attrib-safe-bottom
+- [ ] 07-03-PLAN.md — Mobile bottom sheet (UX-03): matchMedia-gated Pointer-Events drag controller + ranked/legend chips + responsive control bar + attribution reflow above the sheet peek
 **UI hint**: yes
 
 ### Phase 8: Nightly Pipeline & Repo Hardening
@@ -164,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
 | 6. Station Chart Panel | 3/3 | Complete   | 2026-07-20 |
-| 7. Responsive UX & Trust States | 0/TBD | Not started | - |
+| 7. Responsive UX & Trust States | 0/3 | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
