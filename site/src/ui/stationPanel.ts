@@ -27,6 +27,10 @@ import {
   perDoyDistribution,
   perDoyPrecip,
   type DailyObservation,
+  type PerDoyBox,
+  type PerDoyBar,
+  type DistributionResult,
+  type PrecipResult,
 } from "@betravedur/domain";
 import { anchorToWindow } from "../data/window.js";
 import { daylightHours, type DaylightResult } from "../data/daylight.js";
@@ -134,18 +138,88 @@ function buildCloseGlyph(): SVGSVGElement {
 }
 
 /**
- * The chart-render SEAM (Plan 03 fills this). In THIS plan it is a STUB: a sufficient metric's
- * slot shows the `hleð riti…` loading line (real DOM text, muted). Plan 03 replaces the body with
- * a dynamic import('./chartPanel.js') that mounts an ECharts <canvas> into `slot` from `spec`.
- *
- * Exported so Plan 03 can swap the implementation (or the panel can call a provided override)
- * without restructuring the shell.
+ * A chart render request handed to the lazy seam. `kind` selects the chart builder; the payload
+ * carries the pure per-doy data (from perDoyDistribution/perDoyPrecip) + the display metadata. NO
+ * charting-library type crosses this boundary — the shell stays free of the chart lib (RESEARCH
+ * Pitfall 6); only the domain PerDoyBox/PerDoyBar shapes travel to the lazy chunk, which owns all
+ * of the charting-library imports.
  */
-export function renderChartInto(slot: HTMLElement): void {
+type ChartSpec =
+  | {
+      kind: "boxplot";
+      perDoy: PerDoyBox[];
+      unit: string;
+      tone: string;
+      metricLabel: string;
+      zeroFloor?: boolean;
+    }
+  | { kind: "bars"; perDoy: PerDoyBar[]; tone: string; metricLabel: string };
+
+/**
+ * Memoized lazy import of the chart chunk. The FIRST sufficient-metric render triggers
+ * `import("./chartPanel.js")`, which Vite code-splits into its own chunk (the chart lib included)
+ * — so the entry/main bundle never pays for the chart library (the build-size gate asserts this).
+ * Subsequent renders reuse the resolved module. A rejection is surfaced to the caller so the slot
+ * degrades to the no-data text rather than hanging or throwing (T-06-08 / V7).
+ */
+let chartModPromise: Promise<typeof import("./chartPanel.js")> | null = null;
+function loadChartModule(): Promise<typeof import("./chartPanel.js")> {
+  if (!chartModPromise) chartModPromise = import("./chartPanel.js");
+  return chartModPromise;
+}
+
+/**
+ * The chart-render SEAM (Plan 03). Shows the `hleð riti…` loading line immediately (real DOM
+ * text), then lazily imports the ECharts chunk and mounts the boxplot/bar into a fresh canvas host
+ * inside `slot`. On a chunk-load rejection (or an empty/insufficient spec surfaced by the builder)
+ * the slot falls back to the `engin gögn fyrir þetta tímabil` message — never a hang or a throw.
+ *
+ * Exported so a test/override can swap the implementation without restructuring the shell.
+ */
+export function renderChartInto(slot: HTMLElement, spec: ChartSpec): void {
   const loading = document.createElement("p");
   loading.className = "station-panel__nodata";
   loading.textContent = COPY.chartLoading;
   slot.appendChild(loading);
+
+  void loadChartModule()
+    .then((mod) => {
+      // The panel may have been torn down (or re-opened) before the chunk resolved — bail if the
+      // slot is no longer in the document so we never mount into a detached node.
+      if (!document.contains(slot)) return;
+      loading.remove();
+      // A sized host for the ECharts canvas (the slot is a flex centering box; the chart wants a
+      // block with an explicit size, which panel.css gives .station-panel__chart-host).
+      const host = document.createElement("div");
+      host.className = "station-panel__chart-host";
+      slot.appendChild(host);
+      if (spec.kind === "boxplot") {
+        mod.renderBoxplot(host, {
+          perDoy: spec.perDoy,
+          unit: spec.unit,
+          tone: spec.tone,
+          metricLabel: spec.metricLabel,
+          zeroFloor: spec.zeroFloor,
+        });
+      } else {
+        mod.renderBars(host, {
+          perDoy: spec.perDoy,
+          tone: spec.tone,
+          metricLabel: spec.metricLabel,
+        });
+      }
+    })
+    .catch(() => {
+      // Chunk failed to load → honest degrade to the no-data text (never hang/throw).
+      if (!document.contains(slot)) return;
+      loading.remove();
+      appendNoData(slot, COPY.noData);
+    });
+}
+
+/** Resolve a CSS custom-property value from :root (chart tones pass as hex to the ECharts option). */
+function resolveToken(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 /** Append a muted no-data / no-gauge line (text, never a blank canvas — CHART-04) into a slot. */
@@ -166,7 +240,7 @@ function buildFigure(
   title: string,
   readingKey: string,
   swatchClass: string,
-  slotState: { kind: "chart" } | { kind: "nodata"; message: string },
+  slotState: { kind: "chart"; spec: ChartSpec } | { kind: "nodata"; message: string },
 ): HTMLElement {
   const figure = document.createElement("figure");
   figure.className = "station-panel__figure";
@@ -178,7 +252,7 @@ function buildFigure(
 
   const slot = document.createElement("div");
   slot.className = "station-panel__chart-slot";
-  if (slotState.kind === "chart") renderChartInto(slot);
+  if (slotState.kind === "chart") renderChartInto(slot, slotState.spec);
   else appendNoData(slot, slotState.message);
   figure.appendChild(slot);
 
@@ -237,6 +311,10 @@ export function mountStationPanel(
   const open = (stationId: number): void => {
     // Rebuild from scratch on every open (a fresh selection) — the panel is cheap DOM.
     if (panel) panel.remove();
+    // Reset the per-open chart-option record so an E2E (criterion 12) reads only THIS open's
+    // built options, not options accumulated across earlier opens on the same page. (Uses
+    // globalThis — a local `window` WindowSpec const below shadows the global identifier here.)
+    (globalThis as unknown as { __chartOptions?: unknown[] }).__chartOptions = [];
 
     const entry = cache.get(stationId);
     // Defensive: an unknown/uncached station (e.g. a muted station with no file) still gets a
@@ -275,17 +353,22 @@ export function mountStationPanel(
     const window = anchorToWindow(state.anchorDoy, state.widthDays);
     const yearRange = { from: state.yearFrom, til: state.yearTil };
 
-    // Compute per-metric sufficiency from the cached, decoded rows (NO fetch). An uncached/muted
+    // Compute per-metric distributions from the cached, decoded rows (NO fetch). An uncached/muted
     // station has no file → all three are insufficient (whole-station no-data), which is honest.
-    let tempSufficient = false;
-    let windSufficient = false;
-    let precipSufficient = false;
+    // We keep the FULL result (not just `.sufficient`) so a sufficient metric's per-doy boxes/bars
+    // flow to the lazy chart chunk (RESEARCH Pitfall 7: same N-gate as the map).
+    let tempResult: DistributionResult = { sufficient: false };
+    let windResult: DistributionResult = { sufficient: false };
+    let precipResult: PrecipResult = { sufficient: false };
     if (entry) {
       const rows = decodeDerived(entry.file);
-      tempSufficient = perDoyDistribution(rows, window, yearRange, tempSelector).sufficient;
-      windSufficient = perDoyDistribution(rows, window, yearRange, windSelector).sufficient;
-      precipSufficient = perDoyPrecip(rows, window, yearRange).sufficient;
+      tempResult = perDoyDistribution(rows, window, yearRange, tempSelector);
+      windResult = perDoyDistribution(rows, window, yearRange, windSelector);
+      precipResult = perDoyPrecip(rows, window, yearRange);
     }
+    const tempSufficient = tempResult.sufficient;
+    const windSufficient = windResult.sufficient;
+    const precipSufficient = precipResult.sufficient;
     // án úrkomu (no gauge): the station measures temp/wind but has no precip gauge. Use the
     // MarkerDatum.hasPrecip honesty flag (mirrors the map). When precip is sufficient but the
     // marker says no gauge, the precip figure shows the no-gauge message, not a chart.
@@ -305,31 +388,70 @@ export function mountStationPanel(
       empty.append(heading, bodyText);
       body.appendChild(empty);
     } else {
+      // Resolve the three chart tones ONCE (hex from :root) so the lazy chunk gets colors, never
+      // `var()` strings (ECharts options take resolved colors). These are the --chart-* tokens —
+      // never --accent or --score-* (criterion 11: distribution, not finance).
+      const toneTemp = resolveToken("--chart-temp");
+      const toneWind = resolveToken("--chart-wind");
+      const tonePrecip = resolveToken("--chart-precip");
+
       // Temperature figure.
       body.appendChild(
         buildFigure(
           COPY.chartTitles.temp,
           COPY.readingKeys.temp,
           "station-panel__swatch--temp",
-          tempSufficient ? { kind: "chart" } : { kind: "nodata", message: COPY.noData },
+          tempResult.sufficient
+            ? {
+                kind: "chart",
+                spec: {
+                  kind: "boxplot",
+                  perDoy: tempResult.perDoy,
+                  unit: "°C",
+                  tone: toneTemp,
+                  metricLabel: COPY.chartTitles.temp,
+                },
+              }
+            : { kind: "nodata", message: COPY.noData },
         ),
       );
-      // Wind figure.
+      // Wind figure (zero-floored — wind is never below 0).
       body.appendChild(
         buildFigure(
           COPY.chartTitles.wind,
           COPY.readingKeys.wind,
           "station-panel__swatch--wind",
-          windSufficient ? { kind: "chart" } : { kind: "nodata", message: COPY.noData },
+          windResult.sufficient
+            ? {
+                kind: "chart",
+                spec: {
+                  kind: "boxplot",
+                  perDoy: windResult.perDoy,
+                  unit: "m/s",
+                  tone: toneWind,
+                  metricLabel: COPY.chartTitles.wind,
+                  zeroFloor: true,
+                },
+              }
+            : { kind: "nodata", message: COPY.noData },
         ),
       );
       // Precip figure: no-gauge message wins over both chart and per-chart no-data (án úrkomu ≠
-      // "it was dry"). Otherwise sufficient → chart stub; insufficient → per-chart no-data.
-      const precipSlot: { kind: "chart" } | { kind: "nodata"; message: string } = !hasPrecipGauge
-        ? { kind: "nodata", message: COPY.precipNoGauge }
-        : precipSufficient
-          ? { kind: "chart" }
-          : { kind: "nodata", message: COPY.noData };
+      // "it was dry"). Otherwise sufficient → bars; insufficient → per-chart no-data.
+      const precipSlot: { kind: "chart"; spec: ChartSpec } | { kind: "nodata"; message: string } =
+        !hasPrecipGauge
+          ? { kind: "nodata", message: COPY.precipNoGauge }
+          : precipResult.sufficient
+            ? {
+                kind: "chart",
+                spec: {
+                  kind: "bars",
+                  perDoy: precipResult.perDoy,
+                  tone: tonePrecip,
+                  metricLabel: COPY.chartTitles.precip,
+                },
+              }
+            : { kind: "nodata", message: COPY.noData };
       body.appendChild(
         buildFigure(
           COPY.chartTitles.precip,

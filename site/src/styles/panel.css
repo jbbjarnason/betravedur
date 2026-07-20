@@ -117,14 +117,24 @@
   color: var(--ink);
 }
 
-/* The chart slot: where Plan 03 mounts the ECharts <canvas>. Until then it shows the
-   `hleð riti…` stub or a no-data message. A functional min-height so the slot reserves space. */
+/* The chart slot: the flex box that centers the `hleð riti…` stub / no-data message while the
+   lazy ECharts chunk loads, and hosts the sized chart host once it mounts. A functional
+   min-height so the slot reserves space before the canvas exists. */
 .station-panel__chart-slot {
   margin-top: var(--space-xs);
   min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* The sized block ECharts renders its <canvas> into (init needs an explicit box; the flex slot
+   centers text but does not give the canvas a width/height on its own). Full slot width, a
+   functional chart height in the UI-SPEC band (temp/wind ~150px, precip a touch shorter is fine
+   — one height keeps the three charts visually aligned as one window). */
+.station-panel__chart-host {
+  width: 100%;
+  height: 150px;
 }
 
 /* Loading / no-data text inside a chart slot (or a panel-level message): muted, never a blank

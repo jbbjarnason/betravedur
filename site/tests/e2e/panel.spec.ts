@@ -112,15 +112,44 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     "criterion 2: panel shows Hiti + Vindur figures with a <canvas> and a Úrkoma figure with a <canvas> [06-03]",
     async ({ page }) => {
       await waitForMarkers(page);
-      await openPanelViaMarker(page);
-      const panel = page.locator(PANEL);
-      // Three titled chart figures, each rendering an ECharts <canvas> (for a station with data).
-      for (const title of ["Hiti", "Vindur", "Úrkoma"]) {
-        const figure = panel.locator("figure").filter({ hasText: title });
-        await expect(figure).toBeVisible();
-        await expect(figure.locator("canvas")).toBeVisible();
+      // "for a station with data" = a station with ALL THREE metrics, including a precip gauge
+      // (AWS stations honestly show án-úrkomu for precip — they are not the criterion-2 target).
+      // Open each rendered station via the store seam until one yields three chart canvases;
+      // assert the three titled canvases on that data-complete station. (A gauge-less station is
+      // covered by criterion 6, which asserts its precip no-gauge message instead.)
+      const stationIds = await page.locator(PILL).evaluateAll((els) =>
+        els.map((e) => Number((e as HTMLElement).dataset.station)).filter((n) => Number.isFinite(n)),
+      );
+      expect(stationIds.length).toBeGreaterThanOrEqual(1);
+
+      const openStation = async (id: number): Promise<void> => {
+        await page.evaluate((sid) => {
+          (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set(
+            { stationId: sid },
+          );
+        }, id);
+        await page.locator(PANEL).waitFor({ state: "visible", timeout: 5_000 });
+        // Let the lazy chart chunk load + charts mount.
+        await page.waitForTimeout(600);
+      };
+
+      let dataComplete = false;
+      for (const id of stationIds) {
+        await openStation(id);
+        const panel = page.locator(PANEL);
+        const canvasCount = await panel.locator("figure canvas").count();
+        if (canvasCount >= 3) {
+          // This is a data-complete station: assert each titled figure carries a canvas.
+          for (const title of ["Hiti", "Vindur", "Úrkoma"]) {
+            const figure = panel.locator("figure").filter({ hasText: title });
+            await expect(figure).toBeVisible();
+            await expect(figure.locator("canvas")).toBeVisible();
+          }
+          dataComplete = true;
+          break;
+        }
       }
-      expect(await panel.locator("figure canvas").count()).toBeGreaterThanOrEqual(3);
+      expect(dataComplete, "expected at least one station with three chart canvases").toBe(true);
     },
   );
 
