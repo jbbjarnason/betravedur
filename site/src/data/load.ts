@@ -1,0 +1,71 @@
+// BASE_URL-aware loading of the committed static data assets, with content-hashed
+// derived-filename resolution from manifest.json.
+//
+// PURE + BROWSER-SAFE: no Node built-ins. The pure functions (`resolveDerivedFile`,
+// `assetUrl`) are unit-tested directly; the async fetch helpers are exercised in the
+// browser (and E2E). Derived filenames are content-hashed for cache-busting, so the
+// URL is ALWAYS resolved from the manifest — never constructed as `derived/{id}.json`
+// (RESEARCH Pitfall 3). Malformed/missing manifest entries degrade to null, never throw
+// (defensive decode — ASVS V5 / threat T-03-04).
+import type { StationMeta } from "@betravedur/domain";
+import type { DerivedFile } from "@betravedur/pipeline/derive";
+
+/** One manifest entry: the content-hashed derived filename + provenance. */
+export interface ManifestEntry {
+  /** Relative path under public/data, e.g. "derived/1.c1cf25669d53.json". */
+  file: string;
+  hash?: string;
+  from?: number;
+  to?: number;
+  lastFetched?: string;
+}
+
+/** The committed manifest.json shape: station id (string key) → entry. */
+export interface Manifest {
+  stations: Record<string, ManifestEntry>;
+}
+
+/**
+ * Resolve a station's content-hashed derived filename from the manifest.
+ * Returns the relative path (e.g. "derived/1.c1cf25669d53.json") or null when the
+ * station is absent, the manifest is malformed, or the entry carries no `file`.
+ * NEVER throws and NEVER constructs `derived/{id}.json`.
+ */
+export function resolveDerivedFile(manifest: Manifest, id: number): string | null {
+  const stations = manifest?.stations;
+  if (!stations || typeof stations !== "object") return null;
+  const entry = stations[String(id)];
+  const file = entry?.file;
+  return typeof file === "string" && file.length > 0 ? file : null;
+}
+
+/**
+ * Prefix a public-dir-relative path with the Vite base (import.meta.env.BASE_URL).
+ * The base always ends with "/"; a leading "/" on `path` is collapsed so the two
+ * never produce a double slash.
+ */
+export function assetUrl(base: string, path: string): string {
+  const p = path.startsWith("/") ? path.slice(1) : path;
+  return `${base}${p}`;
+}
+
+/** Fetch + parse stations.json. Browser-only (uses fetch). */
+export async function loadStations(base: string): Promise<StationMeta[]> {
+  const res = await fetch(assetUrl(base, "data/stations.json"));
+  return (await res.json()) as StationMeta[];
+}
+
+/** Fetch + parse manifest.json. Browser-only (uses fetch). */
+export async function loadManifest(base: string): Promise<Manifest> {
+  const res = await fetch(assetUrl(base, "data/manifest.json"));
+  return (await res.json()) as Manifest;
+}
+
+/**
+ * Fetch + parse a derived file by its manifest-resolved relative path.
+ * `file` MUST come from `resolveDerivedFile` (the hashed name), not a constructed one.
+ */
+export async function loadDerived(base: string, file: string): Promise<DerivedFile> {
+  const res = await fetch(assetUrl(base, `data/${file}`));
+  return (await res.json()) as DerivedFile;
+}
