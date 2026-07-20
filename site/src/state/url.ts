@@ -37,6 +37,23 @@ function clamp(n: number, lo: number, hi: number): number {
   return Math.min(Math.max(n, lo), hi);
 }
 
+/**
+ * Read a param as a present, non-empty numeric value, or `null` when it should fall back.
+ *
+ * CR-01: an ABSENT param is `null` and an EMPTY-STRING param is `""` — BOTH coerce to
+ * `Number(...) === 0` (finite!), so a bare `Number.isFinite(Number(p.get(k)))` check would
+ * silently treat a truncated share link (or a Phase-6 `?st=42`-only deep link) as the literal
+ * value 0 and clamp it (doy → Jan 1, fra/til → bounds.min), overriding the intended fallback.
+ * Guard on presence + non-empty, exactly as `w`/`st` guard with `p.has(...)`. A garbage value
+ * like `?doy=abc` still coerces to NaN here → null → fallback (the correct existing behaviour).
+ */
+function numParam(p: URLSearchParams, key: string): number | null {
+  const raw = p.get(key);
+  if (raw === null || raw.trim() === "") return null; // absent or empty → fall back
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null; // garbage (NaN) → fall back
+}
+
 /** Snap an arbitrary width to the nearest allowed value; garbage → the default (7). */
 function snapWidth(w: number, fallback: number): number {
   if (!Number.isFinite(w)) return fallback;
@@ -80,33 +97,33 @@ export function paramsToState(
 ): SelectionState {
   const p = new URLSearchParams(qs);
 
-  // doy: integer 1..365; garbage → fallback anchor.
-  const doyRaw = Number(p.get("doy"));
-  const anchorDoy = Number.isFinite(doyRaw)
-    ? clamp(Math.round(doyRaw), 1, 365)
-    : fallback.anchorDoy;
+  // doy: integer 1..365; absent/empty/garbage → fallback anchor (NOT the Number(null)===0 trap).
+  const doyRaw = numParam(p, "doy");
+  const anchorDoy = doyRaw !== null ? clamp(Math.round(doyRaw), 1, 365) : fallback.anchorDoy;
 
-  // w: snap to {7,14,21,30}; garbage → fallback width.
-  const wRaw = Number(p.get("w"));
-  const widthDays = p.has("w") ? snapWidth(wRaw, fallback.widthDays) : fallback.widthDays;
+  // w: snap to {7,14,21,30}; absent/empty → fallback width (snapWidth handles garbage → fallback).
+  const wRaw = numParam(p, "w");
+  const widthDays = wRaw !== null ? snapWidth(wRaw, fallback.widthDays) : fallback.widthDays;
 
   // fra / til: integers clamped into [bounds.min, bounds.max]; enforce fra ≤ til (bump til up).
-  const fraRaw = Number(p.get("fra"));
-  const tilRaw = Number(p.get("til"));
-  let yearFrom = Number.isFinite(fraRaw)
-    ? clamp(Math.round(fraRaw), bounds.min, bounds.max)
-    : clamp(fallback.yearFrom, bounds.min, bounds.max);
-  let yearTil = Number.isFinite(tilRaw)
-    ? clamp(Math.round(tilRaw), bounds.min, bounds.max)
-    : clamp(fallback.yearTil, bounds.min, bounds.max);
+  // Absent/empty/garbage falls back to the fallback range — NOT the Number(null)===0 → bounds.min
+  // collapse (which would silently make a partial URL restore [bounds.min, bounds.min]).
+  const fraRaw = numParam(p, "fra");
+  const tilRaw = numParam(p, "til");
+  let yearFrom =
+    fraRaw !== null
+      ? clamp(Math.round(fraRaw), bounds.min, bounds.max)
+      : clamp(fallback.yearFrom, bounds.min, bounds.max);
+  let yearTil =
+    tilRaw !== null
+      ? clamp(Math.round(tilRaw), bounds.min, bounds.max)
+      : clamp(fallback.yearTil, bounds.min, bounds.max);
   if (yearFrom > yearTil) yearTil = yearFrom; // never an inverted/empty range
 
-  // st: integer or null (omitted → keep fallback, typically null). Never reflected into DOM.
-  let stationId = fallback.stationId;
-  if (p.has("st")) {
-    const stRaw = Number(p.get("st"));
-    stationId = Number.isFinite(stRaw) ? Math.round(stRaw) : fallback.stationId;
-  }
+  // st: integer or null (absent/empty/garbage → keep fallback, typically null). numParam guards
+  // the same Number("")===0 trap so `?st=` does not become station 0. Never reflected into DOM.
+  const stRaw = numParam(p, "st");
+  const stationId = stRaw !== null ? Math.round(stRaw) : fallback.stationId;
 
   // v = "lat,lng,zoom" — clamp each within Iceland maxBounds + zoom range; garbage → fallback.
   let { lat, lng, zoom } = fallback;

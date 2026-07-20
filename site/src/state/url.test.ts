@@ -88,6 +88,43 @@ describe("paramsToState defensive parse (T-04-05: no throw, no NaN)", () => {
   });
 });
 
+describe("paramsToState partial-URL falls back, not the Number(null)===0 trap (CR-01)", () => {
+  it("a viewport-only URL restores the fallback anchor + fallback year range (not Jan 1 / [min,min])", () => {
+    // A truncated share link or a Phase-6 station deep link carries no doy/fra/til. Absent params
+    // must fall back to the intended defaults, NOT be coerced to 0 (→ doy 1, fra/til bounds.min).
+    const s = paramsToState("v=64.5,-20.0,7", BOUNDS, FALLBACK);
+    expect(s.anchorDoy).toBe(FALLBACK.anchorDoy); // NOT 1 (Jan 1)
+    expect(s.widthDays).toBe(FALLBACK.widthDays);
+    expect(s.yearFrom).toBe(FALLBACK.yearFrom); // NOT bounds.min
+    expect(s.yearTil).toBe(FALLBACK.yearTil); // NOT bounds.min (range NOT collapsed)
+  });
+
+  it("?w=14 with no doy/fra/til restores fallback anchor + fallback year range (regression)", () => {
+    const s = paramsToState("w=14", BOUNDS, FALLBACK);
+    expect(s.widthDays).toBe(14); // the one present param is honoured
+    expect(s.anchorDoy).toBe(FALLBACK.anchorDoy); // NOT 1
+    expect(s.yearFrom).toBe(FALLBACK.yearFrom); // NOT bounds.min
+    expect(s.yearTil).toBe(FALLBACK.yearTil); // NOT bounds.min → NOT [min,min]
+  });
+
+  it("empty-string params (?doy=&fra=&til=) fall back, NOT to 0 (Number('')===0 trap)", () => {
+    const s = paramsToState("doy=&w=&fra=&til=&st=", BOUNDS, FALLBACK);
+    expect(s.anchorDoy).toBe(FALLBACK.anchorDoy); // NOT clamp(0)→1
+    expect(s.widthDays).toBe(FALLBACK.widthDays);
+    expect(s.yearFrom).toBe(FALLBACK.yearFrom); // NOT bounds.min
+    expect(s.yearTil).toBe(FALLBACK.yearTil); // NOT bounds.min
+    expect(s.stationId).toBe(FALLBACK.stationId); // NOT station 0
+  });
+
+  it("a Phase-6-style ?st=42-only deep link keeps the fallback selection intact", () => {
+    const s = paramsToState("st=42", BOUNDS, FALLBACK);
+    expect(s.stationId).toBe(42);
+    expect(s.anchorDoy).toBe(FALLBACK.anchorDoy);
+    expect(s.yearFrom).toBe(FALLBACK.yearFrom);
+    expect(s.yearTil).toBe(FALLBACK.yearTil);
+  });
+});
+
 describe("paramsToState clamps (ASVS V5)", () => {
   it("clamps doy into [1, 365]", () => {
     expect(paramsToState("doy=0", BOUNDS, FALLBACK).anchorDoy).toBe(1);
