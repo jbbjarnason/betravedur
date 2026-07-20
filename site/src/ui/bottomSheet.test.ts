@@ -4,7 +4,7 @@
 // TYPED no-op `attachSheet` stub (Plan 03 fills the Pointer-Events drag body). The drag CONTROLLER
 // itself is out of scope here — only the deterministic, unit-checkable pieces are tested.
 import { describe, it, expect } from "vitest";
-import { MOBILE_QUERY, snapNearest, attachSheet } from "./bottomSheet.js";
+import { MOBILE_QUERY, snapNearest, toggleTarget, attachSheet } from "./bottomSheet.js";
 
 describe("MOBILE_QUERY — the single 640px source of truth", () => {
   it("is byte-identical to the CSS @media (max-width: 640px) breakpoint", () => {
@@ -32,6 +32,32 @@ describe("snapNearest — nearest of peek/expanded", () => {
   it("works irrespective of argument order (peek/expanded swapped)", () => {
     // Same geometry, expanded passed first: nearest-to-40 is still the expanded (0) target.
     expect(snapNearest(40, expandedY, peekY)).toBe(expandedY);
+  });
+});
+
+describe("toggleTarget — the keyboard peek↔expanded snap flip", () => {
+  // Convention: larger translateY = peek (collapsed), smaller = expanded (open).
+  const peekY = 400;
+  const expandedY = 0;
+
+  it("returns expandedY when currently AT (or nearest) peek — Enter opens it", () => {
+    expect(toggleTarget(peekY, peekY, expandedY)).toBe(expandedY);
+  });
+
+  it("returns peekY when currently AT (or nearest) expanded — Enter collapses it", () => {
+    expect(toggleTarget(expandedY, peekY, expandedY)).toBe(peekY);
+  });
+
+  it("flips to the OTHER snap from a mid-drag position (nearest decides current)", () => {
+    // Nearer peek (360 of 0..400) → toggle opens to expanded.
+    expect(toggleTarget(360, peekY, expandedY)).toBe(expandedY);
+    // Nearer expanded (40) → toggle collapses to peek.
+    expect(toggleTarget(40, peekY, expandedY)).toBe(peekY);
+  });
+
+  it("resolves an exact midpoint to expandedY as 'current', so it toggles to peek", () => {
+    // snapNearest(200) ties→expandedY, so toggleTarget flips to peekY.
+    expect(toggleTarget(200, peekY, expandedY)).toBe(peekY);
   });
 });
 
