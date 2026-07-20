@@ -16,6 +16,8 @@ export interface YearRangeOptions {
 
 export interface YearRangeHandle {
   el: HTMLElement;
+  /** Re-sync the Frá/Til selects to an externally-changed range (popstate / boot hydration). */
+  syncRange(from: number, til: number): void;
 }
 
 /** Populate a <select> with year <option>s min..max, selecting `selected`. */
@@ -83,5 +85,13 @@ export function createYearRange(opts: YearRangeOptions): YearRangeHandle {
   });
 
   wrap.append(fromLabel, fromSel, tilLabel, tilSel);
-  return { el: wrap };
+  return {
+    el: wrap,
+    // URL→DOM (popstate restore): set both selects WITHOUT firing onRangeChange. Values are
+    // clamped into the option range so an out-of-bounds restore snaps to the nearest year.
+    syncRange(from: number, til: number): void {
+      fromSel.value = String(Math.min(Math.max(from, opts.min), opts.max));
+      tilSel.value = String(Math.min(Math.max(til, opts.min), opts.max));
+    },
+  };
 }

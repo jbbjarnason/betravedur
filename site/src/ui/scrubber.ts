@@ -82,6 +82,8 @@ export interface ScrubberHandle {
   el: HTMLElement;
   /** Update the visible date readout + track fill when the width changes externally. */
   setWidth(widthDays: number): void;
+  /** Re-sync the range value + readouts to an externally-changed anchor (popstate / boot). */
+  syncDoy(doy: number): void;
 }
 
 /**
@@ -160,6 +162,10 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
     const label = windowLabel(doy, width);
     readout.textContent = label;
     stepReadout.textContent = doyLabel(doy);
+    // Mirror the value into an explicit aria-valuenow DOM attribute. A native range exposes
+    // aria-valuenow to the a11y tree from `value`, but not as a queryable DOM attribute; setting
+    // it here makes the restored anchor assertable (UX-02 crafted-URL restore E2E).
+    range.setAttribute("aria-valuenow", String(foldDoy(doy)));
     paintTrack(doy);
   };
 
@@ -198,6 +204,12 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
     setWidth(widthDays: number): void {
       width = widthDays;
       syncReadouts(Number(range.value));
+    },
+    syncDoy(doy: number): void {
+      // URL→DOM (popstate restore): move the thumb + readouts WITHOUT firing onAnchorChange.
+      const folded = foldDoy(doy);
+      range.value = String(folded);
+      syncReadouts(folded);
     },
   };
 }

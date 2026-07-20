@@ -13,7 +13,7 @@ import "./styles/tokens.css";
 import "./styles/markers.css";
 import { renderHeader } from "./ui/header.js";
 import { initMap } from "./map/init.js";
-import { DEFAULT_WINDOW, type MarkerDatum } from "./data/types.js";
+import { type MarkerDatum } from "./data/types.js";
 import {
   loadStations,
   loadManifest,
@@ -22,7 +22,7 @@ import {
   type Manifest,
 } from "./data/load.js";
 import { installMarkerLayer, attachCompositeRenderer, renderComposite } from "./map/markers.js";
-import { createStore, type SelectionStore, type SelectionState } from "./state/store.js";
+import { createStore, type SelectionState } from "./state/store.js";
 import {
   buildStationCache,
   recompute,
@@ -30,7 +30,10 @@ import {
   type StationCache,
   type StationCacheEntry,
 } from "./state/recompute.js";
-import { mountControlBar, type YearBounds } from "./ui/controlBar.js";
+import { yearBounds, defaultSelection } from "./state/defaults.js";
+import { paramsToState } from "./state/url.js";
+import { writeUrl } from "./state/history.js";
+import { mountControlBar } from "./ui/controlBar.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
@@ -46,23 +49,6 @@ const RECOMPUTE_DEBOUNCE_MS = 120;
  * optional signal).
  */
 let latestData: MarkerDatum[] = [];
-
-/**
- * Derive the Frá/Til dropdown bounds from the manifest: min of every entry.from and max of
- * every entry.to across manifest.stations (the per-station coverage high-water marks — the
- * union that grows as Phase 8 backfills history). NOT a hardcoded year literal.
- */
-function yearBoundsFromManifest(manifest: Manifest): YearBounds {
-  const froms: number[] = [];
-  const tos: number[] = [];
-  for (const entry of Object.values(manifest.stations ?? {})) {
-    if (typeof entry.from === "number") froms.push(entry.from);
-    if (typeof entry.to === "number") tos.push(entry.to);
-  }
-  const min = froms.length ? Math.min(...froms) : new Date().getUTCFullYear();
-  const max = tos.length ? Math.max(...tos) : new Date().getUTCFullYear();
-  return { min, max };
-}
 
 /**
  * Fetch every station's derived file ONCE at boot and return the {meta, file} pairs the
@@ -118,31 +104,89 @@ function renderForState(
   renderComposite(map);
 }
 
+/** True when the map's current center/zoom already match the state's viewport (to ~4dp). */
+function viewportMatches(map: maplibregl.Map, s: Readonly<SelectionState>): boolean {
+  const c = map.getCenter();
+  const z = map.getZoom();
+  return (
+    Math.abs(c.lng - s.lng) < 1e-4 &&
+    Math.abs(c.lat - s.lat) < 1e-4 &&
+    Math.abs(z - s.zoom) < 1e-2
+  );
+}
+
+/** Push the store's viewport onto the map (boot hydration / popstate restore only). */
+function applyViewport(map: maplibregl.Map, s: Readonly<SelectionState>): void {
+  if (viewportMatches(map, s)) return; // avoid a redundant moveend → store round-trip
+  map.jumpTo({ center: [s.lng, s.lat], zoom: s.zoom }, { animate: false });
+}
+
 /**
- * Wire the boot fetch → cache → store-driven recompute flow once the map style is ready.
- * (1) fetch + cache every station's file once, (2) attach the composite renderer once,
- * (3) render the initial selection, (4) subscribe a DEBOUNCED recompute so a store change
- * re-renders over the cache with zero network I/O (SEL-04, RESEARCH Pitfall 2).
+ * Wire the boot fetch → hydrate → cache → recompute → URL/viewport flow once the map style is
+ * ready. This owns the loop-proof URL round-trip (RESEARCH Pattern 2):
+ *   (1) fetch + cache every station's file once (the SOLE network read);
+ *   (2) derive union year bounds + the default selection, then HYDRATE the store from the URL
+ *       (crafted link) or the default (no params) — replacing the Plan-01 bootstrap placeholder;
+ *   (3) apply the hydrated viewport to the map (jumpTo), attach the renderer, render initially;
+ *   (4) URL-WRITER: on every store change write the URL (pushState if a discrete control marked
+ *       it, else replaceState) — write ALWAYS, no isUpdating flag;
+ *   (5) DEBOUNCED recompute (120ms) re-renders over the cache with zero network I/O (SEL-04);
+ *   (6) POPSTATE: the ONLY URL→store read after boot — re-hydrate + re-apply the viewport;
+ *   (7) VIEWPORT SYNC (Pitfall 4): map `moveend` mirrors the camera → store (replaceState); the
+ *       map OWNS its viewport during interaction, store→map only on boot/popstate.
  */
-function wireMarkers(map: maplibregl.Map, store: SelectionStore): void {
+function wireMarkers(map: maplibregl.Map): void {
   const install = async (): Promise<void> => {
     try {
       const { entries, muted, manifest } = await loadStationFiles();
       const cache = buildStationCache(entries);
 
+      // (2) Union year bounds + default, then hydrate from the URL (or default when no params).
+      const bounds = yearBounds(manifest);
+      const fallback = defaultSelection(bounds);
+      const initial: SelectionState = location.search
+        ? paramsToState(location.search, bounds, fallback)
+        : fallback;
+      const store = createStore(initial);
+
+      // Expose map + store for E2E driving (no-network proof, URL-restore assertions).
+      (window as unknown as { __map: unknown }).__map = map;
+      (window as unknown as { __store: unknown }).__store = store;
+
+      // (3) Apply the hydrated viewport, attach the renderer, render the initial selection.
+      applyViewport(map, initial);
       attachCompositeRenderer(map); // idempotent (WR-04) — attach once
-      renderForState(map, cache, muted, store.get()); // initial render at boot (fills latestData)
+      renderForState(map, cache, muted, initial); // fills latestData
+      // Reflect the hydrated/default state back into the URL so a no-params load is shareable.
+      writeUrl(initial);
 
-      // Mount the bottom control bar now that bounds + the initial data snapshot exist.
-      // Controls write via store.set → the debounced subscriber below recomputes (no fetch);
-      // the readout reads the fresh latestData snapshot via the getter.
-      mountControlBar(store, yearBoundsFromManifest(manifest), () => latestData);
+      // Mount the control bar (bounds + the initial data snapshot now exist).
+      mountControlBar(store, bounds, () => latestData);
 
+      // (4) URL-writer: write on EVERY store change (push if discrete-marked, else replace).
+      // No isUpdating flag — pushState/replaceState never fire popstate, so this cannot loop.
+      store.subscribe((state) => writeUrl(state));
+
+      // (5) Debounced recompute (120ms trailing) — coalesces scrubber ticks, no fetch.
       let timer: ReturnType<typeof setTimeout> | undefined;
       store.subscribe((state) => {
-        // Debounce ONLY the recompute (120ms trailing) — coalesces scrubber ticks.
         clearTimeout(timer);
         timer = setTimeout(() => renderForState(map, cache, muted, state), RECOMPUTE_DEBOUNCE_MS);
+      });
+
+      // (6) popstate: the ONLY URL→store read after boot. Re-hydrate + restore the viewport.
+      window.addEventListener("popstate", () => {
+        const restored = paramsToState(location.search, bounds, store.get());
+        store.set(restored);
+        applyViewport(map, restored);
+      });
+
+      // (7) Viewport sync (Pitfall 4): the map owns its camera during interaction; on moveend
+      // mirror center/zoom into the store (a replaceState write). The store's no-op-skip +
+      // viewportMatches guard keep the boot/popstate jumpTo from re-looping through here.
+      map.on("moveend", () => {
+        const c = map.getCenter();
+        store.set({ lng: c.lng, lat: c.lat, zoom: map.getZoom() });
       });
     } catch (err) {
       // Defensive: the shell (map + header + attribution) stays up even if data load fails.
@@ -163,28 +207,10 @@ function boot(): void {
   renderHeader(headerMount);
   const map = initMap(mapMount);
 
-  // Temporary bootstrap selection: the DEFAULT_WINDOW summer week (doy 197, 14 days) over a
-  // wide placeholder year range, so the boot render matches Phase-3 behaviour exactly.
-  // Plan 03 owns default selection + URL — it replaces this with today's-week / last-10-years
-  // derived from the current date and the manifest year bounds, plus URL hydration.
-  const initial: SelectionState = {
-    anchorDoy: DEFAULT_WINDOW.startDoy,
-    widthDays: DEFAULT_WINDOW.endDoy - DEFAULT_WINDOW.startDoy + 1,
-    yearFrom: 1, // placeholder full range (Plan 03 replaces with data-derived bounds)
-    yearTil: 9999,
-    stationId: null,
-    lng: -19.0,
-    lat: 65.0,
-    zoom: 6,
-  };
-  const store = createStore(initial);
-
-  // Expose the map + store for E2E interactivity assertions (UI-SPEC 9/10) and deterministic
-  // selection driving (SEL-04 no-network proof: page.evaluate(() => __store.set({...}))).
-  (window as unknown as { __map: unknown }).__map = map;
-  (window as unknown as { __store: unknown }).__store = store;
-
-  wireMarkers(map, store);
+  // Store creation + URL hydration + default selection happen inside wireMarkers, AFTER the
+  // manifest fetch supplies the year bounds (the default needs data-derived bounds; the URL
+  // parse needs those bounds to clamp fra/til). The Plan-01 bootstrap placeholder is gone.
+  wireMarkers(map);
 }
 
 boot();

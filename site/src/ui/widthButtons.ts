@@ -18,6 +18,8 @@ export interface WidthButtonsOptions {
 
 export interface WidthButtonsHandle {
   el: HTMLElement;
+  /** Re-sync aria-pressed to an externally-changed width (popstate / boot hydration). */
+  syncWidth(days: number): void;
 }
 
 /**
@@ -56,5 +58,7 @@ export function createWidthButtons(opts: WidthButtonsOptions): WidthButtonsHandl
     group.appendChild(btn);
   }
 
-  return { el: group };
+  // Re-sync aria-pressed to an external width change (popstate restore) WITHOUT re-firing
+  // onWidthChange — this is the URL→DOM direction, not a user action.
+  return { el: group, syncWidth: (days: number): void => setActive(days) };
 }

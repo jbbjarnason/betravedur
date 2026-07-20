@@ -10,6 +10,7 @@ import "../styles/controls.css";
 import { createScrubber } from "./scrubber.js";
 import { createWidthButtons } from "./widthButtons.js";
 import { createYearRange } from "./yearRange.js";
+import { markDiscrete } from "../state/history.js";
 import type { SelectionStore } from "../state/store.js";
 import type { MarkerDatum } from "../data/types.js";
 
@@ -69,27 +70,43 @@ export function mountControlBar(
     onAnchorChange: (doy) => store.set({ anchorDoy: doy }),
   });
 
-  // Width buttons → store.set widthDays (and keep the scrubber's window paint in sync).
+  // Width buttons → store.set widthDays (DISCRETE → pushState via markDiscrete: back-button
+  // reverts the width). Also keep the scrubber's window paint in sync.
   const widthButtons = createWidthButtons({
     initialWidth: state.widthDays,
     onWidthChange: (days) => {
       scrubber.setWidth(days);
+      markDiscrete();
       store.set({ widthDays: days });
     },
   });
 
-  // Frá/Til dropdowns → store.set yearFrom/yearTil (bounds are manifest-derived).
+  // Frá/Til dropdowns → store.set yearFrom/yearTil (DISCRETE → pushState; bounds manifest-derived).
   const yearRange = createYearRange({
     min: bounds.min,
     max: bounds.max,
     initialFrom: state.yearFrom,
     initialTil: state.yearTil,
-    onRangeChange: ({ from, til }) => store.set({ yearFrom: from, yearTil: til }),
+    onRangeChange: ({ from, til }) => {
+      markDiscrete();
+      store.set({ yearFrom: from, yearTil: til });
+    },
   });
 
   inner.append(readout, scrubber.el, widthButtons.el, yearRange.el);
   bar.appendChild(inner);
   document.body.appendChild(bar);
+
+  // Re-sync every control's DOM to the store on external changes (popstate restore / boot
+  // hydration). The sync* methods set DOM WITHOUT firing their onChange callbacks, so this is a
+  // pure URL→DOM mirror and never loops. Controls' own click/input already updated their DOM;
+  // re-syncing to the same value is idempotent.
+  store.subscribe((s) => {
+    scrubber.setWidth(s.widthDays);
+    scrubber.syncDoy(s.anchorDoy);
+    widthButtons.syncWidth(s.widthDays);
+    yearRange.syncRange(s.yearFrom, s.yearTil);
+  });
 
   // The readout updates on every recompute: the store change is the trigger; getLatestData
   // returns the freshly recomputed data main.ts stored. Debounce-align to the recompute so
