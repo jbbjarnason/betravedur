@@ -19,7 +19,7 @@
 
 ### Map
 
-- [ ] **MAP-01**: Interactive pan/zoom map of Iceland (MapLibre GL + self-hosted PMTiles basemap, no API keys)
+- [x] **MAP-01**: Interactive pan/zoom map of Iceland (MapLibre GL + self-hosted PMTiles basemap, no API keys)
 - [ ] **MAP-02**: Station markers show historical averages for the selected period: temperature, wind speed + direction arrow, precipitation indicator
 - [ ] **MAP-03**: Markers are colored by the combined weather score, with a legend explaining the color scale
 - [ ] **MAP-04**: Marker density adapts to zoom level (more stations appear as user zooms in; no unreadable overlap)
@@ -46,12 +46,12 @@
 
 ### UX & Site
 
-- [ ] **UX-01**: Icelandic-only UI with the slogan "Leitin að betra veðri" in the site branding
+- [x] **UX-01**: Icelandic-only UI with the slogan "Leitin að betra veðri" in the site branding
 - [ ] **UX-02**: Full UI state (period, year range, selected station, map view) is encoded in the URL — permalinks are shareable and bookmarkable
 - [ ] **UX-03**: Mobile-responsive: bottom-sheet station panel on phones, side panel on desktop
 - [ ] **UX-04**: Info panel explains "sögulegt meðaltal, ekki spá" (historical, not forecast), shows Veðurstofan attribution and data currency ("uppfært í nótt")
 - [ ] **UX-05**: Loading, empty, and no-data states for map and panels
-- [ ] **SITE-01**: Fully static site built with Vite/TypeScript, deployed to GitHub Pages by CI on every data update
+- [x] **SITE-01**: Fully static site built with Vite/TypeScript, deployed to GitHub Pages by CI on every data update
 
 ## v2 Requirements (Deferred)
 
@@ -89,11 +89,11 @@ Which phases cover which requirements.
 | DATA-02 | Phase 2 | Complete |
 | DATA-04 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Complete |
-| MAP-01 | Phase 3 | Pending |
+| MAP-01 | Phase 3 | Complete |
 | MAP-02 | Phase 3 | Pending |
 | MAP-04 | Phase 3 | Pending |
-| UX-01 | Phase 3 | Pending |
-| SITE-01 | Phase 3 | Pending |
+| UX-01 | Phase 3 | Complete |
+| SITE-01 | Phase 3 | Complete |
 | SEL-01 | Phase 4 | Pending |
 | SEL-02 | Phase 4 | Pending |
 | SEL-03 | Phase 4 | Pending |

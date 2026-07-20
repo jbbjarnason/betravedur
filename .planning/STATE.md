@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
-last_updated: "2026-07-20T07:22:55.952Z"
+status: executing
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-07-20T08:44:15.840Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 11
+  completed_plans: 9
   percent: 25
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** A visitor picks a time-of-year period and instantly sees, on a map, where in Iceland the weather has historically been best — backed by real Veðurstofan station history.
-**Current focus:** Phase 2 — Derived Data Pipeline & Backfill
+**Current focus:** Phase 3 — Static Site Shell & Interactive Map
 
 ## Current Position
 
-Phase: 2 (Derived Data Pipeline & Backfill) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Phase: 3 (Static Site Shell & Interactive Map) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [██████████] 100%
+Progress: [████████░░] 82%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 02 P02 | 6min | 2 tasks | 11 files |
 | Phase 02 P03 | 3min | 2 tasks | 6 files |
 | Phase 2 P04 | 7min | 2 tasks | 5 files |
+| Phase 03 P01 | 12 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 02-02: raw store persists exactly 10 DailyObservation fields via explicit fixed-order record build (no spread) => field-pruned AND byte-identical idempotent partitions; highWaterYear drives resume, wired now not in 02-04.
 - [Phase 02]: Plan 02-03: content-addressed manifest — contentHash = sha256(derivedBytes).slice(0,12); updateManifest is pure and rewrites a station's hashed filename derived/{station}.{hash}.json + high-water marks IFF its bytes change (returning-visitor cache deltas).
 - [Phase 02]: Plan 02-03: buildStationsJson gates the no-splice registry on >=3 qualifying years of REAL data via domain effectiveN (not start); decommissioned stations clearing the bar retained; entries built field-by-field (no spread).
+- [Phase 03]: Plan 03-01: site/ Vite+TS workspace ships a deployable /betravedur/ base-path dist; self-hosted iceland.pmtiles maxzoom-9 extract is 7.3 MiB (no API keys); grayscale basemap muted to #E8EBED via pure paint override; preview-build Playwright E2E pins the Vite×MapLibre A1 worker risk (5/5 green); attribution sourced from domain ATTRIBUTION.
 
 ### Pending Todos
 
@@ -107,6 +109,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T07:22:51.391Z
-Stopped at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
+Last session: 2026-07-20T08:44:15.836Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
