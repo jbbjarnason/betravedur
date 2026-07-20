@@ -55,7 +55,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 02-01-PLAN.md — Pipeline workspace + derive.ts columnar encoder/decoder (season-year round-trip + ≤4KB/station-year size budget)
-- [ ] 02-02-PLAN.md — Resumable chunked/paced backfill loop + field-pruned idempotent raw store + 413/502/503 fetch taxonomy
+- [x] 02-02-PLAN.md — Resumable chunked/paced backfill loop + field-pruned idempotent raw store + 413/502/503 fetch taxonomy
 - [ ] 02-03-PLAN.md — Content-hashed manifest.json (delta property) + stations.json from no-splice registry (≥3 qualifying years)
 - [ ] 02-04-PLAN.md — Aggregate orchestrator (touched-only) + orphan data branch + real subset backfill (self-verified) + PIPELINE.md
 
@@ -144,7 +144,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
-| 2. Derived Data Pipeline & Backfill | 1/4 | In Progress|  |
+| 2. Derived Data Pipeline & Backfill | 2/4 | In Progress|  |
 | 3. Static Site Shell & Interactive Map | 0/TBD | Not started | - |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
