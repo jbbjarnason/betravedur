@@ -61,6 +61,13 @@ type ECOption = ComposeOption<
 declare global {
   interface Window {
     __chartOptions?: ECOption[];
+    /**
+     * Count of LIVE (initialized-but-not-yet-disposed) ECharts instances (CR-01 regression hook).
+     * Incremented in `initChart`, decremented on `dispose()`. An E2E opens→closes→reopens the panel
+     * and asserts this returns to 0 after close — proving instances do NOT accumulate (the leak was
+     * that `echarts.init` results were dropped and never disposed). Not used by production logic.
+     */
+    __liveChartInstances?: number;
   }
 }
 
@@ -112,10 +119,84 @@ function resolveToken(name: string): string {
   return v || "#5B6670"; // defensive fallback to a neutral muted-ink-ish tone
 }
 
+/**
+ * A disposable handle owning ONE ECharts instance and its ResizeObserver (CR-01 + WR-01). The
+ * stationPanel shell tracks every handle a render returns and calls `dispose()` on panel close AND
+ * before every re-open, so no ECharts instance (its canvas, its render loop, its global-registry
+ * entry) or ResizeObserver ever outlives the panel node it was mounted into (CR-01: the leak was
+ * that `echarts.init` results were dropped on the floor and never disposed).
+ */
+export interface ChartHandle {
+  dispose(): void;
+}
+
+/**
+ * Init an ECharts instance into `container`, set the option, wire a ResizeObserver so the chart
+ * tracks the panel/viewport (WR-01 — ECharts does NOT auto-track element resize; the app must call
+ * `chart.resize()`), and return a handle that disposes BOTH the observer and the instance (CR-01).
+ * Records the option on window.__chartOptions for the E2E option-shape assertions.
+ */
+function initChart(container: HTMLElement, option: ECOption): ChartHandle {
+  const chart = echarts.init(container, undefined, { renderer: "canvas" });
+  chart.setOption(option);
+  (window.__chartOptions ??= []).push(option);
+  // CR-01 regression hook: track the live-instance count so the E2E can assert no accumulation.
+  window.__liveChartInstances = (window.__liveChartInstances ?? 0) + 1;
+  let counted = true;
+
+  // WR-01: reflow with the panel/viewport (esp. the ≤640px full-width breakpoint). Guard
+  // ResizeObserver for headless/older runtimes — absence just means no live reflow, never a throw.
+  let ro: ResizeObserver | null = null;
+  if (typeof ResizeObserver === "function") {
+    ro = new ResizeObserver(() => {
+      // The instance may already be disposed if a teardown races the observer callback.
+      if (!chart.isDisposed()) chart.resize();
+    });
+    ro.observe(container);
+  }
+
+  return {
+    dispose(): void {
+      // CR-01: disconnect the observer in the SAME dispose path as the instance (WR-01 note) so
+      // neither outlives the panel. Idempotent — dispose() may be called on close AND re-open.
+      if (ro) {
+        ro.disconnect();
+        ro = null;
+      }
+      if (!chart.isDisposed()) chart.dispose();
+      if (counted) {
+        window.__liveChartInstances = (window.__liveChartInstances ?? 1) - 1;
+        counted = false; // decrement exactly once even under a double-dispose
+      }
+    },
+  };
+}
+
 /** The app font stack, resolved so ECharts text matches the app's type system (never ECharts default). */
 function resolveFontFamily(): string {
   return resolveToken("--font-stack") || "sans-serif";
 }
+
+/**
+ * Convert a `#rrggbb` (or `#rgb`) hex tone to an `rgba(r,g,b,a)` string at alpha `a` (UI-SPEC box
+ * fill: 0.28–0.35 alpha). Used so the box FILL is translucent while the border/whiskers/median line
+ * stay at full opacity — the median "typical day" line must read on top of the fill (UI BLOCKER:
+ * a whole-element opacity of 0.85 made boxes near-solid and hid the median). Falls back to the
+ * input string unchanged if it is not a parseable hex (defensive — e.g. an already-rgba token).
+ */
+function withAlpha(hex: string, alpha: number): string {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  let h = m[1]!;
+  if (h.length === 3) h = h[0]! + h[0]! + h[1]! + h[1]! + h[2]! + h[2]!;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Box-fill alpha per UI-SPEC Distribution Candlestick Spec (0.28–0.35); the median/whiskers stay full. */
+const BOX_FILL_ALPHA = 0.3;
 
 /** True when the user prefers reduced motion (charts are static → `animation:false`). */
 function prefersReducedMotion(): boolean {
@@ -268,13 +349,16 @@ function writeNoData(container: HTMLElement): void {
  * Single neutral tone (no directional coloring); category x-axis in window order with thinned
  * Icelandic date labels; `animation:false` under reduced-motion; a11y summary + hidden table.
  * Records the built option on window.__chartOptions. Defensive: empty → the no-data line.
+ *
+ * Returns a {@link ChartHandle} owning the ECharts instance + its ResizeObserver so the shell can
+ * dispose it (CR-01/WR-01), or `null` when no chart was created (the no-data path).
  */
-export function renderBoxplot(container: HTMLElement, spec: BoxplotSpec): void {
+export function renderBoxplot(container: HTMLElement, spec: BoxplotSpec): ChartHandle | null {
   const boxes = spec.perDoy;
   const present = boxes.filter((d): d is Extract<PerDoyBox, { min: number }> => !d.missing);
   if (present.length === 0) {
     writeNoData(container);
-    return;
+    return null;
   }
 
   const fontFamily = resolveFontFamily();
@@ -298,14 +382,16 @@ export function renderBoxplot(container: HTMLElement, spec: BoxplotSpec): void {
     grid,
     tooltip: {
       trigger: "item",
-      // PLAIN string formatter — no HTML injection of any station-derived text (V11). ECharts
-      // passes the boxplot 5-number value array; we format the numbers only.
+      // PLAIN string formatter — no HTML injection of any station-derived text (V11). Read from
+      // `params.data` (the SOURCE [min,p10,p50,p90,max] array WE supplied), not ECharts' internal
+      // processed `value` (which is dimension-prefixed with the category index) — WR-05: the old
+      // guard bailed to "" on any array shorter than 6, brittle coupling to an undocumented
+      // internal shape. Our source array is a known [min,p10,p50,p90,max] 5-tuple.
       formatter: (params: unknown) => {
-        const p = params as { name?: string; value?: number[] };
-        const v = p.value;
-        if (!Array.isArray(v) || v.length < 6) return "";
-        // boxplot value array is [categoryIndex, min, Q1, median, Q3, max] in ECharts params.
-        const [, min, q1, med, q3, max] = v as number[];
+        const p = params as { name?: string; data?: Array<number | "-"> };
+        const d = p.data;
+        if (!Array.isArray(d) || d.length < 5 || d.some((x) => x === "-")) return "";
+        const [min, q1, med, q3, max] = d as number[];
         return (
           `${p.name ?? ""}\n` +
           `dæmigerður: ${formatIce(med!, 1)} ${unit}\n` +
@@ -332,17 +418,18 @@ export function renderBoxplot(container: HTMLElement, spec: BoxplotSpec): void {
       {
         type: "boxplot",
         data,
-        // ONE neutral tone — the box fill (reduced-alpha via ECharts opacity), median + whiskers
-        // in the full-opacity tone. No second directional tone, no up/down. Distribution, not finance.
-        itemStyle: { color: spec.tone, borderColor: spec.tone, opacity: 0.85 },
+        // ONE neutral tone — the box FILL is the tone at ~0.30 alpha (UI-SPEC 0.28–0.35) while the
+        // border, whiskers, caps and the MEDIAN line stay the full-opacity tone (opacity:1), so the
+        // median "typical day" line reads on top of the fill (UI BLOCKER: a whole-element opacity of
+        // 0.85 made the boxes near-solid and hid the median). No directional up/down tone —
+        // distribution, not finance.
+        itemStyle: { color: withAlpha(spec.tone, BOX_FILL_ALPHA), borderColor: spec.tone, opacity: 1 },
         boxWidth: [10, 40],
       },
     ],
   };
 
-  const chart = echarts.init(container, undefined, { renderer: "canvas" });
-  chart.setOption(option);
-  (window.__chartOptions ??= []).push(option);
+  const handle = initChart(container, option);
 
   // A11y: aria-label summary + a visually-hidden per-day min/median/max table.
   const summary = boxplotAriaSummary(spec);
@@ -353,19 +440,23 @@ export function renderBoxplot(container: HTMLElement, spec: BoxplotSpec): void {
     formatIce(b.max, 1),
   ]);
   attachA11y(container, summary, ["Dagur", `Lægst (${unit})`, `Dæmigert (${unit})`, `Hæst (${unit})`], rows);
+  return handle;
 }
 
 /**
  * Render a precip BAR chart (per-doy median total) into `container`. A missing doy is a `null`
  * datum → an explicit GAP (no bar), never a zero-height bar. Single --chart-precip tone;
  * `animation:false` under reduced-motion; a11y summary + hidden table. Defensive: empty → no-data.
+ *
+ * Returns a {@link ChartHandle} owning the ECharts instance + its ResizeObserver so the shell can
+ * dispose it (CR-01/WR-01), or `null` when no chart was created (the no-data path).
  */
-export function renderBars(container: HTMLElement, spec: BarsSpec): void {
+export function renderBars(container: HTMLElement, spec: BarsSpec): ChartHandle | null {
   const bars = spec.perDoy;
   const present = bars.filter((d): d is Extract<PerDoyBar, { value: number }> => !d.missing);
   if (present.length === 0) {
     writeNoData(container);
-    return;
+    return null;
   }
 
   const fontFamily = resolveFontFamily();
@@ -411,11 +502,10 @@ export function renderBars(container: HTMLElement, spec: BarsSpec): void {
     ],
   };
 
-  const chart = echarts.init(container, undefined, { renderer: "canvas" });
-  chart.setOption(option);
-  (window.__chartOptions ??= []).push(option);
+  const handle = initChart(container, option);
 
   const summary = barsAriaSummary(spec);
   const rows = present.map((b) => [doyLabel(b.doy), formatIce(b.value, 1)]);
   attachA11y(container, summary, ["Dagur", "Úrkoma (mm)"], rows);
+  return handle;
 }
