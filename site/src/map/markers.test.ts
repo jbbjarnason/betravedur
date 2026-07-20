@@ -4,7 +4,8 @@
 // omission / muted ófullnægjandi-gögn). No map, no browser — the rendering core.
 import { describe, expect, it } from "vitest";
 import type { MarkerDatum } from "../data/types.js";
-import { toFeatureCollection, formatCallout } from "./markers.js";
+import type * as maplibregl from "maplibre-gl";
+import { toFeatureCollection, formatCallout, attachCompositeRenderer } from "./markers.js";
 
 /** A "happy path" sufficient datum: temp + concrete wind dir + precip. */
 function fullDatum(overrides: Partial<MarkerDatum> = {}): MarkerDatum {
@@ -142,5 +143,45 @@ describe("formatCallout", () => {
     expect(html).toContain(">4<"); // integer speed numeral present
     expect(html).toMatch(/m\/s/); // unit present (nested span between numeral and unit)
     expect(html).toContain("breytileg átt");
+  });
+});
+
+describe("attachCompositeRenderer — idempotency (WR-04)", () => {
+  // A minimal fake map that records on/off calls per event, so we can assert the
+  // idle/move handler pairs do not accumulate across re-invocations.
+  function fakeMap() {
+    const handlers: Record<string, Set<unknown>> = { idle: new Set(), move: new Set() };
+    const map = {
+      on(evt: string, fn: unknown) {
+        (handlers[evt] ??= new Set()).add(fn);
+      },
+      off(evt: string, fn: unknown) {
+        handlers[evt]?.delete(fn);
+      },
+    } as unknown as maplibregl.Map;
+    return { map, handlers };
+  }
+
+  it("does not stack idle/move listeners when re-invoked (Phase-4 re-wire)", () => {
+    const { map, handlers } = fakeMap();
+    attachCompositeRenderer(map);
+    expect(handlers.idle!.size).toBe(1);
+    expect(handlers.move!.size).toBe(1);
+
+    // Re-wire twice more (as a period change would) — the prior pair must be detached.
+    attachCompositeRenderer(map);
+    attachCompositeRenderer(map);
+    expect(handlers.idle!.size).toBe(1);
+    expect(handlers.move!.size).toBe(1);
+  });
+
+  it("keeps separate maps independent", () => {
+    const a = fakeMap();
+    const b = fakeMap();
+    attachCompositeRenderer(a.map);
+    attachCompositeRenderer(b.map);
+    attachCompositeRenderer(a.map);
+    expect(a.handlers.idle!.size).toBe(1);
+    expect(b.handlers.idle!.size).toBe(1);
   });
 });

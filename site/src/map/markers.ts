@@ -278,12 +278,31 @@ export function renderComposite(map: maplibregl.Map): void {
 }
 
 /**
+ * The `idle`/`move` handler pair currently attached per map, so a re-invocation can
+ * detach the prior pair before wiring a fresh one (WR-04) rather than stacking. Keyed
+ * by map so multiple maps never cross-contaminate; entries are GC'd with the map.
+ */
+const ATTACHED_HANDLERS = new WeakMap<maplibregl.Map, () => void>();
+
+/**
  * Wire the composite renderer to the map lifecycle: draw on `idle` (after collision
  * settles) and keep pills glued to the basemap on every `move`. Decoupled from the data
  * source so a period change (Phase 4) just calls installMarkerLayer + a fresh render.
+ *
+ * IDEMPOTENT (WR-04): re-invoking this (e.g. the Phase-4 period selector re-running the
+ * wire flow) detaches any handler pair a prior call attached and installs exactly one
+ * fresh pair — the `idle`/`move` listeners never accumulate, so each map event triggers
+ * a single queryRenderedFeatures + DOM rebuild, not one per historical attach.
  */
 export function attachCompositeRenderer(map: maplibregl.Map): void {
+  const prior = ATTACHED_HANDLERS.get(map);
+  if (prior) {
+    // Remove the previously-attached pair before re-wiring so handlers don't stack.
+    map.off("idle", prior);
+    map.off("move", prior);
+  }
   const draw = (): void => renderComposite(map);
   map.on("idle", draw);
   map.on("move", draw);
+  ATTACHED_HANDLERS.set(map, draw);
 }
