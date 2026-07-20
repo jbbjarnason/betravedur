@@ -45,11 +45,21 @@ export function readoutText(data: ReadonlyArray<MarkerDatum>): string {
  *   keeps a module-level `latestData` updated on every recompute and passes this getter, so
  *   the readout updates on every recompute (the store subscription is the update trigger).
  */
+/** The control-bar handle: a `refreshReadout` main.ts calls after each recompute settles. */
+export interface ControlBarHandle {
+  /**
+   * Re-render the global "meðaltal N ára" readout from the latest recomputed data. main.ts calls
+   * this right after it updates `latestData` in renderForState, so the readout reflects the SAME
+   * frame the markers show — no timer, no 140>120 race, no per-change timer pile-up (WR-01).
+   */
+  refreshReadout(): void;
+}
+
 export function mountControlBar(
   store: SelectionStore,
   bounds: YearBounds,
   getLatestData: () => ReadonlyArray<MarkerDatum>,
-): void {
+): ControlBarHandle {
   const state = store.get();
 
   const bar = document.createElement("div");
@@ -122,14 +132,13 @@ export function mountControlBar(
     yearRange.syncRange(s.yearFrom, s.yearTil);
   });
 
-  // The readout updates on every recompute: the store change is the trigger; getLatestData
-  // returns the freshly recomputed data main.ts stored. Debounce-align to the recompute so
-  // the readout reflects the SAME frame the markers show.
-  store.subscribe(() => {
-    // Read after a microtask-plus so the recompute subscriber (also on this store) has run.
-    // main.ts's recompute is debounced 120ms; poll once just past it for the settled data.
-    setTimeout(() => {
+  // The readout is refreshed by main.ts via the returned refreshReadout(), invoked right after
+  // each recompute updates latestData (WR-01). This replaces the old per-store-change
+  // setTimeout(140) — no timer pile-up during a scrubber drag, and no fragile 140>120ms race
+  // against the recompute debounce (the readout reads the SAME settled frame the markers show).
+  return {
+    refreshReadout(): void {
       readout.textContent = readoutText(getLatestData());
-    }, 140);
-  });
+    },
+  };
 }

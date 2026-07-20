@@ -33,7 +33,7 @@ import {
 import { yearBounds, defaultSelection } from "./state/defaults.js";
 import { paramsToState } from "./state/url.js";
 import { writeUrl } from "./state/history.js";
-import { mountControlBar } from "./ui/controlBar.js";
+import { mountControlBar, type ControlBarHandle } from "./ui/controlBar.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
@@ -49,6 +49,15 @@ const RECOMPUTE_DEBOUNCE_MS = 120;
  * optional signal).
  */
 let latestData: MarkerDatum[] = [];
+
+/**
+ * The mounted control bar's handle (set once mountControlBar runs). renderForState calls
+ * controlBar?.refreshReadout() right after it updates latestData so the "meðaltal N ára" readout
+ * reflects the SAME frame the markers show — replacing the old fragile setTimeout(140) poll
+ * (WR-01). Null until the bar mounts (the initial renderForState runs just before mount and sets
+ * latestData; the bar reads it directly at mount via getLatestData).
+ */
+let controlBar: ControlBarHandle | null = null;
 
 /**
  * Fetch every station's derived file ONCE at boot and return the {meta, file} pairs the
@@ -102,6 +111,8 @@ function renderForState(
   latestData = data; // snapshot for the control-bar N readout (updates on every recompute)
   installMarkerLayer(map, data);
   renderComposite(map);
+  // Refresh the global "meðaltal N ára" readout from THIS frame's data (WR-01: no timer race).
+  controlBar?.refreshReadout();
 }
 
 /** True when the map's current center/zoom already match the state's viewport (to ~4dp). */
@@ -161,16 +172,28 @@ function wireMarkers(map: maplibregl.Map): void {
       // Reflect the hydrated/default state back into the URL so a no-params load is shareable.
       writeUrl(initial);
 
-      // Mount the control bar (bounds + the initial data snapshot now exist).
-      mountControlBar(store, bounds, () => latestData);
+      // Mount the control bar (bounds + the initial data snapshot now exist). Keep the handle so
+      // renderForState can refresh the N readout after each recompute (WR-01, no timer).
+      controlBar = mountControlBar(store, bounds, () => latestData);
 
       // (4) URL-writer: write on EVERY store change (push if discrete-marked, else replace).
       // No isUpdating flag — pushState/replaceState never fire popstate, so this cannot loop.
       store.subscribe((state) => writeUrl(state));
 
       // (5) Debounced recompute (120ms trailing) — coalesces scrubber ticks, no fetch.
+      // WR-02: marker data is a pure function of (anchorDoy, widthDays, yearFrom, yearTil) ONLY —
+      // never the viewport. A pan/zoom writes {lng,lat,zoom} into the store, which must NOT trigger
+      // a (byte-identical) recompute. Track the last-rendered selection tuple and early-return when
+      // no selection-relevant key changed, so viewport-only changes skip recompute (the URL is
+      // still written by the separate URL-writer subscriber above).
+      const selectionKey = (s: Readonly<SelectionState>): string =>
+        `${s.anchorDoy}|${s.widthDays}|${s.yearFrom}|${s.yearTil}`;
+      let lastRenderedKey = selectionKey(initial); // the initial render already happened above
       let timer: ReturnType<typeof setTimeout> | undefined;
       store.subscribe((state) => {
+        const key = selectionKey(state);
+        if (key === lastRenderedKey) return; // viewport-only change → no recompute (WR-02)
+        lastRenderedKey = key;
         clearTimeout(timer);
         timer = setTimeout(() => renderForState(map, cache, muted, state), RECOMPUTE_DEBOUNCE_MS);
       });
@@ -185,7 +208,13 @@ function wireMarkers(map: maplibregl.Map): void {
       // (7) Viewport sync (Pitfall 4): the map owns its camera during interaction; on moveend
       // mirror center/zoom into the store (a replaceState write). The store's no-op-skip +
       // viewportMatches guard keep the boot/popstate jumpTo from re-looping through here.
+      // WR-03: a boot/popstate jumpTo also fires moveend, but the map snaps the camera to values
+      // that differ from the stored full-precision lng/lat/zoom by sub-1e-4 bits — enough for the
+      // store's strict-=== no-op-skip to NOT skip, emitting a spurious replaceState that overwrites
+      // the freshly restored history entry. Guard the OUTBOUND write with viewportMatches so a
+      // jump-induced moveend (already matching to display precision) is a genuine no-op.
       map.on("moveend", () => {
+        if (viewportMatches(map, store.get())) return; // jumpTo settle → no spurious write (WR-03)
         const c = map.getCenter();
         store.set({ lng: c.lng, lat: c.lat, zoom: map.getZoom() });
       });
