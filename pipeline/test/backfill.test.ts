@@ -68,20 +68,28 @@ describe("backfill chunk error taxonomy", () => {
   });
 
   it("B: a 502 consumed by the fetch layer still resolves the chunk with rows", async () => {
-    // The client retries 502 internally; from the loop's view the second call succeeds.
+    // The client retries 502 internally; from the loop's view the retried call succeeds
+    // and returns exactly the requested span (no duplication, no over-fetch).
     let calls = 0;
-    const fetchAws = vi.fn(async (): Promise<DailyObservation[]> => {
-      calls++;
-      if (calls === 1) throw new ApiHttpError(502, "Bad Gateway");
-      return rowsForSpan(1, 2000, 2004);
-    });
+    const fetchAws = vi.fn(
+      async (_ids: number[], from: string, to: string): Promise<DailyObservation[]> => {
+        calls++;
+        if (calls === 1) throw new ApiHttpError(502, "Bad Gateway");
+        const y0 = Number(from.slice(0, 4));
+        const y1 = Number(to.slice(0, 4));
+        return rowsForSpan(1, y0, y1);
+      },
+    );
 
     const rows = await fetchChunk("aws", 1, 2000, 2004, {
       fetchAws,
       fetchSynop: vi.fn(),
       sleep: async () => {},
     });
-    expect(rows.length).toBe(5);
+    // 5 distinct years (2000..2004), one row each — the halving covers disjoint spans.
+    const dates = rows.map((r) => r.date).sort();
+    expect(new Set(dates).size).toBe(dates.length);
+    expect(dates).toEqual(rowsForSpan(1, 2000, 2004).map((r) => r.date).sort());
   });
 
   it("C: a persistent 503 propagates as an error and NEVER resolves to []", async () => {

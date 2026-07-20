@@ -1,5 +1,5 @@
 // @betravedur/fetch — Node-only build-time API client for api.vedur.is.
-export { BASE_URL, fetchWithRetry } from "./client.js";
+export { BASE_URL, fetchWithRetry, ApiHttpError } from "./client.js";
 export {
   fetchAwsDay,
   fetchSynopDay,
