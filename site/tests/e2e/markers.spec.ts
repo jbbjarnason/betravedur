@@ -84,17 +84,21 @@ test("per-marker N: each pill aria-label carries its own coverage (meðaltal N �
   // UI-SPEC honest-coverage: a screen-reader user on an individual marker must hear THAT
   // station's coverage, not just its name. Every pill's aria-label is
   // "{name}: meðaltal {n} ára" when sufficient, else "{name}: ófullnægjandi gögn".
+  // Phase-5 WR-3 (color-not-sole-channel for AT): a SCORED sufficient pill ALSO appends its
+  // einkunn — "{name}: meðaltal {n} ára, einkunn {s,d}" — so screen readers get the numeral too.
   await waitForMarkers(page);
   const labels = await page.locator(PILL).evaluateAll((els) =>
     els.map((e) => e.getAttribute("aria-label") ?? ""),
   );
   expect(labels.length).toBeGreaterThanOrEqual(1);
   for (const label of labels) {
-    expect(label).toMatch(/^.+: (meðaltal \d+ ára|ófullnægjandi gögn)$/);
+    expect(label).toMatch(
+      /^.+: (meðaltal \d+ ára(, einkunn \d{1,2},\d)?|ófullnægjandi gögn)$/,
+    );
   }
   // The committed 2-station sample is sufficient at the default window, so at least one pill
   // surfaces a concrete "meðaltal N ára" coverage count (not merely the muted fallback).
-  expect(labels.some((l) => /: meðaltal \d+ ára$/.test(l))).toBe(true);
+  expect(labels.some((l) => /: meðaltal \d+ ára(, einkunn \d{1,2},\d)?$/.test(l))).toBe(true);
 });
 
 test("criterion 9: zooming in changes the zoom level and/or visible callout count", async ({ page }) => {

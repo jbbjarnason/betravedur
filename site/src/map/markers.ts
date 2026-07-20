@@ -29,6 +29,11 @@ import { scoreColor } from "./score-color.js";
  * score===null path first), but a stray non-finite input clamps to `0,0` so the badge can
  * never render `NaN,` — belt-and-suspenders over the number|null contract (T-05-03: the
  * numeral is always a formatted number, never a reflected string).
+ *
+ * IN-03 (accuracy note, not load-bearing): every current caller already passes a finite
+ * combine()-produced number, so the `Number.isFinite` branch is unreachable in practice today.
+ * It is retained as intentional hardening against a future caller — NOT relied upon by any
+ * present code path. Do not read the guard as a live invariant.
  */
 export function formatScore(score: number): string {
   const n = Number.isFinite(score) ? Math.max(0, Math.min(10, score)) : 0;
@@ -273,10 +278,21 @@ function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
   // count in the pill's aria-label so a screen-reader user on an individual marker hears its
   // coverage, not just the name. N reflects the station's own qualifying years (MarkerDatum.n),
   // never the picker span; insufficient stations carry the ófullnægjandi gögn honesty signal.
-  pill.setAttribute(
-    "aria-label",
-    datum.sufficient ? `${datum.name}: meðaltal ${datum.n} ára` : `${datum.name}: ófullnægjandi gögn`,
-  );
+  //
+  // UI-REVIEW (color-not-sole-channel for screen readers): a SCORED pill also announces its
+  // score in the accessible name, so the numeral channel exists for AT users too — the badge
+  // itself stays aria-hidden (its numeral would otherwise double-read), and the score rides on
+  // the pill wrapper's label. The án-úrkomu / ófullnægjandi variants are unaffected (they carry
+  // their honesty vocabulary), keeping "color is never the sole channel" true on the map layer.
+  let ariaLabel: string;
+  if (!datum.sufficient) {
+    ariaLabel = `${datum.name}: ófullnægjandi gögn`;
+  } else if (datum.score !== null) {
+    ariaLabel = `${datum.name}: meðaltal ${datum.n} ára, einkunn ${formatScore(datum.score)}`;
+  } else {
+    ariaLabel = `${datum.name}: meðaltal ${datum.n} ára`;
+  }
+  pill.setAttribute("aria-label", ariaLabel);
   pill.tabIndex = -1; // not yet in the tab order (activated in Phase 6)
   pill.innerHTML = html;
 
