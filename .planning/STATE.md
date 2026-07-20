@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: executing
 stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-07-20T14:46:26.807Z"
+last_updated: "2026-07-20T19:48:58.699Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 23
+  completed_plans: 21
   percent: 75
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** A visitor picks a time-of-year period and instantly sees, on a map, where in Iceland the weather has historically been best — backed by real Veðurstofan station history.
-**Current focus:** Phase 6 — Station Chart Panel
+**Current focus:** Phase 7 — Responsive UX & Trust States
 
 ## Current Position
 
-Phase: 6 (Station Chart Panel) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 7 (Responsive UX & Trust States) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [██████████] 100%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [██████████] 100%
 | Phase 06 P01 | 8min | 3 tasks | 9 files |
 | Phase 06 P02 | 12min | 2 tasks | 9 files |
 | Phase 06 P03 | 12 | 2 tasks | 4 files |
+| Phase 07 P01 | 8min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,7 @@ Recent decisions affecting current work:
 - [Phase 06]: [Phase 06] Plan 06-01: per-doy distribution foundation — percentile (type-7) + perDoyDistribution + perDoyPrecip in @betravedur/domain operating on DECODED DailyObservation[] (not DerivedFile) so the domain stays zero-dep; reshape mirrors computeMarkerDatum (qualifyingYears 0.8 + effectiveN N>=3) so panel coverage honesty == map; precip = per-doy MEDIAN total, empty bucket -> {missing:true} explicit gap never a zero box/bar. daylightHours polar-safe via suncalc 2.0.1 (branch alwaysUp/alwaysDown then null sunrise/sunset -> sun noon-altitude), no NaN at Iceland solstices. echarts 6.1.0 + suncalc 2.0.1 pinned exact in site, no @types stubs, no postinstall. panel.spec skeleton: 14 UI-SPEC criteria fixme + build-size chunk-split gate. tsc 0 errors, full unit+E2E green.
 - [Phase 06]: [Phase 06] Plan 06-02: station chart panel SHELL — mountStationPanel subscribes to the single Phase-5 stationId seam (open on non-null, teardown + un-yield on null); close button AND Escape both store.set({stationId:null}) so the existing Phase-4 URL st clearing + marker deselect run for free. Ranked "Bestu staðir" list YIELDS (hide-not-destroy setYielded) while open, restores exactly on close. Marker-click open delegated from #marker-overlay -> setDiscrete stationId (markers.ts stays store-free). Daylight readout (midpoint doy, polar-safe Icelandic copy) + three-granularity no-data (per-chart / án-úrkomu / whole-station Engin gögn) render immediately from the boot StationCache — ZERO data fetch on open (E2E criterion 10). renderChartInto is a hleð riti… stub Plan 03 fills with lazy ECharts. Comma decimal owned via toFixed+replace (is-IS locale fell back to a dot in headless). --chart-temp/wind/precip tokens distinct from --score-*/--accent. tsc 0, full E2E green (61 pass, 5 Plan-03 fixmes), 281 unit pass.
 - [Phase 06]: [Phase 06] Plan 06-03: lazy ECharts chart chunk — chartPanel.ts (à-la-carte echarts/core + BoxplotChart/BarChart + Grid/Tooltip/Title + CanvasRenderer, echarts.use) renders honest distribution BOXPLOTS for temp/wind (box p10–p90, median line, min/max whiskers, single neutral --chart-temp/--chart-wind tone, NOT candlestick, no directional color) + precip BARS (per-doy median; missing doy = ECharts empty-value '-' marker = explicit gap, never a zero bar), reached via memoized import('./chartPanel.js') from the stationPanel renderChartInto seam so Vite code-splits echarts OUT of the entry bundle (build-size gate green: echarts in chartPanel-*.js chunk, entry chunk echarts-free). Chart tones resolved in the shell (getComputedStyle :root) and passed as hex across the seam — no charting-lib type crosses the boundary. Canvas a11y = role=img + aria-label distribution summary + visually-hidden per-day table; reduced-motion -> animation:false (window.__chartOptions reset per open, E2E asserts it); tooltip formatters return plain Icelandic strings (no HTML injection, V11); chunk-load rejection -> engin gögn fallback (never hang/throw, T-06-08). All 14 panel.spec criteria + build gate green; full E2E 66 pass + unit 281 pass; tsc 0. Phase 6 COMPLETE (CHART-01/02/03/04).
+- [Phase 07]: Plan 07-01: trust-states foundation — freshness client-side from manifest max(lastFetched) (no pipeline change, preserves Phase-2 determinism) + hand-rolled Icelandic date (null-tolerant, never Invalid Date); three distinct UX-05 seams (init.ts map.on error->showMapError, main.ts showLoading/hideLoading, empty/catch->showEmptyState); states.ts z30 overlay + aria-live, trust.css .bv-state no accent/score/chart; bottomSheet MOBILE_QUERY 640px + snapNearest + typed attachSheet stub; Wave-0 E2E states active + responsive/info fixmes; 74 E2E/302 unit pass, tsc 0, no new deps.
 
 ### Pending Todos
 
@@ -133,6 +135,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T14:46:00.340Z
+Last session: 2026-07-20T19:48:35.428Z
 Stopped at: Completed 06-03-PLAN.md
 Resume file: None
