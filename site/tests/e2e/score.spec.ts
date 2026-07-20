@@ -256,49 +256,271 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     });
   });
 
-  // 05-03 (ranked "Bestu staðir" panel):
-  test.fixme(
-    "criterion 5: a 'Bestu staðir' panel renders with an <ol> of rows [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 6: ranked rows are in descending score order (each row score <= previous) [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 7: ranked list updates on selection change with ZERO network requests [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 8: an 'ófullnægjandi gögn' station is ABSENT from the ranked list [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 9: an 'án úrkomu' station IS ranked + badged and its marker is colored (not muted) [05-02/05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 10: clicking a row moves the map (easeTo) + sets URL 'st' param, opening NO chart panel [05-03]",
-    async () => {},
-  );
-  // criterion 11 (coloring half — no /data/ fetch on a selection change) is asserted in
-  // "criterion 2 (+11)" above (05-02); the ranking half is added with the list in 05-03.
-  test.fixme(
-    "criterion 11: none of the RANKING interactions fire a network request [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 12: empty state — a fully-unscorable selection shows 'Engin einkunn', no throw [05-03]",
-    async () => {},
-  );
-  test.fixme(
-    "criterion 13: collapse toggle flips aria-expanded, hides/shows the list, keeps the map band visible [05-03]",
-    async () => {},
-  );
-  // criterion 14 (marker-badge half) is asserted above (05-02); the ranked-ROW score format
-  // is added with the list in 05-03.
-  test.fixme(
-    "criterion 14: every ranked-ROW score matches the Icelandic one-decimal comma format /^\\d{1,2},\\d$/ [05-03]",
-    async () => {},
-  );
+  // 05-03 (ranked "Bestu staðir" panel): IMPLEMENTED.
+
+  /** The ranked-panel row selector: each row is a <li data-station> with a <button>. */
+  const ROW = ".ranked-list__ol li[data-station]";
+
+  /** Parse a ranked-row score string ("7,8") to a number (Icelandic comma → point). */
+  const parseScore = (s: string): number => Number(s.trim().replace(",", "."));
+
+  /** Read every ranked-row's { station, score } top-to-bottom. */
+  const readRows = (page: Page): Promise<Array<{ station: string; score: string }>> =>
+    page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>(".ranked-list__ol li[data-station]")).map(
+        (li) => ({
+          station: li.dataset.station ?? "",
+          score: li.querySelector<HTMLElement>(".ranked-list__score")?.textContent ?? "",
+        }),
+      ),
+    );
+
+  test("criterion 5: a 'Bestu staðir' panel renders with an <ol> of rows [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const panel = page.locator('.ranked-list[aria-label="Bestu staðir"]');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator(".ranked-list__title")).toHaveText("Bestu staðir");
+    // An <ol> with at least one row (the default selection has scored stations).
+    await expect(panel.locator("ol.ranked-list__ol")).toBeVisible();
+    expect(await page.locator(ROW).count()).toBeGreaterThanOrEqual(1);
+  });
+
+  test("criterion 6: ranked rows are in descending score order (each row <= previous) [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const rows = await readRows(page);
+    expect(rows.length).toBeGreaterThanOrEqual(2);
+    const scores = rows.map((r) => parseScore(r.score));
+    for (let i = 1; i < scores.length; i++) {
+      expect(scores[i]!).toBeLessThanOrEqual(scores[i - 1]!);
+    }
+  });
+
+  test("criterion 7 (+11): the ranked list updates on a selection change with ZERO /data/ requests [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const before = await readRows(page);
+    expect(before.length).toBeGreaterThanOrEqual(1);
+
+    let dataRequests = 0;
+    page.on("request", (req) => {
+      if (req.url().includes("/data/")) dataRequests++;
+    });
+
+    // Widen the baseline year range so scores shift → the list re-sorts/re-renders.
+    await page.evaluate(() => {
+      const store = (window as unknown as {
+        __store: { get(): { yearFrom: number }; set(p: Record<string, unknown>): void };
+      }).__store;
+      const s = store.get();
+      store.set({ yearFrom: Math.max(1949, s.yearFrom - 20) });
+    });
+    await page.waitForTimeout(600);
+
+    const after = await readRows(page);
+    // At least one row's score value differs after the recompute.
+    const beforeMap = new Map(before.map((r) => [r.station, r.score]));
+    const changed = after.some((r) => beforeMap.has(r.station) && beforeMap.get(r.station) !== r.score);
+    expect(changed).toBe(true);
+    // No /data/ fetch fired during the re-rank (pure client-side read of the store).
+    expect(dataRequests).toBe(0);
+  });
+
+  test("criterion 8: an 'ófullnægjandi gögn' station is ABSENT from the ranked list [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    // The exclusion INVARIANT asserted positively on every run: every muted (score:null /
+    // ófullnægjandi gögn) marker must be absent from the ranked list, i.e. the row set is a
+    // subset of the SCORED markers only. (The 2-station SW fixture rarely renders a naturally
+    // muted station under the default selection, so we assert the invariant rather than depend
+    // on one being present — see also criterion 12 which drives the all-muted empty state.)
+    const mutedStations = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>("#marker-overlay [data-station]"))
+        .filter((p) => !p.classList.contains("marker-pill--scored"))
+        .map((p) => p.dataset.station ?? ""),
+    );
+    const rowStations = (await readRows(page)).map((r) => r.station);
+    // No muted station appears as a row (holds vacuously if none are muted — still a real check).
+    for (const st of mutedStations) {
+      expect(rowStations).not.toContain(st);
+    }
+    // And, symmetrically, every listed row IS a scored marker (never a muted one).
+    const scoredStations = await page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll<HTMLElement>("#marker-overlay [data-station].marker-pill--scored"),
+      ).map((p) => p.dataset.station ?? ""),
+    );
+    for (const st of rowStations) {
+      expect(scoredStations).toContain(st);
+    }
+  });
+
+  test("criterion 9: an 'án úrkomu' station IS ranked + badged and its marker is colored (not muted) [05-02/05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    // A ranked row carrying the án-úrkomu badge.
+    const badgedRow = page
+      .locator(".ranked-list__ol li[data-station]")
+      .filter({ has: page.locator(".ranked-list__badge", { hasText: "án úrkomu" }) })
+      .first();
+    test.skip(
+      (await badgedRow.count()) === 0,
+      "no án-úrkomu station scored in the current view",
+    );
+    await expect(badgedRow).toBeVisible();
+    const station = await badgedRow.getAttribute("data-station");
+
+    // Its marker pill is COLORED (has the scored class + a real --pill-score), not muted.
+    const pill = page.locator(`#marker-overlay [data-station="${station}"]`);
+    await expect(pill).toHaveClass(/marker-pill--scored/);
+    const pillScore = await pill.evaluate((el) =>
+      getComputedStyle(el).getPropertyValue("--pill-score").trim(),
+    );
+    expect(pillScore).not.toBe("");
+    expect(pillScore.toLowerCase()).not.toContain("rgba(31, 41, 51, 0.1");
+  });
+
+  test("criterion 10 (+11): clicking a row flies the map (easeTo) + selects + writes 'st', with NO chart panel [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+
+    let dataRequests = 0;
+    page.on("request", (req) => {
+      if (req.url().includes("/data/")) dataRequests++;
+    });
+
+    const targetStation = (await readRows(page))[0]?.station;
+    expect(targetStation).toBeTruthy();
+
+    const centerBefore = await page.evaluate(
+      () => (window as unknown as { __map: { getCenter(): { lng: number; lat: number } } }).__map.getCenter(),
+    );
+
+    // Click the first ranked row (the whole row button is the target).
+    await page.locator(`.ranked-list__ol li[data-station="${targetStation}"] button`).click();
+    await page.waitForTimeout(800); // let easeTo settle
+
+    // (a) The store's stationId is the clicked station.
+    const storeStation = await page.evaluate(
+      () => (window as unknown as { __store: { get(): { stationId: number | null } } }).__store.get().stationId,
+    );
+    expect(String(storeStation)).toBe(targetStation);
+
+    // (b) The URL 'st' param equals it.
+    const stParam = await page.evaluate(() => new URLSearchParams(location.search).get("st"));
+    expect(stParam).toBe(targetStation);
+
+    // (c) The map center moved (easeTo toward the station).
+    const centerAfter = await page.evaluate(
+      () => (window as unknown as { __map: { getCenter(): { lng: number; lat: number } } }).__map.getCenter(),
+    );
+    const moved =
+      Math.abs(centerAfter.lng - centerBefore.lng) > 1e-4 ||
+      Math.abs(centerAfter.lat - centerBefore.lat) > 1e-4;
+    expect(moved).toBe(true);
+
+    // (d) NO chart panel opened (Phase-6 seam kept clean). No panel selector exists yet.
+    expect(await page.locator(".station-chart, .chart-panel, [data-chart-panel]").count()).toBe(0);
+
+    // (e) No /data/ fetch fired for the select/fly-to.
+    expect(dataRequests).toBe(0);
+  });
+
+  test("criterion 12: empty state — a fully-unscorable selection shows 'Engin einkunn', no throw [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    // A single-year baseline (yearFrom === yearTil) gives every station at most 1 qualifying year
+    // (< the N≥3 sufficiency gate), so no station is scorable → score:null everywhere → empty list.
+    await page.evaluate(() => {
+      const store = (window as unknown as {
+        __store: { get(): { yearTil: number }; set(p: Record<string, unknown>): void };
+      }).__store;
+      const til = store.get().yearTil;
+      store.set({ yearFrom: til, yearTil: til });
+    });
+    await page.waitForTimeout(600);
+
+    // The panel still renders, showing the empty heading + body (not an empty <ol>, no throw).
+    const panel = page.locator('.ranked-list[aria-label="Bestu staðir"]');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator(".ranked-list__empty-heading")).toHaveText("Engin einkunn");
+    await expect(panel.locator(".ranked-list__empty")).toBeVisible();
+    expect(await page.locator(ROW).count()).toBe(0);
+  });
+
+  test("criterion 13: collapse toggle flips aria-expanded, hides/shows the list, keeps the map band visible [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const panel = page.locator('.ranked-list[aria-label="Bestu staðir"]');
+    const toggle = panel.locator(".ranked-list__collapse");
+    const body = panel.locator(".ranked-list__body");
+
+    // Expanded by default.
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(body).toBeVisible();
+    const expandedWidth = (await panel.boundingBox())!.width;
+
+    // Collapse → aria-expanded=false, body hidden, panel narrows to a slim tab.
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(body).toBeHidden();
+    const collapsedWidth = (await panel.boundingBox())!.width;
+    expect(collapsedWidth).toBeLessThan(expandedWidth);
+
+    // Re-expand → back to visible.
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(body).toBeVisible();
+  });
+
+  test("criterion 14: every ranked-ROW score matches the Icelandic one-decimal comma format /^\\d{1,2},\\d$/ [05-03]", async ({
+    page,
+  }) => {
+    await waitForMarkers(page);
+    const rows = await readRows(page);
+    expect(rows.length).toBeGreaterThanOrEqual(1);
+    for (const r of rows) {
+      expect(r.score.trim()).toMatch(/^\d{1,2},\d$/);
+    }
+  });
+
+  test("evidence: capture the ranked list + colored map (desktop + narrow) for self-inspection [05-03]", async ({
+    page,
+  }) => {
+    mkdirSync(EVIDENCE, { recursive: true });
+    await waitForMarkers(page);
+
+    // Desktop: frame Iceland so the ranked panel (right) + legend (bottom-left) + colored markers
+    // all coexist without occluding the central station band.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.evaluate(() => {
+      (window as unknown as { __map: { jumpTo(o: unknown): void } }).__map.jumpTo({
+        center: [-18.9, 64.9],
+        zoom: 5.6,
+      });
+    });
+    await page.waitForTimeout(600);
+    await page.screenshot({
+      path: resolve(EVIDENCE, "05-03-ranked-list-desktop.png"),
+      fullPage: false,
+    });
+
+    // Narrow (<640px): the panel degrades to a functional right-docked list (Phase-7 does the
+    // polished sheet); verify total chrome still leaves the map band visible.
+    await page.setViewportSize({ width: 600, height: 900 });
+    await page.waitForTimeout(400);
+    await page.screenshot({
+      path: resolve(EVIDENCE, "05-03-ranked-list-narrow.png"),
+      fullPage: false,
+    });
+  });
 });
