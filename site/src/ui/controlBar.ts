@@ -29,7 +29,9 @@ export interface YearBounds {
  * no URL/user string is ever innerHTML'd here).
  */
 export function readoutText(data: ReadonlyArray<MarkerDatum>): string {
-  const ns = data.filter((d) => d.sufficient && d.n >= 3).map((d) => d.n).sort((a, b) => a - b);
+  // IN-01: `sufficient` is defined as exactly `qualifying.length >= 3`, so it already implies
+  // `n >= 3` — filter on `sufficient` alone (the extra `n >= 3` clause was dead weight).
+  const ns = data.filter((d) => d.sufficient).map((d) => d.n).sort((a, b) => a - b);
   if (ns.length === 0) return "ófullnægjandi gögn";
   const min = ns[0]!;
   const max = ns[ns.length - 1]!;

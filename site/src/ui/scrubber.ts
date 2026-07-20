@@ -173,9 +173,11 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
   };
 
   range.addEventListener("input", () => {
+    // IN-03: unlike the stepper/page-step emit() path (which folds via foldDoy), this reads the
+    // raw range value directly. That is SAFE because the native range is bounded min="1" max="365"
+    // step="1", so range.value is ALWAYS already in 1..365 — no fold is needed and folding here
+    // would disturb the live drag. If the range bounds/step ever change, route this through emit().
     const doy = Number(range.value);
-    // PageUp/Down is native ±? — enforce a documented ±7 week step via keydown below; here
-    // just reflect the current value.
     syncReadouts(doy);
     opts.onAnchorChange(doy);
   });

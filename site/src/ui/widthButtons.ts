@@ -2,7 +2,14 @@
 // mutually exclusive (radio semantics). Framework-free — builds DOM + takes an onWidthChange
 // callback; controlBar.ts wires it to store.set. Copy is verbatim from the UI-SPEC.
 
-/** The four width options in order — label + day count (UI-SPEC Width Segmented Buttons). */
+/**
+ * The four width options in order — label + day count (UI-SPEC Width Segmented Buttons).
+ *
+ * IN-02 (documented decision, not a defect): "1 mánuður" maps to a FIXED 30-day window
+ * regardless of the anchor month (Feb would be 28/29, July 31). This is a deliberate product
+ * simplification consistent with the domain's day-of-year model (doy windows carry no month
+ * context) and the UI-SPEC's stated "a fixed 30 is acceptable and simplest". Not calendar-exact.
+ */
 const WIDTHS: ReadonlyArray<{ label: string; days: number }> = [
   { label: "1 vika", days: 7 },
   { label: "2 vikur", days: 14 },

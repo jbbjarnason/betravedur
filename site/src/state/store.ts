@@ -19,6 +19,14 @@
 /**
  * The complete selection the whole app derives from. Flat by design (no nesting) so a
  * `set(patch)` is a shallow merge and equality checks are per-key primitive comparisons.
+ *
+ * WR-04 — INVARIANT (do not break without updating store.ts): every field here MUST be a
+ * primitive (`number | number | null`). The no-op-skip in `set` compares patched keys with
+ * strict `===`, which is correct ONLY for primitives. Adding a non-primitive field (e.g. a
+ * `bbox: number[]` viewport or `selectedStations: number[]`) would defeat the skip — a freshly
+ * constructed but value-equal array/object is always `!==`, so every such `set` would notify
+ * and churn the recompute/history-flood-prevention the whole loop-prevention design leans on.
+ * If a non-primitive field is ever needed, make the no-op check value-aware for that key first.
  */
 export interface SelectionState {
   /** Window anchor as a leap-folded day-of-year, 1–365 (Feb 29 unreachable by construction). */
