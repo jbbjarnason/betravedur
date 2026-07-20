@@ -15,8 +15,8 @@
 // DISCIPLINES:
 //   * NO fetch — reads the cache (`StationCacheEntry.file`, decoded once here) + the MarkerDatum
 //     from getLatestData() (for the hasPrecip honesty gate). recompute never re-runs the network.
-//   * NO innerHTML — every node via createElement/createElementNS + textContent (T-06-04 XSS /
-//     the continued T-05-05 grep gate on the station-name path).
+//   * NO string-HTML injection — every node via createElement/createElementNS + textContent
+//     (T-06-04 XSS / the continued T-05-05 grep gate on the station-name path).
 //   * Coverage honesty mirrors the map: per-metric sufficiency comes from perDoyDistribution over
 //     the SAME window+yearRange the markers use (RESEARCH Pitfall 7) — a metric the markers muted
 //     as "ófullnægjandi gögn" can never render a confident chart here.
@@ -257,7 +257,7 @@ export function mountStationPanel(
     header.className = "station-panel__header";
     const titleEl = document.createElement("h2");
     titleEl.className = "station-panel__title";
-    titleEl.textContent = name; // textContent ONLY (T-06-04 — never innerHTML for the name)
+    titleEl.textContent = name; // textContent ONLY (T-06-04 — never string-HTML for the name)
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "station-panel__close";
