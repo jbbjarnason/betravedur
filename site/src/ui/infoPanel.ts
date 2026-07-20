@@ -274,9 +274,15 @@ export function mountInfoPanel(
   };
   wireDialog();
 
-  button.addEventListener("click", () => {
-    if (!dialog.open) dialog.showModal();
-  });
+  // WR-02: ONE guarded opener used at all three call sites (button click, first-visit auto-open,
+  // setFreshness re-open). `dialog` is reassigned on rebuild, so this reads the current binding via
+  // closure. The `typeof … === "function"` guard means a runtime without HTMLDialogElement.showModal
+  // (an unsupported <dialog>) silently no-ops everywhere instead of TypeError-ing on click/refresh.
+  const openDialog = (): void => {
+    if (typeof dialog.showModal === "function" && !dialog.open) dialog.showModal();
+  };
+
+  button.addEventListener("click", openDialog);
 
   // First-visit auto-open — ONCE, and NEVER on a permalink-restored view (permalink guard).
   const hasUrlParams = location.search.length > 1;
@@ -286,8 +292,8 @@ export function mountInfoPanel(
   } catch {
     dismissed = false; // storage unavailable → treat as first visit (still permalink-guarded)
   }
-  if (!dismissed && !hasUrlParams && typeof dialog.showModal === "function") {
-    dialog.showModal();
+  if (!dismissed && !hasUrlParams) {
+    openDialog();
   }
 
   return {
@@ -299,7 +305,7 @@ export function mountInfoPanel(
       dialog.replaceWith(rebuilt);
       dialog = rebuilt;
       wireDialog();
-      if (wasOpen) dialog.showModal(); // preserve an open panel across a freshness update
+      if (wasOpen) openDialog(); // preserve an open panel across a freshness update (WR-02 guarded)
     },
   };
 }
