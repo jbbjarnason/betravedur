@@ -1,0 +1,211 @@
+/*
+ * Score coloring (Phase 5, MAP-03 + SCORE-03) — the score-ramp channels on the marker pill
+ * and the bottom-left legend panel. Consumes the BuGn --score-* tokens (tokens.css) and the
+ * inline --pill-score custom property buildPill sets per scored marker.
+ *
+ * TWO redundant channels per scored pill, so color is NEVER the sole signal:
+ *   1. a 4-6px LEFT COLOR BAR in the station's --pill-score ramp color (a bar, NOT a thin 2px
+ *      ring — RESEARCH Pitfall 3: the pale BuGn low-end lacks contrast as a hairline ring; a
+ *      chunky left bar with a --hairline floor stays perceptible against the white pill and
+ *      the muted basemap), and
+ *   2. an always-visible numeric score BADGE (ink-on-white chip) — the required non-color
+ *      channel; the badge's ring is the redundant color key.
+ *
+ * The reserved temperature-red token is NEVER referenced in this file — the score family is
+ * chromatically distinct from that red (grep-gated in the plan verify step to FAIL on match).
+ */
+
+/* ── Scored marker pill: left color bar + hairline floor ─────────────────────── */
+
+/*
+ * The scored pill keeps its white body, ink text, and red temp numeral. The left edge gains a
+ * 5px color bar via a wide left border in the score-ramp color, sitting over the existing 1px
+ * --hairline box border (which remains as the floor so the pale low-end never disappears). The
+ * bar rounds with the pill's left corners.
+ */
+.marker-pill--scored {
+  border-left: 5px solid var(--pill-score, var(--hairline));
+  /* Keep the pale low-end legible: a faint inner hairline outlines the whole pill so even a
+     near-white --score-0/1 bar reads as an intentional colored edge, not a rendering artifact
+     (Pitfall 3 floor). */
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18), inset 0 0 0 1px var(--hairline);
+}
+
+/* ── Score badge: ink numeral on a white chip, with a ramp-colored ring ───────── */
+
+.marker-pill .marker-score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 1px var(--space-xs); /* 1px 4px */
+  border-radius: 6px;
+
+  /* Legibility is ramp-INDEPENDENT: ink numeral on white (13:1), never colored text. */
+  background: var(--secondary);
+  color: var(--ink);
+  /* The ring is the redundant color channel (doubles as a per-marker color key). */
+  border: 2px solid var(--pill-score, var(--hairline));
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+/* ── Legend panel (SCORE-03) ──────────────────────────────────────────────────
+ * Bottom-left floating panel with the BuGn color scale + a native <details> explainer.
+ * Same surface treatment as the header + control bar so all chrome reads as one language.
+ * Sits above the control bar (clearing --bar-height) and never wider than the occlusion
+ * budget (≤320px) so it does not occlude the central Iceland station band at zoom 6.
+ */
+
+.score-legend {
+  position: fixed;
+  left: var(--space-md);
+  bottom: calc(var(--bar-height, 100px) + var(--space-lg));
+  z-index: 10; /* header/control-bar tier, above markers (z5) + canvas (z0) */
+
+  width: max-content;
+  max-width: 320px;
+  padding: var(--space-md);
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+
+  font-family: var(--font-stack);
+  color: var(--ink);
+}
+
+.score-legend__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* The continuous BuGn ramp bar, low → high. 1px hairline so the pale low end reads. */
+.score-legend__ramp {
+  height: 12px;
+  margin-top: var(--space-sm);
+  border-radius: 4px;
+  border: 1px solid var(--hairline);
+  background: linear-gradient(
+    to right,
+    var(--score-0),
+    var(--score-1),
+    var(--score-2),
+    var(--score-3),
+    var(--score-4),
+    var(--score-5),
+    var(--score-6),
+    var(--score-7),
+    var(--score-8),
+    var(--score-9),
+    var(--score-10)
+  );
+}
+
+/* Tick labels 0 2 4 6 8 10 beneath the ramp, aligned to their stops. */
+.score-legend__ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--muted-ink);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+/* Endpoint captions: verra (low) ↔ betra (high). Plain-Icelandic direction cue so the scale
+   is legible even in monochrome. */
+.score-legend__captions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--muted-ink);
+}
+
+.score-legend__rule {
+  margin: var(--space-sm) 0;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+
+/* Native <details> explainer — built-in expand/collapse + keyboard (Enter/Space) + aria. */
+.score-explainer > summary {
+  cursor: pointer;
+  list-style: none; /* hide the default marker; we style our own affordance */
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  /* 44px min hit area for the disclosure (UI-SPEC spacing exception). */
+  min-height: 44px;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.score-explainer > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A caret that rotates on open (redundant to the native aria-expanded). */
+.score-explainer > summary::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.15s ease;
+}
+
+.score-explainer[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.score-explainer__body {
+  margin-top: var(--space-sm);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.score-explainer__body p {
+  margin: 0 0 var(--space-sm);
+}
+
+.score-explainer__body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Focus outline: ink, never accent (UI-SPEC a11y). */
+.score-explainer > summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Reduced motion: no caret rotation churn. */
+@media (prefers-reduced-motion: reduce) {
+  .score-explainer > summary::before {
+    transition: none;
+  }
+}

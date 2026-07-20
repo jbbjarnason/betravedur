@@ -16,8 +16,24 @@
  */
 import type * as maplibregl from "maplibre-gl";
 import type { MarkerDatum } from "../data/types.js";
+import { scoreColor } from "./score-color.js";
 
 // ── Pure helpers (unit-tested) ──────────────────────────────────────────────
+
+/**
+ * Format a 0-10 score as the Icelandic one-decimal comma string used on the pill badge
+ * and the ranked list (`7,8`, `10,0`, `0,0`). One decimal matches the domain's rounding;
+ * the comma is the Icelandic decimal separator (UI-SPEC Copywriting: never `7.8`).
+ *
+ * Pure + total: a null/NaN score is never passed here (the caller branches on the muted /
+ * score===null path first), but a stray non-finite input clamps to `0,0` so the badge can
+ * never render `NaN,` — belt-and-suspenders over the number|null contract (T-05-03: the
+ * numeral is always a formatted number, never a reflected string).
+ */
+export function formatScore(score: number): string {
+  const n = Number.isFinite(score) ? Math.max(0, Math.min(10, score)) : 0;
+  return n.toFixed(1).replace(".", ",");
+}
 
 /** Feature properties carried on each station anchor. */
 export interface MarkerFeatureProps {
@@ -243,6 +259,25 @@ function buildPill(map: maplibregl.Map, datum: MarkerDatum): HTMLElement {
   );
   pill.tabIndex = -1; // not yet in the tab order (activated in Phase 6)
   pill.innerHTML = html;
+
+  // Score channels (MAP-03): a SCORED pill (score !== null, sufficient ⇒ !muted) gains
+  // (1) a BuGn score-ramp left-bar/ring via the inline --pill-score custom property and the
+  //     `marker-pill--scored` class (score.css draws the bar over a --hairline floor), and
+  // (2) an always-visible numeric score badge (ink-on-white chip, ring color redundant).
+  // The muted (score:null / ófullnægjandi gögn) branch is untouched — no --pill-score, no
+  // class, no badge — so it renders byte-identical to the Phase-3 muted pill (regression-safe;
+  // T-05-04: null/muted pills never enter the ramp path).
+  if (!muted && datum.score !== null) {
+    pill.style.setProperty("--pill-score", scoreColor(datum.score));
+    pill.classList.add("marker-pill--scored");
+    const badge = document.createElement("span");
+    badge.className = "marker-score-badge";
+    // T-05-03: the numeral is a formatted number written via textContent — never raw markup,
+    // never a reflected data string.
+    badge.textContent = formatScore(datum.score);
+    badge.setAttribute("aria-hidden", "true"); // coverage/name already in the pill aria-label
+    pill.prepend(badge);
+  }
 
   const { x, y } = map.project([datum.lon, datum.lat]);
   pill.style.left = `${x}px`;

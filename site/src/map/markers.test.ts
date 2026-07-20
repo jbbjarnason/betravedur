@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 import type { MarkerDatum } from "../data/types.js";
 import type * as maplibregl from "maplibre-gl";
-import { toFeatureCollection, formatCallout, attachCompositeRenderer } from "./markers.js";
+import { toFeatureCollection, formatCallout, formatScore, attachCompositeRenderer } from "./markers.js";
 
 /** A "happy path" sufficient datum: temp + concrete wind dir + precip. */
 function fullDatum(overrides: Partial<MarkerDatum> = {}): MarkerDatum {
@@ -58,6 +58,32 @@ describe("toFeatureCollection", () => {
     const fc = toFeatureCollection([fullDatum({ station: 42, priority: 3.5 })]);
     expect(fc.features[0]!.properties.station).toBe(42);
     expect(fc.features[0]!.properties.priority).toBe(3.5);
+  });
+});
+
+describe("formatScore (MAP-03 — Icelandic one-decimal comma badge)", () => {
+  it("formats a score to one decimal with an Icelandic comma (never a point)", () => {
+    expect(formatScore(7.8)).toBe("7,8");
+    expect(formatScore(7.84)).toBe("7,8"); // one-decimal rounding
+    expect(formatScore(8)).toBe("8,0");
+  });
+
+  it("matches the UI-SPEC badge regex /^\\d{1,2},\\d$/ at both ends of the scale", () => {
+    const re = /^\d{1,2},\d$/;
+    expect(formatScore(0)).toBe("0,0");
+    expect(formatScore(10)).toBe("10,0");
+    expect(re.test(formatScore(0))).toBe(true);
+    expect(re.test(formatScore(10))).toBe(true);
+    expect(re.test(formatScore(6.5))).toBe(true);
+  });
+
+  it("clamps out-of-range / non-finite input so the badge never shows NaN, (T-05-03)", () => {
+    expect(formatScore(12)).toBe("10,0");
+    expect(formatScore(-3)).toBe("0,0");
+    // Non-finite (NaN/Infinity) resolves to the LOW stop, mirroring scoreColor's total-clamp
+    // contract — the badge can never render NaN, (T-05-03).
+    expect(formatScore(Number.NaN)).toBe("0,0");
+    expect(formatScore(Number.POSITIVE_INFINITY)).toBe("0,0");
   });
 });
 

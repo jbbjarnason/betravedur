@@ -25,6 +25,32 @@
   --marker-empty-bg: #f4f6f7;
   --hairline: rgba(31, 41, 51, 0.1);
 
+  /*
+   * Score ramp (Phase 5, MAP-03) — the SEQUENTIAL 0-10 weather-score color family for the
+   * marker left-bar/ring, the score badge ring, and the legend swatches. This is the
+   * ColorBrewer BuGn ramp (cool light blue → vivid dark green, "gott veður = grænt"),
+   * sampled from scoreColor() (site/src/map/score-color.ts) at each integer stop so the
+   * LEGEND and the per-marker color agree exactly at the labeled ticks.
+   *
+   * RECONCILIATION (05-01 → 05-02): the authoritative ramp is BuGn — 05-01's scoreColor +
+   * its boundary tests pin it. The 05-UI-SPEC's earlier 11-stop slate→yellow-green table
+   * (#5B6B7A … #84A81F) is SUPERSEDED and intentionally NOT used here. These tokens are
+   * BuGn, not the slate family. Accent red (--accent) stays reserved to the temperature
+   * numeral — the score ramp is a chromatically distinct blue→teal→green family and never
+   * approaches the accent.
+   */
+  --score-0: #edf8fb;
+  --score-1: #ddf2f1;
+  --score-2: #ccece6;
+  --score-3: #b3e2d8;
+  --score-4: #99d8c9;
+  --score-5: #80cdb7;
+  --score-6: #66c2a4;
+  --score-7: #49b282;
+  --score-8: #2ca25f;
+  --score-9: #168846;
+  --score-10: #006d2c;
+
   /* Typography */
   --font-stack: -apple-system, "Segoe UI", "Helvetica Neue", "Inter", Arial,
     sans-serif;
