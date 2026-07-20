@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
+status: executing
 stopped_at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
-last_updated: "2026-07-19T19:28:25.708Z"
-last_activity: 2026-07-19
+last_updated: "2026-07-20T06:57:00.214Z"
+last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 8
+  completed_plans: 5
   percent: 13
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-19)
 
 **Core value:** A visitor picks a time-of-year period and instantly sees, on a map, where in Iceland the weather has historically been best — backed by real Veðurstofan station history.
-**Current focus:** Phase 1 — Data Access & Domain Core
+**Current focus:** Phase 2 — Derived Data Pipeline & Backfill
 
 ## Current Position
 
-Phase: 1 (Data Access & Domain Core) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-07-19
+Phase: 2 (Derived Data Pipeline & Backfill) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-07-20
 
-Progress: [██████████] 100%
+Progress: [██████░░░░] 63%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 1 P02 | 6 | 2 tasks | 8 files |
 | Phase 1 P03 | 12 | 2 tasks | 13 files |
 | Phase 1 P04 | 5 | 2 tasks | 4 files |
+| Phase 2 P01 | 20 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 01-02: coverage-honest climatology math (leap-fold, >=80%/N>=3, unit-vector wind mean 350/10->~0, precip missing!=zero) implemented TDD; domain stays dependency-free.
 - [Phase ?]: Plan 01-03: hardened api.vedur.is trust boundary (SCHEMA_DRIFT assert, error-body detect, range-clamp, leap-folded doy Feb-29 drop) + no-splice integer-keyed registry + CC BY 4.0 ATTRIBUTION.
 - [Phase ?]: Plan 01-04: combined weather score (SCORE-01) — fixed explainable 0-10 curves + renormalizing combine() with contributing/missingRain 'án úrkomu'; Walking Skeleton closed end-to-end on real data.
+- [Phase ?]: Plan 02-01: derived-file format is columnar integer-quantized implicit-date (encodeDerived/decodeDerived); columns stored by CALENDAR year, both pipeline and client re-group via groupBySeasonYear after decode (WR-03) — December never pre-shifted in storage.
+- [Phase ?]: Plan 02-01: derived encoding holds 1757 B/station-year gzip on a real 6-year Keflavik AWS fixture (<4 KB budget); nulls preserved (never 0), all-null columns dropped, AWS omits r / SYNOP omits dv.
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-19T19:28:07.974Z
+Last session: 2026-07-20T06:56:54.700Z
 Stopped at: ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability populated
 Resume file: None
