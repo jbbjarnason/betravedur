@@ -35,7 +35,10 @@ describe("createStore", () => {
 
     expect(a).toHaveBeenCalledTimes(1);
     expect(b).toHaveBeenCalledTimes(1);
-    const snap = a.mock.calls[0][0] as Readonly<SelectionState>;
+    // noUncheckedIndexedAccess: calls[0] is `unknown[] | undefined`. The prior toHaveBeenCalledTimes(1)
+    // guarantees calls[0] exists; assert it explicitly, then read arg 0.
+    expect(a.mock.calls[0]).toBeDefined();
+    const snap = a.mock.calls[0]![0] as Readonly<SelectionState>;
     expect(snap.anchorDoy).toBe(30);
     // Untouched fields carry through unchanged.
     expect(snap.widthDays).toBe(14);

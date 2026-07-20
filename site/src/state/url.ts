@@ -24,6 +24,9 @@ import type { YearBounds } from "./defaults.js";
 /** Allowed window widths (SEL-01). A garbage `w` snaps to the nearest of these. */
 const ALLOWED_WIDTHS = [7, 14, 21, 30] as const;
 
+/** The width union — `best` in snapWidth must accept ANY allowed width, not just the first. */
+type AllowedWidth = (typeof ALLOWED_WIDTHS)[number];
+
 /** Iceland viewport clamp bounds (mirrors map/init.ts maxBounds + min/max zoom). */
 const LNG_MIN = -26;
 const LNG_MAX = -12;
@@ -57,7 +60,9 @@ function numParam(p: URLSearchParams, key: string): number | null {
 /** Snap an arbitrary width to the nearest allowed value; garbage → the default (7). */
 function snapWidth(w: number, fallback: number): number {
   if (!Number.isFinite(w)) return fallback;
-  let best = ALLOWED_WIDTHS[0];
+  // Type as the width UNION (not the literal 7 that `ALLOWED_WIDTHS[0]` narrows to via as-const),
+  // so the `best = cand` reassignment inside the loop type-checks (tsc debt: TS2322).
+  let best: AllowedWidth = ALLOWED_WIDTHS[0];
   let bestDist = Infinity;
   for (const cand of ALLOWED_WIDTHS) {
     const d = Math.abs(cand - w);

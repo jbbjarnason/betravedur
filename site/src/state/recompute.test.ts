@@ -8,6 +8,7 @@ import { encodeDerived, type DerivedFile } from "@betravedur/pipeline/derive";
 import type { DailyObservation, StationMeta } from "@betravedur/domain";
 import { buildStationCache, recompute, type StationCacheEntry } from "./recompute.js";
 import type { SelectionState } from "./store.js";
+import type { MarkerDatum } from "../data/types.js";
 
 const synthMeta = (id: number): StationMeta => ({
   station: id,
@@ -90,13 +91,20 @@ describe("recompute (SEL-04)", () => {
     const cache = buildStationCache([deepStation(11)]);
     const early = recompute(cache, state({ anchorDoy: 190, widthDays: 7 }));
     const late = recompute(cache, state({ anchorDoy: 204, widthDays: 7 }));
+    // The single-station cache always yields exactly one datum; grab it explicitly so the later
+    // property reads are on a defined value (noUncheckedIndexedAccess: [0] is T | undefined).
+    const earlyD = early[0];
+    const lateD = late[0];
+    expect(earlyD).toBeDefined();
+    expect(lateD).toBeDefined();
     // Both computed, both sufficient — the temp gradient across doy makes the means differ.
-    expect(early[0].tempC).not.toBeNull();
-    expect(late[0].tempC).not.toBeNull();
-    expect(early[0].tempC).not.toBeCloseTo(late[0].tempC as number, 6);
+    expect(earlyD!.tempC).not.toBeNull();
+    expect(lateD!.tempC).not.toBeNull();
+    expect(earlyD!.tempC).not.toBeCloseTo(lateD!.tempC as number, 6);
     // A window entirely outside the covered doys yields a muted datum — still no fetch, no throw.
     const empty = recompute(cache, state({ anchorDoy: 5, widthDays: 7 }));
-    expect(empty[0].sufficient).toBe(false);
+    expect(empty[0]).toBeDefined();
+    expect(empty[0]!.sufficient).toBe(false);
   });
 
   it("a cache entry whose computeMarkerDatum throws degrades to a muted datum (never throws)", () => {
@@ -114,17 +122,17 @@ describe("recompute (SEL-04)", () => {
       { meta: synthMeta(99), file: corrupt },
     ]);
 
-    let out;
+    let out: MarkerDatum[] | undefined;
     expect(() => {
       out = recompute(cache, state());
     }).not.toThrow();
     expect(out).toHaveLength(2);
     // The healthy station still computes; the corrupt one is muted, not dropped.
-    const bad = out!.find((d) => d.station === 99)!;
+    const bad = out!.find((d: MarkerDatum) => d.station === 99)!;
     expect(bad.sufficient).toBe(false);
     expect(bad.n).toBe(0);
     expect(bad.tempC).toBeNull();
-    const good = out!.find((d) => d.station === 11)!;
+    const good = out!.find((d: MarkerDatum) => d.station === 11)!;
     expect(good.sufficient).toBe(true);
   });
 });
