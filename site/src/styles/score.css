@@ -209,3 +209,201 @@
     transition: none;
   }
 }
+
+/* ── Ranked "Bestu staðir" panel (SCORE-02) ───────────────────────────────────
+ * A collapsible right-docked list of the scored stations for the current selection,
+ * ranked by score descending. Same surface treatment as the header / control bar / legend
+ * so all chrome reads as one design language. Sits below the 56px header, above the control
+ * bar (clearing --bar-height), ~280px wide — within the occlusion budget so the central
+ * Iceland station band stays visible. Collapsible so it never permanently crowds the map.
+ */
+.ranked-list {
+  position: fixed;
+  right: 0;
+  top: calc(56px + var(--space-lg));
+  bottom: calc(var(--bar-height, 100px) + var(--space-lg));
+  z-index: 10; /* header/control-bar tier, above markers (z5) + canvas (z0) */
+
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  max-width: calc(100vw - 2 * var(--space-md));
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  /* Right-docked: round only the left corners so it reads as a panel hanging off the edge. */
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+
+  font-family: var(--font-stack);
+  color: var(--ink);
+  overflow: hidden; /* the inner list owns the scroll */
+}
+
+.ranked-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ranked-list__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.ranked-list__collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44px min hit target (UI-SPEC spacing exception). */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ranked-list__collapse svg {
+  transition: transform 0.15s ease;
+}
+
+/* Collapsed: the chevron points the other way (redundant to aria-expanded=false). */
+.ranked-list--collapsed .ranked-list__collapse svg {
+  transform: rotate(-90deg);
+}
+
+/* Collapsed: shrink to a slim right-edge tab so the central map band is fully visible. */
+.ranked-list--collapsed {
+  width: max-content;
+}
+
+.ranked-list__body {
+  flex: 1;
+  min-height: 0; /* allow the inner <ol> to scroll rather than grow the panel */
+  overflow-y: auto;
+}
+
+.ranked-list__ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ranked-list__row {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ranked-list__row:last-child {
+  border-bottom: 0;
+}
+
+/* The whole row is the click target — a full-width native <button>, ≥44px tall. */
+.ranked-list__rowbtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+  font-family: inherit;
+}
+
+.ranked-list__rowbtn:hover {
+  background: var(--dominant);
+}
+
+.ranked-list__rowbtn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+/* Selected row: --dominant fill (reciprocal highlight with the marker ring-thicken). */
+.ranked-list__row--selected .ranked-list__rowbtn {
+  background: var(--dominant);
+}
+
+.ranked-list__rank {
+  flex: 0 0 auto;
+  min-width: 20px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--muted-ink);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+.ranked-list__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.ranked-list__badge {
+  flex: 0 0 auto;
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--muted-ink);
+  white-space: nowrap;
+}
+
+.ranked-list__score {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+/* Empty state: a plain heading + one-sentence body (never an empty <ol> or a throw). */
+.ranked-list__empty {
+  padding: var(--space-md);
+}
+
+.ranked-list__empty-heading {
+  margin: 0 0 var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.ranked-list__empty-body {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--muted-ink);
+}
