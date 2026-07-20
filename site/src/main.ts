@@ -149,8 +149,9 @@ function wireMarkers(map: maplibregl.Map): void {
         : fallback;
       const store = createStore(initial);
 
-      // Expose map + store for E2E driving (no-network proof, URL-restore assertions).
-      (window as unknown as { __map: unknown }).__map = map;
+      // Expose the store for E2E driving (no-network proof, URL-restore assertions). The map
+      // itself is exposed synchronously in boot() (see below) so the Phase-3 shell.spec zoom
+      // test can read window.__map before this async data load completes (no regression).
       (window as unknown as { __store: unknown }).__store = store;
 
       // (3) Apply the hydrated viewport, attach the renderer, render the initial selection.
@@ -206,6 +207,13 @@ function boot(): void {
 
   renderHeader(headerMount);
   const map = initMap(mapMount);
+
+  // Expose the live map instance SYNCHRONOUSLY, immediately after initMap() — the map exists
+  // here, before any data loads. Phase 3's shell.spec zoom test reads window.__map right after
+  // the canvas is visible (pre-manifest), so this assignment MUST stay in boot() and NOT be
+  // deferred into the async install() (which only completes post-manifest-fetch). Moving it
+  // into install() regressed shell.spec.ts:62 ("interactivity: zooming in raises the map zoom").
+  (window as unknown as { __map: unknown }).__map = map;
 
   // Store creation + URL hydration + default selection happen inside wireMarkers, AFTER the
   // manifest fetch supplies the year bounds (the default needs data-derived bounds; the URL
