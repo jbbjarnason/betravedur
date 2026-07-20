@@ -103,7 +103,10 @@ Plans:
   1. Markers are colored by the combined weather score, with a visible legend explaining the color scale
   2. A ranked "best stations for this period" list is shown and updates with the current selection
   3. An explainer ("hvernig er einkunnin reiknuð?") shows how the score combines temperature, precipitation, and wind
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 05-01-PLAN.md — Data-layer score extension (MarkerDatum.score via combine()) + scoreColor BuGn helper + Wave-0 test scaffolds
+- [ ] 05-02-PLAN.md — Score-colored markers (ring/badge) + legend & transparent explainer
+- [ ] 05-03-PLAN.md — Ranked "Bestu staðir" list + row-click fly-to/select
 **UI hint**: yes
 
 ### Phase 6: Station Chart Panel
@@ -155,7 +158,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
-| 5. Score Coloring & Ranking | 0/TBD | Not started | - |
+| 5. Score Coloring & Ranking | 0/3 | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |

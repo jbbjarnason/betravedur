@@ -2,8 +2,8 @@
 phase: 5
 slug: score-coloring-ranking
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-07-20
 ---
 
@@ -39,7 +39,15 @@ created: 2026-07-20
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | Status |
 |---------|------|------|-------------|-----------|-------------------|--------|
-| (filled by planner) | | | | | | ⬜ pending |
+| 05-01-T1 | 05-01 | 1 | MAP-03 | unit | `npx vitest run site/src/data/averages.test.ts` | ⬜ pending |
+| 05-01-T2 | 05-01 | 1 | MAP-03 | unit | `npx vitest run site/src/map/score-color.test.ts` | ⬜ pending |
+| 05-01-T3 | 05-01 | 1 | MAP-03 | e2e | `cd site && npm run build && npx playwright test tests/e2e/score.spec.ts --project=chromium` | ⬜ pending |
+| 05-02-T1 | 05-02 | 2 | MAP-03 | unit | `npx vitest run` (+ score-family accent grep gate) | ⬜ pending |
+| 05-02-T2 | 05-02 | 2 | SCORE-03 | build+grep | `npx tsc --noEmit -p site && grep -c 'úrkoma 40%\|vindur 30%\|hiti 30%' site/src/ui/legend.ts` | ⬜ pending |
+| 05-02-T3 | 05-02 | 2 | MAP-03, SCORE-03 | e2e | `cd site && npm run build && npx playwright test tests/e2e/score.spec.ts --project=chromium` | ⬜ pending |
+| 05-03-T1 | 05-03 | 3 | SCORE-02 | unit | `npx vitest run site/src/ui/rankedList.test.ts` | ⬜ pending |
+| 05-03-T2 | 05-03 | 3 | SCORE-02 | build+grep | `npx tsc --noEmit -p site && grep -nc 'easeTo\|rankedList' site/src/main.ts` | ⬜ pending |
+| 05-03-T3 | 05-03 | 3 | SCORE-02 | e2e | `cd site && npm run build && npm run e2e -w site` | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
