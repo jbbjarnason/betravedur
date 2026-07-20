@@ -281,6 +281,20 @@
   text-align: right;
 }
 
+/* ── Attribution legibility while the station panel is open (LICENSING) ─────────────────────
+ * The right-docked station panel (panel.css: position fixed; right:0; width:340px; z-index:10)
+ * paints its rgba(255,255,255,0.92) glass surface OVER the bottom-right MapLibre attribution,
+ * degrading the CC BY 4.0 / OpenStreetMap / Protomaps / Veðurstofa Íslands credit's contrast — an
+ * attribution-legibility (licensing) violation, not a cosmetic one. mountStationPanel toggles a
+ * `.panel-open` class on <body> on open/close; while open, push the whole bottom-right container
+ * leftward by the panel width + a small gap (340px + 4px) so the credit stays clear of the panel.
+ * (Phase 7's mobile bottom-sheet eliminates the right-panel overlap; this is the cheap desktop-now
+ * fix.) The existing --bar-height bottom offset above is preserved by the shorthand-free
+ * margin-right. */
+.panel-open .maplibregl-ctrl-bottom-right {
+  margin-right: 344px;
+}
+
 /* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */
 @media (prefers-reduced-motion: reduce) {
   .control-bar,

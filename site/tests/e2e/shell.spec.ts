@@ -160,6 +160,88 @@ test("attribution: the credit control is NOT occluded by the bottom-left legend 
   }
 });
 
+test("attribution: the credit control is NOT occluded by the OPEN station panel (licensing)", async ({
+  page,
+}) => {
+  // UI BLOCKER regression guard (UI-REVIEW #3): the right-docked station panel (position:fixed;
+  // right:0; width:340px; z-index:10) paints its glass surface OVER the bottom-right MapLibre
+  // credit, degrading its legibility — an attribution-licensing violation. mountStationPanel
+  // toggles `.panel-open` on <body>; a controls.css rule then pushes the bottom-right container
+  // margin-right: 344px so the credit clears the panel. Assert: with the panel OPEN, the painted
+  // credit box does not intersect the panel box (and the credit is still visible).
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const bar = page.locator(".control-bar");
+  await bar.waitFor({ state: "visible", timeout: 20_000 });
+  await page.locator("canvas.maplibregl-canvas").waitFor({ state: "visible", timeout: 15_000 });
+  await page.waitForFunction(
+    () => {
+      const m = (window as { __map?: { isStyleLoaded(): boolean } }).__map;
+      return (
+        !!m &&
+        m.isStyleLoaded() &&
+        document.querySelectorAll("#marker-overlay [data-station]").length > 0
+      );
+    },
+    { timeout: 20_000 },
+  );
+
+  // Open the panel via the store seam (first rendered station).
+  const stationId = await page
+    .locator("#marker-overlay [data-station]")
+    .first()
+    .getAttribute("data-station");
+  expect(stationId).not.toBeNull();
+  await page.evaluate((sid) => {
+    (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set({
+      stationId: Number(sid),
+    });
+  }, stationId);
+  const panel = page.locator("section.station-panel[aria-label]");
+  await panel.waitFor({ state: "visible", timeout: 5_000 });
+
+  // The body carries the .panel-open offset class while the panel is open.
+  expect(await page.evaluate(() => document.body.classList.contains("panel-open"))).toBe(true);
+
+  // Expand the credit to its full painted box (best-effort — some builds render expanded).
+  const attrib = page.locator(".maplibregl-ctrl-attrib").first();
+  const isShown = await attrib
+    .evaluate(
+      (el) =>
+        el.classList.contains("maplibregl-compact-show") ||
+        !el.classList.contains("maplibregl-compact"),
+    )
+    .catch(() => false);
+  if (!isShown) {
+    const toggle = page.locator(".maplibregl-ctrl-attrib-button");
+    if (await toggle.count()) {
+      await toggle.first().click({ trial: false }).catch(() => undefined);
+    }
+  }
+  await page.waitForTimeout(400);
+
+  await expect(attrib).toBeVisible();
+  const attribBox = await attrib.boundingBox();
+  const panelBox = await panel.boundingBox();
+  expect(attribBox, "attribution box with panel open").not.toBeNull();
+  expect(panelBox, "panel box").not.toBeNull();
+
+  // Axis-aligned bounding-box intersection: the painted credit must NOT overlap the panel.
+  const a = attribBox!;
+  const p = panelBox!;
+  const overlaps =
+    a.x < p.x + p.width - 1 &&
+    a.x + a.width > p.x + 1 &&
+    a.y < p.y + p.height - 1 &&
+    a.y + a.height > p.y + 1;
+  expect(
+    overlaps,
+    `attribution [${a.x},${a.y},${a.width}x${a.height}] must not intersect the open panel ` +
+      `[${p.x},${p.y},${p.width}x${p.height}] (licensing legibility)`,
+  ).toBe(false);
+});
+
 test("interactivity: zooming in raises the map zoom level", async ({ page }) => {
   await page.goto("/");
   await page.locator("canvas.maplibregl-canvas").waitFor({ state: "visible", timeout: 15_000 });

@@ -157,12 +157,54 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
     "criterion 3: the three exact reading-key sentences are present as DOM text [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
+      // Temp + wind keys are present on any data station — assert them on the first marker.
       await openPanelViaMarker(page);
       const panel = page.locator(PANEL);
-      // Temp key, wind key, precip key — asserted by their distinctive substrings.
       await expect(panel).toContainText("8 af hverjum 10");
       await expect(panel).toContainText("hægasta og hvassasta");
-      await expect(panel).toContainText("eyða þýðir að úrkoma var ekki mæld");
+
+      // Precip reading key: it must appear ON A STATION WITH A PRECIP GAUGE (where the precip
+      // figure renders bars), and is deliberately SUPPRESSED on an án-úrkomu station whose precip
+      // figure shows "engin úrkomumæling á þessari stöð" (UI FIX-NOW #4 — the key describes bars/
+      // gaps that are not rendered there). Open stations via the store seam until one shows a
+      // precip chart (not the no-gauge message), then assert the precip key is present there AND
+      // absent on the no-gauge station.
+      const stationIds = await page.locator(PILL).evaluateAll((els) =>
+        els.map((e) => Number((e as HTMLElement).dataset.station)).filter((n) => Number.isFinite(n)),
+      );
+      const openStation = async (id: number): Promise<void> => {
+        await page.evaluate((sid) => {
+          (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set(
+            { stationId: sid },
+          );
+        }, id);
+        await page.locator(PANEL).waitFor({ state: "visible", timeout: 5_000 });
+        await page.waitForTimeout(400);
+      };
+
+      let sawGaugeStation = false;
+      let sawNoGaugeSuppression = false;
+      for (const id of stationIds) {
+        await openStation(id);
+        const precipFigure = page.locator(PANEL).locator("figure").filter({ hasText: "Úrkoma" });
+        const noGauge =
+          (await precipFigure.getByText("engin úrkomumæling á þessari stöð").count()) > 0;
+        const hasPrecipKey =
+          (await precipFigure.getByText("eyða þýðir að úrkoma var ekki mæld").count()) > 0;
+        if (noGauge) {
+          // Suppression invariant: no reading key beside the no-gauge message.
+          expect(hasPrecipKey).toBe(false);
+          sawNoGaugeSuppression = true;
+        } else if (hasPrecipKey) {
+          // A gauge-bearing station renders the precip bars AND the precip reading key.
+          sawGaugeStation = true;
+        }
+        if (sawGaugeStation && sawNoGaugeSuppression) break;
+      }
+      // At least one station must carry the precip reading key (the key is real and reachable).
+      expect(sawGaugeStation, "expected a precip-gauge station showing the precip reading key").toBe(
+        true,
+      );
     },
   );
 
@@ -359,6 +401,86 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
         });
         expect(hasSummary).toBe(true);
       }
+    },
+  );
+
+  test(
+    "CR-01 regression: ECharts instances are disposed — open→close→reopen does not accumulate instances or canvases",
+    async ({ page }) => {
+      await waitForMarkers(page);
+
+      // Pick a data-complete station (three chart canvases) so the dispose path is actually
+      // exercised — a no-data/no-gauge station would create no instances to leak.
+      const stationIds = await page.locator(PILL).evaluateAll((els) =>
+        els.map((e) => Number((e as HTMLElement).dataset.station)).filter((n) => Number.isFinite(n)),
+      );
+      expect(stationIds.length).toBeGreaterThanOrEqual(1);
+
+      const openStation = async (id: number): Promise<number> => {
+        await page.evaluate((sid) => {
+          (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set(
+            { stationId: sid },
+          );
+        }, id);
+        await page.locator(PANEL).waitFor({ state: "visible", timeout: 5_000 });
+        await page.waitForTimeout(600); // let the lazy chunk load + charts mount
+        return page.locator(`${PANEL} figure canvas`).count();
+      };
+
+      const closePanel = async (): Promise<void> => {
+        await page.evaluate(() => {
+          (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set(
+            { stationId: null },
+          );
+        });
+        await expect(page.locator(PANEL)).toHaveCount(0);
+        await page.waitForTimeout(100);
+      };
+
+      // Find a station that mounts >=1 chart canvas.
+      let dataStation: number | null = null;
+      let canvasesWhenOpen = 0;
+      for (const id of stationIds) {
+        const n = await openStation(id);
+        if (n >= 1) {
+          dataStation = id;
+          canvasesWhenOpen = n;
+          break;
+        }
+        await closePanel();
+      }
+      expect(dataStation, "expected a station that mounts >=1 chart canvas").not.toBeNull();
+      expect(canvasesWhenOpen).toBeGreaterThanOrEqual(1);
+
+      const liveInstances = () =>
+        page.evaluate(
+          () => (window as unknown as { __liveChartInstances?: number }).__liveChartInstances ?? 0,
+        );
+      const canvasCount = () => page.evaluate(() => document.querySelectorAll("canvas").length);
+
+      // Baseline: with the panel open, some chart instances are live.
+      const openInstances = await liveInstances();
+      expect(openInstances).toBeGreaterThanOrEqual(1);
+      const baselineCanvases = await canvasCount();
+
+      // Close → every ECharts instance must be disposed (live count back to 0) and its canvas gone.
+      await closePanel();
+      expect(await liveInstances()).toBe(0);
+
+      // Open→close→reopen several times; live instances must return to 0 after each close and never
+      // climb above the single-open count while open — proving no accumulation (CR-01).
+      for (let i = 0; i < 3; i++) {
+        await openStation(dataStation!);
+        const whileOpen = await liveInstances();
+        expect(whileOpen).toBe(openInstances); // exactly one panel's worth, not N panels' worth
+        await closePanel();
+        expect(await liveInstances()).toBe(0);
+      }
+
+      // Total canvases in the document must not have grown across the cycles (detached-but-alive
+      // ECharts canvases were the leak). Reopen once and compare to the first-open baseline.
+      await openStation(dataStation!);
+      expect(await canvasCount()).toBe(baselineCanvases);
     },
   );
 });

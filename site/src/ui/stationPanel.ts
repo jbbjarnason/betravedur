@@ -121,14 +121,16 @@ const SVGNS = "http://www.w3.org/2000/svg";
 
 /** Build the inline × close glyph (static chrome; createElementNS only). */
 function buildCloseGlyph(): SVGSVGElement {
+  // 24×24 glyph inside the ≥44px hit target (UI-SPEC: "inline SVG, 24×24 in a ≥44px hit target").
+  // The path uses a 24-unit viewBox with a matching stroke inset (was 16px — UI FIX-NOW #5).
   const svg = document.createElementNS(SVGNS, "svg");
-  svg.setAttribute("viewBox", "0 0 16 16");
-  svg.setAttribute("width", "16");
-  svg.setAttribute("height", "16");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", "24");
+  svg.setAttribute("height", "24");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("focusable", "false");
   const path = document.createElementNS(SVGNS, "path");
-  path.setAttribute("d", "M3 3l10 10M13 3L3 13");
+  path.setAttribute("d", "M5 5l14 14M19 5L5 19");
   path.setAttribute("fill", "none");
   path.setAttribute("stroke", "currentColor");
   path.setAttribute("stroke-width", "1.5");
@@ -169,14 +171,33 @@ function loadChartModule(): Promise<typeof import("./chartPanel.js")> {
 }
 
 /**
+ * A disposable chart handle (the lazy chunk returns one per mounted ECharts instance). Kept as a
+ * local structural type so the shell never imports the charting library (RESEARCH Pitfall 6) — it
+ * only ever calls `.dispose()` on the panel-lifecycle teardown/re-open path (CR-01).
+ */
+export interface DisposableChart {
+  dispose(): void;
+}
+
+/**
  * The chart-render SEAM (Plan 03). Shows the `hleð riti…` loading line immediately (real DOM
  * text), then lazily imports the ECharts chunk and mounts the boxplot/bar into a fresh canvas host
  * inside `slot`. On a chunk-load rejection (or an empty/insufficient spec surfaced by the builder)
  * the slot falls back to the `engin gögn fyrir þetta tímabil` message — never a hang or a throw.
  *
+ * `registerChart` is invoked with the mounted chart handle (if any) so the panel lifecycle can
+ * dispose it on close AND before every re-open (CR-01 — the ECharts instance + its ResizeObserver
+ * must never outlive the panel node). The handle may arrive AFTER a teardown (the chunk resolves
+ * async); the callback re-checks `document.contains(slot)` before mounting and the lifecycle owner
+ * disposes any late arrival too.
+ *
  * Exported so a test/override can swap the implementation without restructuring the shell.
  */
-export function renderChartInto(slot: HTMLElement, spec: ChartSpec): void {
+export function renderChartInto(
+  slot: HTMLElement,
+  spec: ChartSpec,
+  registerChart?: (chart: DisposableChart | null) => void,
+): void {
   const loading = document.createElement("p");
   loading.className = "station-panel__nodata";
   loading.textContent = COPY.chartLoading;
@@ -193,21 +214,23 @@ export function renderChartInto(slot: HTMLElement, spec: ChartSpec): void {
       const host = document.createElement("div");
       host.className = "station-panel__chart-host";
       slot.appendChild(host);
-      if (spec.kind === "boxplot") {
-        mod.renderBoxplot(host, {
-          perDoy: spec.perDoy,
-          unit: spec.unit,
-          tone: spec.tone,
-          metricLabel: spec.metricLabel,
-          zeroFloor: spec.zeroFloor,
-        });
-      } else {
-        mod.renderBars(host, {
-          perDoy: spec.perDoy,
-          tone: spec.tone,
-          metricLabel: spec.metricLabel,
-        });
-      }
+      // Mount the chart and hand the disposable handle to the lifecycle owner (CR-01). renderBoxplot
+      // / renderBars return `null` on their internal no-data path (no instance created).
+      const chart =
+        spec.kind === "boxplot"
+          ? mod.renderBoxplot(host, {
+              perDoy: spec.perDoy,
+              unit: spec.unit,
+              tone: spec.tone,
+              metricLabel: spec.metricLabel,
+              zeroFloor: spec.zeroFloor,
+            })
+          : mod.renderBars(host, {
+              perDoy: spec.perDoy,
+              tone: spec.tone,
+              metricLabel: spec.metricLabel,
+            });
+      registerChart?.(chart);
     })
     .catch(() => {
       // Chunk failed to load → honest degrade to the no-data text (never hang/throw).
@@ -238,9 +261,10 @@ function appendNoData(slot: HTMLElement, message: string): void {
  */
 function buildFigure(
   title: string,
-  readingKey: string,
+  readingKey: string | null,
   swatchClass: string,
   slotState: { kind: "chart"; spec: ChartSpec } | { kind: "nodata"; message: string },
+  registerChart?: (chart: DisposableChart | null) => void,
 ): HTMLElement {
   const figure = document.createElement("figure");
   figure.className = "station-panel__figure";
@@ -252,19 +276,23 @@ function buildFigure(
 
   const slot = document.createElement("div");
   slot.className = "station-panel__chart-slot";
-  if (slotState.kind === "chart") renderChartInto(slot, slotState.spec);
+  if (slotState.kind === "chart") renderChartInto(slot, slotState.spec, registerChart);
   else appendNoData(slot, slotState.message);
   figure.appendChild(slot);
 
   // The mandatory plain-Icelandic reading key (real DOM text). A tiny series swatch precedes it
-  // (redundant to the titled figure + geometry — color is never the sole channel).
-  const key = document.createElement("p");
-  key.className = "station-panel__reading-key";
-  const swatch = document.createElement("span");
-  swatch.className = `station-panel__swatch ${swatchClass}`;
-  swatch.setAttribute("aria-hidden", "true");
-  key.append(swatch, document.createTextNode(readingKey));
-  figure.appendChild(key);
+  // (redundant to the titled figure + geometry — color is never the sole channel). A `null`
+  // readingKey suppresses the key entirely — used for the precip no-gauge slot, whose reading key
+  // would otherwise describe bars/gaps that are not rendered (UI FIX-NOW #4).
+  if (readingKey !== null) {
+    const key = document.createElement("p");
+    key.className = "station-panel__reading-key";
+    const swatch = document.createElement("span");
+    swatch.className = `station-panel__swatch ${swatchClass}`;
+    swatch.setAttribute("aria-hidden", "true");
+    key.append(swatch, document.createTextNode(readingKey));
+    figure.appendChild(key);
+  }
 
   return figure;
 }
@@ -289,6 +317,21 @@ export function mountStationPanel(
   // The single live panel element (null when closed) + the element focus returns to on close.
   let panel: HTMLElement | null = null;
   let returnFocusTo: HTMLElement | null = null;
+  // Every ECharts instance mounted for the CURRENT panel (CR-01). Disposed on close AND before
+  // every re-open so no instance/canvas/ResizeObserver leaks across station-to-station switches.
+  let liveCharts: DisposableChart[] = [];
+
+  /** Dispose + clear every tracked chart handle (CR-01). Idempotent. */
+  const disposeCharts = (): void => {
+    for (const c of liveCharts) {
+      try {
+        c.dispose();
+      } catch {
+        // A double-dispose or a torn-down instance must never break teardown.
+      }
+    }
+    liveCharts = [];
+  };
 
   const close = (): void => {
     // Single close path for the button, Escape, and a store-driven deselect: clear stationId.
@@ -299,9 +342,15 @@ export function mountStationPanel(
 
   const teardown = (): void => {
     if (!panel) return;
+    // CR-01: dispose every ECharts instance BEFORE the host DOM is removed so no instance (its
+    // canvas, render loop, global-registry entry) or ResizeObserver outlives the panel node.
+    disposeCharts();
     panel.remove();
     panel = null;
     rankedList.setYielded(false);
+    // Attribution legibility (UI licensing): the right-docked panel no longer covers the
+    // bottom-right MapLibre credit, so drop the offset class.
+    document.body.classList.remove("panel-open");
     // Return focus to the element that launched the panel (the marker pill / ranked row), else
     // let it fall to <body> — continues the Phase-5 select-seam focus intent.
     if (returnFocusTo && document.contains(returnFocusTo)) returnFocusTo.focus();
@@ -309,6 +358,15 @@ export function mountStationPanel(
   };
 
   const open = (stationId: number): void => {
+    // WR-02: capture the launcher (marker pill / ranked row) BEFORE detaching the old panel. On a
+    // station→station switch the active element is the OLD panel's close button; capturing after
+    // the detach (the previous bug) left `returnFocusTo` pointing at a removed node so focus fell
+    // to <body>. We only overwrite returnFocusTo below when this launcher is a live, non-panel
+    // element — so a genuine re-select keeps the ORIGINAL launcher as the return target.
+    const launcher = (document.activeElement as HTMLElement | null) ?? null;
+    // CR-01: dispose the previous open's ECharts instances before its host DOM is removed on a
+    // station-to-station switch — otherwise each switch leaks the prior instances/canvases.
+    disposeCharts();
     // Rebuild from scratch on every open (a fresh selection) — the panel is cheap DOM.
     if (panel) panel.remove();
     // Reset the per-open chart-option record so an E2E (criterion 12) reads only THIS open's
@@ -395,6 +453,14 @@ export function mountStationPanel(
       const toneWind = resolveToken("--chart-wind");
       const tonePrecip = resolveToken("--chart-precip");
 
+      // CR-01: register every mounted chart handle with the panel lifecycle's liveCharts so
+      // teardown/re-open can dispose it. A late-arriving handle (the chunk resolves async) is still
+      // tracked and disposed by the next teardown/open; if the panel was already torn down, the
+      // handle mounts into a detached node only if renderChartInto's document.contains(slot) passes.
+      const registerChart = (chart: DisposableChart | null): void => {
+        if (chart) liveCharts.push(chart);
+      };
+
       // Temperature figure.
       body.appendChild(
         buildFigure(
@@ -413,6 +479,7 @@ export function mountStationPanel(
                 },
               }
             : { kind: "nodata", message: COPY.noData },
+          registerChart,
         ),
       );
       // Wind figure (zero-floored — wind is never below 0).
@@ -434,6 +501,7 @@ export function mountStationPanel(
                 },
               }
             : { kind: "nodata", message: COPY.noData },
+          registerChart,
         ),
       );
       // Precip figure: no-gauge message wins over both chart and per-chart no-data (án úrkomu ≠
@@ -452,12 +520,21 @@ export function mountStationPanel(
                 },
               }
             : { kind: "nodata", message: COPY.noData };
+      // UI FIX-NOW #4: suppress the precip reading key when the slot is the no-gauge message — the
+      // key describes "súlurnar" (bars) and "eyða" (gaps) that are NOT rendered for an án-úrkomu
+      // station, so a user (incl. a screen-reader user) would read a description of an absent chart.
+      // Only the no-gauge kind suppresses it; a genuine chart or per-chart no-data keeps the key.
+      const precipReadingKey =
+        precipSlot.kind === "nodata" && precipSlot.message === COPY.precipNoGauge
+          ? null
+          : COPY.readingKeys.precip;
       body.appendChild(
         buildFigure(
           COPY.chartTitles.precip,
-          COPY.readingKeys.precip,
+          precipReadingKey,
           "station-panel__swatch--precip",
           precipSlot,
+          registerChart,
         ),
       );
     }
@@ -478,12 +555,37 @@ export function mountStationPanel(
 
     section.appendChild(body);
 
-    // Escape anywhere in the panel closes it (criterion 9). Keydown on the panel container
-    // catches focus in the close button or any child.
+    // Escape anywhere in the panel closes it (criterion 9). Tab/Shift+Tab cycle within the panel
+    // (WR-03 focus trap): the panel behaves like a modal (it yields the ranked list, moves focus
+    // in, closes on Escape) but previously let Tab escape to the map/controls behind the overlay.
+    // We cycle at the first/last focusable so keyboard/SR users stay inside until they close it.
     section.addEventListener("keydown", (ev) => {
       if (ev.key === "Escape") {
         ev.preventDefault();
         close();
+        return;
+      }
+      if (ev.key !== "Tab") return;
+      const focusables = Array.from(
+        section.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.hasAttribute("disabled") && el.offsetParent !== null);
+      if (focusables.length === 0) {
+        // No child focusable → keep focus on the panel container itself.
+        ev.preventDefault();
+        section.focus();
+        return;
+      }
+      const first = focusables[0]!;
+      const last = focusables[focusables.length - 1]!;
+      const active = document.activeElement;
+      if (ev.shiftKey && (active === first || active === section)) {
+        ev.preventDefault();
+        last.focus();
+      } else if (!ev.shiftKey && active === last) {
+        ev.preventDefault();
+        first.focus();
       }
     });
 
@@ -491,9 +593,18 @@ export function mountStationPanel(
     panel = section;
     // Yield the ranked list (hide-not-destroy) while the panel is open (criterion 8).
     rankedList.setYielded(true);
+    // Attribution legibility (UI licensing): push the bottom-right MapLibre credit clear of the
+    // right-docked panel while it is open (a .panel-open rule in controls.css owns the offset).
+    document.body.classList.add("panel-open");
+    // WR-02: only adopt the pre-detach launcher as the return target when it is a live, non-panel
+    // element — so a station→station switch keeps returning focus to the original marker/row, and
+    // never to a removed node (which would drop focus to <body>). Capturing document.activeElement
+    // HERE (post-append) would point at the old panel's close button on a switch — the fixed bug.
+    if (launcher && !section.contains(launcher) && document.contains(launcher)) {
+      returnFocusTo = launcher;
+    }
     // Move focus to the close button so keyboard/SR users land in the new content (and Escape is
-    // immediately live). Remember the launcher so focus returns there on close.
-    returnFocusTo = (document.activeElement as HTMLElement | null) ?? null;
+    // immediately live).
     closeBtn.focus();
   };
 
