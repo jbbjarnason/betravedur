@@ -15,62 +15,92 @@ import { renderHeader } from "./ui/header.js";
 import { initMap } from "./map/init.js";
 import { DEFAULT_WINDOW, type MarkerDatum } from "./data/types.js";
 import { loadStations, loadManifest, loadDerived, resolveDerivedFile } from "./data/load.js";
-import { computeMarkerDatum } from "./data/averages.js";
-import { installMarkerLayer, attachCompositeRenderer } from "./map/markers.js";
+import { installMarkerLayer, attachCompositeRenderer, renderComposite } from "./map/markers.js";
+import { createStore, type SelectionStore, type SelectionState } from "./state/store.js";
+import {
+  buildStationCache,
+  recompute,
+  mutedDatum,
+  type StationCache,
+  type StationCacheEntry,
+} from "./state/recompute.js";
 import type * as maplibregl from "maplibre-gl";
 
 const BASE = import.meta.env.BASE_URL;
 
+/** Trailing-debounce for the scrubber-driven recompute (RESEARCH A4) — coalesces rapid ticks. */
+const RECOMPUTE_DEBOUNCE_MS = 120;
+
 /**
- * Fetch + decode + average every station into a MarkerDatum[]. Each station is guarded
- * independently: a missing manifest entry or a malformed/failed derived fetch degrades
- * THAT station to a muted callout (never dropping it, never white-screening the page).
+ * Fetch every station's derived file ONCE at boot and return the {meta, file} pairs the
+ * recompute cache is built from. Each station is guarded independently: a missing manifest
+ * entry or a malformed/failed fetch degrades THAT station — its {meta} is returned with a
+ * `file: null` sentinel so the caller emits a muted datum for it (never dropping it, never
+ * white-screening the page). THIS is the sole network read — recompute never re-fetches.
  */
-async function loadMarkerData(): Promise<MarkerDatum[]> {
+async function loadStationFiles(): Promise<{ entries: StationCacheEntry[]; muted: MarkerDatum[] }> {
   const [stations, manifest] = await Promise.all([loadStations(BASE), loadManifest(BASE)]);
 
-  const data = await Promise.all(
-    stations.map(async (meta): Promise<MarkerDatum | null> => {
+  const results = await Promise.all(
+    stations.map(async (meta) => {
       try {
         const file = resolveDerivedFile(manifest, meta.station);
-        if (!file) return mutedDatum(meta);
+        if (!file) return { meta, file: null };
         const derived = await loadDerived(BASE, file);
-        return computeMarkerDatum(meta, derived, DEFAULT_WINDOW);
+        return { meta, file: derived };
       } catch {
-        // A single bad file must not sink the whole map (T-03-06) — emit it muted.
-        return mutedDatum(meta);
+        // A single bad file must not sink the whole map (T-03-06) — mute it, keep the rest.
+        return { meta, file: null };
       }
     }),
   );
 
-  return data.filter((d): d is MarkerDatum => d !== null);
+  const entries: StationCacheEntry[] = [];
+  const muted: MarkerDatum[] = [];
+  for (const r of results) {
+    if (r.file) entries.push({ meta: r.meta, file: r.file });
+    else muted.push(mutedDatum(r.meta));
+  }
+  return { entries, muted };
 }
 
-/** A muted, insufficient datum for a station whose derived data could not be resolved. */
-function mutedDatum(meta: { station: number; name: string; lon: number; lat: number }): MarkerDatum {
-  return {
-    station: meta.station,
-    name: meta.name,
-    lon: meta.lon,
-    lat: meta.lat,
-    tempC: null,
-    windSpeed: null,
-    windDir: null,
-    windVariable: true,
-    hasPrecip: false,
-    n: 0,
-    sufficient: false,
-    priority: 9999,
-  };
+/**
+ * Render markers for the current store state: recompute over the cached files (NO fetch) plus
+ * the boot-time muted stations, then re-`setData` the (idempotent) layer and redraw the pills.
+ * Reuses installMarkerLayer / renderComposite verbatim — never stacks listeners, never fetches.
+ */
+function renderForState(
+  map: maplibregl.Map,
+  cache: StationCache,
+  muted: MarkerDatum[],
+  state: Readonly<SelectionState>,
+): void {
+  const data = [...recompute(cache, state), ...muted];
+  installMarkerLayer(map, data);
+  renderComposite(map);
 }
 
-/** Wire the load → source → composite flow once the map style is ready. */
-function wireMarkers(map: maplibregl.Map): void {
+/**
+ * Wire the boot fetch → cache → store-driven recompute flow once the map style is ready.
+ * (1) fetch + cache every station's file once, (2) attach the composite renderer once,
+ * (3) render the initial selection, (4) subscribe a DEBOUNCED recompute so a store change
+ * re-renders over the cache with zero network I/O (SEL-04, RESEARCH Pitfall 2).
+ */
+function wireMarkers(map: maplibregl.Map, store: SelectionStore): void {
   const install = async (): Promise<void> => {
     try {
-      const data = await loadMarkerData();
-      installMarkerLayer(map, data);
-      attachCompositeRenderer(map);
+      const { entries, muted } = await loadStationFiles();
+      const cache = buildStationCache(entries);
+
+      attachCompositeRenderer(map); // idempotent (WR-04) — attach once
+      renderForState(map, cache, muted, store.get()); // initial render at boot
+
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      store.subscribe((state) => {
+        // Debounce ONLY the recompute (120ms trailing) — coalesces scrubber ticks.
+        clearTimeout(timer);
+        timer = setTimeout(() => renderForState(map, cache, muted, state), RECOMPUTE_DEBOUNCE_MS);
+      });
     } catch (err) {
       // Defensive: the shell (map + header + attribution) stays up even if data load fails.
       console.error("[betravedur] marker load failed", err);
@@ -90,10 +120,28 @@ function boot(): void {
   renderHeader(headerMount);
   const map = initMap(mapMount);
 
-  // Expose the map for E2E interactivity assertions (UI-SPEC criteria 9, 10).
-  (window as unknown as { __map: unknown }).__map = map;
+  // Temporary bootstrap selection: the DEFAULT_WINDOW summer week (doy 197, 14 days) over a
+  // wide placeholder year range, so the boot render matches Phase-3 behaviour exactly.
+  // Plan 03 owns default selection + URL — it replaces this with today's-week / last-10-years
+  // derived from the current date and the manifest year bounds, plus URL hydration.
+  const initial: SelectionState = {
+    anchorDoy: DEFAULT_WINDOW.startDoy,
+    widthDays: DEFAULT_WINDOW.endDoy - DEFAULT_WINDOW.startDoy + 1,
+    yearFrom: 1, // placeholder full range (Plan 03 replaces with data-derived bounds)
+    yearTil: 9999,
+    stationId: null,
+    lng: -19.0,
+    lat: 65.0,
+    zoom: 6,
+  };
+  const store = createStore(initial);
 
-  wireMarkers(map);
+  // Expose the map + store for E2E interactivity assertions (UI-SPEC 9/10) and deterministic
+  // selection driving (SEL-04 no-network proof: page.evaluate(() => __store.set({...}))).
+  (window as unknown as { __map: unknown }).__map = map;
+  (window as unknown as { __store: unknown }).__store = store;
+
+  wireMarkers(map, store);
 }
 
 boot();
