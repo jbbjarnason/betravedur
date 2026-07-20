@@ -1,0 +1,18 @@
+{
+  "stations": {
+    "1": {
+      "file": "derived/1.c1cf25669d53.json",
+      "hash": "c1cf25669d53",
+      "from": 1949,
+      "to": 2026,
+      "lastFetched": "2026-07-20T07:18:37.625Z"
+    },
+    "1350": {
+      "file": "derived/1350.eaecfc5ae78f.json",
+      "hash": "eaecfc5ae78f",
+      "from": 2008,
+      "to": 2026,
+      "lastFetched": "2026-07-20T07:18:37.594Z"
+    }
+  }
+}
