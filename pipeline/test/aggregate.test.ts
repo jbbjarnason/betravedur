@@ -27,6 +27,7 @@ import { decodeDerived, encodeDerived } from "../src/derive.js";
 import type { DerivedFile } from "../src/derive.js";
 import {
   aggregateStation,
+  aggregateStationWithDerived,
   aggregateAll,
   countQualifyingYears,
   shipOutputs,
@@ -342,6 +343,33 @@ describe("CR-01: aggregate refuses to write outside the store root and rejects b
     expect(() => aggregateStation(root, 1.5, "sj" as StationType, manifest)).toThrow(
       /invalid station id/,
     );
+  });
+});
+
+describe("WR-04: aggregateStationWithDerived returns the encoded file it already wrote", () => {
+  it("the returned DerivedFile equals the bytes on disk (no re-read/re-encode needed)", () => {
+    const years = [2018, 2019, 2020];
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, years, (y) => ({ t: y - 2018 })));
+
+    const { manifest, derived } = aggregateStationWithDerived(
+      root,
+      AWS_STATION,
+      "sj" as StationType,
+      { stations: {} },
+    );
+    const entry = manifest.stations[AWS_STATION]!;
+    const onDisk = JSON.parse(readFileSync(join(root, entry.file), "utf8")) as DerivedFile;
+    // The returned derived object is byte-equivalent to what was written — the caller can decode
+    // it directly instead of re-reading + re-encoding the raw partitions.
+    expect(JSON.stringify(derived, null, 2) + "\n").toBe(readFileSync(join(root, entry.file), "utf8"));
+    expect(derived.station).toBe(onDisk.station);
+    expect(decodeDerived(derived)).toEqual(decodeDerived(onDisk));
+  });
+
+  it("aggregateStation still returns just the manifest (backward-compatible)", () => {
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, [2018, 2019, 2020]));
+    const m = aggregateStation(root, AWS_STATION, "sj" as StationType, { stations: {} });
+    expect(m.stations[AWS_STATION]).toBeDefined();
   });
 });
 

@@ -20,6 +20,7 @@ export { buildStationsJson, serializeStationsJson } from "./stations.js";
 export type { StationEntry } from "./stations.js";
 export {
   aggregateStation,
+  aggregateStationWithDerived,
   aggregateAll,
   countQualifyingYears,
   shipOutputs,

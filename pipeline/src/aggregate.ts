@@ -39,6 +39,7 @@ import {
   qualifyingYears,
 } from "@betravedur/domain";
 import { encodeDerived, decodeDerived } from "./derive.js";
+import type { DerivedFile } from "./derive.js";
 import {
   readPartition,
   highWaterYear,
@@ -142,6 +143,24 @@ export function aggregateStation(
   type: StationType,
   manifest: Manifest,
 ): Manifest {
+  return aggregateStationWithDerived(root, station, type, manifest).manifest;
+}
+
+/**
+ * Like `aggregateStation` but ALSO returns the encoded `DerivedFile` it already computed.
+ *
+ * WR-04: the CLI loop needs decoded rows to count qualifying years. Previously it re-called
+ * `decodeDerived(encodeDerived(readAllRaw(root, id), type))` on the very next line — re-reading
+ * every raw partition from disk and re-encoding a second time (twice the I/O + encode work for a
+ * 78-year station, and a fragile coupling if `readAllRaw` were ever non-deterministic). Returning
+ * the derived file here lets the caller decode it ONCE, from the exact bytes just written.
+ */
+export function aggregateStationWithDerived(
+  root: string,
+  station: number,
+  type: StationType,
+  manifest: Manifest,
+): { manifest: Manifest; derived: DerivedFile } {
   // Reject an invalid station id before it reaches any path (raw read OR derived write). CR-01.
   assertStationId(station);
   const rows = readAllRaw(root, station);
@@ -165,7 +184,7 @@ export function aggregateStation(
     mkdirSync(dirname(outPath), { recursive: true });
     writeFileSync(outPath, bytes);
   }
-  return next;
+  return { manifest: next, derived };
 }
 
 /**
@@ -192,9 +211,16 @@ export function aggregateAll(
   const completed: number[] = [];
   try {
     for (const { type, id } of specs) {
-      manifest = aggregateStation(root, id, type, manifest);
-      const decoded = decodeDerived(encodeDerived(readAllRaw(root, id), type, id));
-      qualifyingCounts.set(id, countQualifyingYears(decoded));
+      // WR-04: reuse the DerivedFile aggregateStation already encoded — decode it once instead
+      // of re-reading + re-encoding every raw partition on the next line.
+      const { manifest: nextManifest, derived } = aggregateStationWithDerived(
+        root,
+        id,
+        type,
+        manifest,
+      );
+      manifest = nextManifest;
+      qualifyingCounts.set(id, countQualifyingYears(decodeDerived(derived)));
       completed.push(id);
       // Persist progress after every station so derived files never outrun the manifest.
       writeFileSync(manifestPath, serializeManifest(manifest));
