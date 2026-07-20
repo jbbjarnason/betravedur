@@ -1,0 +1,106 @@
+/*
+ * Design tokens — Phase 3 UI-SPEC (Color, Spacing, Typography scales).
+ * Vanilla CSS custom properties consumed by the shell and (later) marker CSS.
+ * Restrained, cool, Icelandic palette: muted basemap so white callouts read as
+ * figure; a single warm red reserved for the temperature numeral (Phase 5+).
+ */
+
+:root {
+  /* Spacing scale (multiples of 4; 8-point friendly) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Color roles */
+  --dominant: #e8ebed; /* map sea/land base tone + page background under canvas */
+  --secondary: #ffffff; /* callout surface + header bar surface */
+  --accent: #c0392b; /* temperature numeral only (reserved) */
+  --ink: #1f2933; /* primary text */
+  --muted-ink: #5b6670; /* slogan, unit labels, honesty vocabulary */
+  --marker-empty-fg: #9aa5ae; /* muted marker state */
+  --marker-empty-bg: #f4f6f7;
+  --hairline: rgba(31, 41, 51, 0.1);
+
+  /* Typography */
+  --font-stack: -apple-system, "Segoe UI", "Helvetica Neue", "Inter", Arial,
+    sans-serif;
+  --display-size: 20px;
+  --display-weight: 600;
+  --body-size: 14px;
+  --body-weight: 400;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-stack);
+  color: var(--ink);
+  background: var(--dominant); /* shows through while PMTiles load */
+}
+
+/* Full-bleed map is the base layer (z0). */
+#map {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--dominant);
+}
+
+/* Slim floating header over the map top edge (z10). */
+header.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--hairline);
+}
+
+header.app-header .wordmark {
+  font-size: var(--display-size);
+  font-weight: var(--display-weight);
+  line-height: 1.2;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+header.app-header .slogan {
+  font-size: var(--body-size);
+  font-weight: var(--body-weight);
+  line-height: 1.5;
+  color: var(--muted-ink);
+}
+
+/* On narrow widths the slogan drops beneath the wordmark. */
+@media (max-width: 420px) {
+  header.app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    justify-content: center;
+  }
+}
+
+/* Attribution: muted, legible, sits above canvas. */
+.maplibregl-ctrl-attrib {
+  font-size: var(--body-size);
+  color: var(--muted-ink);
+}
