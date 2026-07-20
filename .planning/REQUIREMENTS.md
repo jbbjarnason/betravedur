@@ -47,7 +47,7 @@
 ### UX & Site
 
 - [x] **UX-01**: Icelandic-only UI with the slogan "Leitin að betra veðri" in the site branding
-- [ ] **UX-02**: Full UI state (period, year range, selected station, map view) is encoded in the URL — permalinks are shareable and bookmarkable
+- [x] **UX-02**: Full UI state (period, year range, selected station, map view) is encoded in the URL — permalinks are shareable and bookmarkable
 - [ ] **UX-03**: Mobile-responsive: bottom-sheet station panel on phones, side panel on desktop
 - [ ] **UX-04**: Info panel explains "sögulegt meðaltal, ekki spá" (historical, not forecast), shows Veðurstofan attribution and data currency ("uppfært í nótt")
 - [ ] **UX-05**: Loading, empty, and no-data states for map and panels
@@ -98,7 +98,7 @@ Which phases cover which requirements.
 | SEL-02 | Phase 4 | Complete |
 | SEL-03 | Phase 4 | Complete |
 | SEL-04 | Phase 4 | Complete |
-| UX-02 | Phase 4 | Pending |
+| UX-02 | Phase 4 | Complete |
 | MAP-03 | Phase 5 | Pending |
 | SCORE-02 | Phase 5 | Pending |
 | SCORE-03 | Phase 5 | Pending |

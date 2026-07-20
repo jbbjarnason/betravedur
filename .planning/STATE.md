@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-07-20T10:23:48.732Z"
+status: verifying
+stopped_at: Completed 04-03-PLAN.md (Phase 4 complete)
+last_updated: "2026-07-20T10:37:35.444Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 13
-  percent: 38
+  completed_plans: 14
+  percent: 50
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 Phase: 4 (Selection & Instant Recompute) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-20
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [█████████░] 93%
 | Phase 03 P03 | 7min | 2 tasks | 5 files |
 | Phase 04 P01 | 4 min | 3 tasks | 9 files |
 | Phase 04 P02 | 15min | 3 tasks | 8 files |
+| Phase 04 P03 | 7.5min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 03] Plan 03-03: hybrid marker system — invisible MapLibre symbol layer owns native zoom-adaptive collision (text-allow-overlap:false + symbol-sort-key + text-opacity:0); rich white-pill callouts drawn ONLY for post-collision queryRenderedFeatures survivors into a single reused #marker-overlay (no maplibregl.Marker, grep-gated); accent red reserved to temp numeral; insufficient stations emitted muted (ófullnægjandi gögn) not filtered; pills are focus-ready <button data-station> skeletons, NO click handler (Phase-6 seam); all 11 UI-SPEC criteria green on preview build — MAP-02, MAP-04, Phase 3 complete.
 - [Phase 04]: [Phase 04] Plan 04-01: SelectionState SoT = vanilla observable store (Object.freeze + Set<Listener> + no-op-skip, zero deps); anchorToWindow -> wrap-aware WindowSpec (anchor=start); computeMarkerDatum yearRange filters season-year keys before effectiveN so N is honest qualifying-years-in-range; boot caches derived files once, debounced 120ms store subscriber recomputes over cache with NO fetch (SEL-04); window.__store exposed; temporary bootstrap default left for Plan 03. — Phase-4 core: the load-bearing selection + instant-recompute slice Plans 02/03 and Phase 5/6 build on.
 - [Phase 04]: Plan 04-02: bottom control bar — framework-free control builders (scrubber/width/year) store-agnostic, wired via controlBar to store.set; global meðaltal N ára readout reads a module-level latestData snapshot via a getLatestData getter (pinned, not optional); year bounds derived from manifest union; native range/select/button for free a11y; selection.spec proves width/scrubber/year recompute re-renders markers with ZERO /data/ requests + 500px stepper; controls.css uses 0 accent refs.
+- [Phase 04]: Plan 04-03: loop-proof state↔URL round-trip (write-always via writeUrl / read-on-popstate-only; NO isUpdating flag) + defensive paramsToState (clamp/fallback, never throws/NaN, T-04-05/06); data-derived defaultSelection (today's leap-folded doy, 1 vika, last-10 manifest-union years) REPLACES the Phase-3 fixed DEFAULT_WINDOW; map owns its viewport (moveend→store→replaceState, jumpTo only on boot/popstate); crafted-URL→exact-view restore proven E2E (16 tests). Phase 4 complete.
 
 ### Pending Todos
 
@@ -119,6 +121,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T10:22:07.537Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-07-20T10:37:35.440Z
+Stopped at: Completed 04-03-PLAN.md (Phase 4 complete)
 Resume file: None

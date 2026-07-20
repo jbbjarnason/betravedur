@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Data Access & Domain Core** - Confirm Veðurstofan API/terms and build the tested, shared domain math (circular wind mean, honest N, precipitation-as-missing, combined score) (completed 2026-07-19)
 - [x] **Phase 2: Derived Data Pipeline & Backfill** - Backfill history and precompute compact per-station derived files the browser can aggregate, kept within Pages limits (completed 2026-07-20)
 - [x] **Phase 3: Static Site Shell & Interactive Map** - Vite/TS static site with an Icelandic-branded MapLibre map of Iceland showing station markers with historical averages (completed 2026-07-20)
-- [ ] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state
+- [x] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state (completed 2026-07-20)
 - [ ] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer
 - [ ] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling
 - [ ] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout
@@ -91,7 +91,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Foundation slice: observable selection store + anchorToWindow + computeMarkerDatum yearRange param + boot-cache recompute (no fetch) + window.__store (SEL-01/02/03/04)
 - [x] 04-02-PLAN.md — Bottom control bar: scrubber + width buttons + Frá/Til dropdowns + meðaltal N ára readout wired to the store, no-network recompute E2E (SEL-01/02/03/04)
-- [ ] 04-03-PLAN.md — URL state: loop-proof round-trip + defensive clamp + union year bounds + default selection + viewport sync + crafted-URL restore E2E (UX-02, SEL-02)
+- [x] 04-03-PLAN.md — URL state: loop-proof round-trip + defensive clamp + union year bounds + default selection + viewport sync + crafted-URL restore E2E (UX-02, SEL-02)
 **UI hint**: yes
 
 ### Phase 5: Score Coloring & Ranking
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
 | 3. Static Site Shell & Interactive Map | 3/3 | Complete   | 2026-07-20 |
-| 4. Selection & Instant Recompute | 2/3 | In Progress|  |
+| 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
 | 7. Responsive UX & Trust States | 0/TBD | Not started | - |
