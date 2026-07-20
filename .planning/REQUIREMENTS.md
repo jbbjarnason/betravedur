@@ -20,7 +20,7 @@
 ### Map
 
 - [x] **MAP-01**: Interactive pan/zoom map of Iceland (MapLibre GL + self-hosted PMTiles basemap, no API keys)
-- [ ] **MAP-02**: Station markers show historical averages for the selected period: temperature, wind speed + direction arrow, precipitation indicator
+- [x] **MAP-02**: Station markers show historical averages for the selected period: temperature, wind speed + direction arrow, precipitation indicator
 - [ ] **MAP-03**: Markers are colored by the combined weather score, with a legend explaining the color scale
 - [ ] **MAP-04**: Marker density adapts to zoom level (more stations appear as user zooms in; no unreadable overlap)
 
@@ -90,7 +90,7 @@ Which phases cover which requirements.
 | DATA-04 | Phase 2 | Complete |
 | DATA-07 | Phase 2 | Complete |
 | MAP-01 | Phase 3 | Complete |
-| MAP-02 | Phase 3 | Pending |
+| MAP-02 | Phase 3 | Complete |
 | MAP-04 | Phase 3 | Pending |
 | UX-01 | Phase 3 | Complete |
 | SITE-01 | Phase 3 | Complete |

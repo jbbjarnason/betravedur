@@ -72,7 +72,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 03-01-PLAN.md — Foundation slice: site/ Vite+TS workspace, committed PMTiles Iceland basemap + sample data, MapLibre map + Icelandic header/slogan + CC BY 4.0 attribution, preview-build E2E gate (MAP-01, UX-01, SITE-01)
-- [ ] 03-02-PLAN.md — Data layer (TDD): manifest hashed-filename resolution + decodeDerived → domain averages → MarkerDatum (án úrkomu / breytileg átt / ófullnægjandi gögn) (MAP-02)
+- [x] 03-02-PLAN.md — Data layer (TDD): manifest hashed-filename resolution + decodeDerived → domain averages → MarkerDatum (án úrkomu / breytileg átt / ófullnægjandi gögn) (MAP-02)
 - [ ] 03-03-PLAN.md — Marker render slice: symbol-layer collision + hybrid white-pill composite at zoom-adaptive density + full 11-criterion UI-SPEC E2E gate (MAP-02, MAP-04)
 **UI hint**: yes
 
@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Data Access & Domain Core | 4/4 | Complete   | 2026-07-19 |
 | 2. Derived Data Pipeline & Backfill | 4/4 | Complete   | 2026-07-20 |
-| 3. Static Site Shell & Interactive Map | 1/3 | In Progress|  |
+| 3. Static Site Shell & Interactive Map | 2/3 | In Progress|  |
 | 4. Selection & Instant Recompute | 0/TBD | Not started | - |
 | 5. Score Coloring & Ranking | 0/TBD | Not started | - |
 | 6. Station Chart Panel | 0/TBD | Not started | - |
