@@ -91,7 +91,12 @@ export async function fetchChunk(
  * so a re-run fetches ONLY newer years. When the store is already current (high-water ==
  * current year), the loop performs no fetch at all.
  *
- * Returns the new high-water year (the last calendar year attempted).
+ * Returns the STORE-DERIVED high-water year — the last calendar year that actually has data
+ * on disk (`deps.highWaterYear(id)` after the loop), NOT `yEnd` (the last year *attempted*).
+ * When the newest chunk 404s (a normal no-data case per PIPELINE.md §2), `upsertPartition([])`
+ * writes nothing, so no partition exists for those trailing years; returning the attempted
+ * `yEnd` would overstate the on-disk high-water and diverge from what a resume reads (WR-02).
+ * Falls back to the last attempted year only when the store has no partitions at all.
  */
 export async function backfillStation(
   kind: ObservationKind,
@@ -111,15 +116,20 @@ export async function backfillStation(
     y0 = hw === null ? nowYear : hw + 1;
   }
 
-  let highWater = y0 - 1;
+  let lastAttempted = y0 - 1;
   for (let y = y0; y <= nowYear; y += CHUNK_YEARS) {
     const yEnd = Math.min(y + CHUNK_YEARS - 1, nowYear);
     const rows = await fetchChunk(kind, id, y, yEnd, deps);
     deps.upsertPartition(id, rows);
-    highWater = yEnd;
+    lastAttempted = yEnd;
     await sleep(PACE_MS);
   }
-  return highWater;
+  // Return the store's ACTUAL high-water (last year with data on disk), not the last year
+  // attempted — trailing 404 years write no partition, so `lastAttempted` would overstate it
+  // and disagree with a resume that re-reads the store (WR-02). Fall back to `lastAttempted`
+  // only when the store is entirely empty (no partitions at all).
+  const storeHw = deps.highWaterYear(id);
+  return storeHw ?? lastAttempted;
 }
 
 /**

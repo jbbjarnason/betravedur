@@ -128,6 +128,60 @@ describe("backfill chunk error taxonomy", () => {
   });
 });
 
+describe("WR-02: backfillStation returns the store-derived high-water, not the last year attempted", () => {
+  it("returns the actual on-disk high-water when trailing years 404 (no data)", async () => {
+    // The newest chunk returns [] (404 no-data): upsert writes nothing for those years, so the
+    // store's high-water is 2020 even though the loop *attempts* through nowYear=2026.
+    const stored: DailyObservation[] = [];
+    const upsertPartition = vi.fn((_station: number, rows: DailyObservation[]) => {
+      stored.push(...rows);
+    });
+    // Simulate a store whose high-water is the max year actually written.
+    const highWaterYear = vi.fn(() => {
+      if (stored.length === 0) return null;
+      return Math.max(...stored.map((r) => Number(r.date.slice(0, 4))));
+    });
+
+    const fetchAws = vi.fn(
+      async (_ids: number[], from: string, _to: string): Promise<DailyObservation[]> => {
+        const y0 = Number(from.slice(0, 4));
+        // Years through 2020 have data; anything starting after 2020 is a 404 -> [].
+        if (y0 > 2020) return [];
+        const rows: DailyObservation[] = [];
+        const y1 = Math.min(y0 + 4, 2020);
+        for (let y = y0; y <= y1; y++) rows.push(row(1, `${y}-06-15`));
+        return rows;
+      },
+    );
+
+    const hw = await backfillStation("aws", 1, 2016, {
+      fetchAws,
+      fetchSynop: vi.fn(),
+      upsertPartition,
+      highWaterYear,
+      sleep: async () => {},
+      nowYear: 2026,
+    });
+
+    // The returned high-water is the last year WITH DATA (2020), NOT the last attempted (2026).
+    expect(hw).toBe(2020);
+  });
+
+  it("falls back to the last attempted year only when the store is entirely empty", async () => {
+    // All chunks 404 -> nothing ever written -> highWaterYear stays null.
+    const highWaterYear = vi.fn(() => null);
+    const hw = await backfillStation("aws", 1, 2016, {
+      fetchAws: vi.fn(async (): Promise<DailyObservation[]> => []),
+      fetchSynop: vi.fn(),
+      upsertPartition: vi.fn(),
+      highWaterYear,
+      sleep: async () => {},
+      nowYear: 2020,
+    });
+    expect(hw).toBe(2020);
+  });
+});
+
 describe("backfill pacing", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
