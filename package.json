@@ -26,10 +26,10 @@
   "dependencies": {
     "@playwright/test": "^1.61.1",
     "@protomaps/basemaps": "^5.7.2",
-    "echarts": "^6.1.0",
+    "echarts": "6.1.0",
     "maplibre-gl": "^5.24.0",
     "pmtiles": "^4.4.1",
-    "suncalc": "^2.0.1",
+    "suncalc": "2.0.1",
     "vite": "^8.1.5"
   }
 }
