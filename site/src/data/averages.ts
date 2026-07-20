@@ -60,14 +60,34 @@ function stationPriority(meta: StationMeta): number {
 }
 
 /**
+ * The baseline year range (SEL-02): restrict the season-years used for averaging to
+ * [from, til] inclusive. WindowSpec carries NO year field by contract (it is day-of-year
+ * only), so the year range is a SEPARATE dimension applied here — over the season-year
+ * groups, before qualifyingYears/effectiveN. Omit it (undefined) to use every year in the
+ * file (the pre-Phase-4 behaviour, byte-identical).
+ */
+export interface YearRange {
+  from: number;
+  til: number;
+}
+
+/**
  * Compute the MarkerDatum for one station over `window` (default: the fixed
  * summer window until Phase 4). Never throws: empty / all-null metrics yield an
  * insufficient, muted datum rather than NaN or an exception.
+ *
+ * `yearRange` (SEL-02/03): when provided, only season-years within [from, til] contribute.
+ * Because the filter is applied BEFORE qualifyingYears/effectiveN, `n` (the "meðaltal N ára"
+ * label) then reports the honest count of QUALIFYING years within the picked baseline — never
+ * the raw picker span `til - from + 1` (SEL-03, RESEARCH Pitfall 3). A range that leaves fewer
+ * than 3 qualifying years collapses to the muted "ófullnægjandi gögn" state, same as always.
+ * A NaN/undefined-bounded range simply matches nothing → n=0 muted (never throws, T-04-01).
  */
 export function computeMarkerDatum(
   meta: StationMeta,
   file: DerivedFile,
   window: WindowSpec = DEFAULT_WINDOW,
+  yearRange?: YearRange,
 ): MarkerDatum {
   const rows = decodeDerived(file);
   const windowDays = expandWindow(window);
@@ -78,7 +98,15 @@ export function computeMarkerDatum(
   // honour (WR-02): if temperature coverage is too thin to vouch for an average,
   // the whole datum is the muted "ófullnægjandi gögn" state — we never show a
   // confident wind arrow or precip drop drawn from data below the gate.
-  const byYear = groupBySeasonYear(rows, window);
+  const allYears = groupBySeasonYear(rows, window);
+  // SEL-02: keep only season-years inside the selected baseline range. A comparison
+  // against a NaN/undefined bound yields an empty map (n=0 muted), never a throw (T-04-01).
+  // When yearRange is undefined this is a no-op — byYear === allYears semantically.
+  const byYear = yearRange
+    ? new Map(
+        [...allYears].filter(([y]) => y >= yearRange.from && y <= yearRange.til),
+      )
+    : allYears;
   const qYears = qualifyingYears(byYear, windowDays, (o) => o.t);
   const { n, sufficient } = effectiveN(qYears);
 

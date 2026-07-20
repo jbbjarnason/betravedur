@@ -88,6 +88,65 @@ describe("computeMarkerDatum — real sample, default window", () => {
   });
 });
 
+describe("computeMarkerDatum — yearRange baseline (SEL-02/03)", () => {
+  it("honest N within range: n is the QUALIFYING-years count, not the picker span", () => {
+    // AWS #1350 over 2010–2026: the picker span is 17 years, but only 15 have qualifying
+    // in-window coverage. `n` must report 15 (the honest "meðaltal N ára"), never 17 (SEL-03).
+    const span = 2026 - 2010 + 1; // 17
+    const d = computeMarkerDatum(meta(1350), AWS_1350, DEFAULT_WINDOW, { from: 2010, til: 2026 });
+    expect(d.sufficient).toBe(true);
+    expect(d.n).toBe(15);
+    expect(d.n).toBeLessThanOrEqual(span);
+    expect(d.n).not.toBe(span); // the SEL-03 dishonesty guard: N ≠ raw span
+    expect(d.tempC).not.toBeNull();
+
+    // A deep SYNOP range likewise: 1940–1960 spans 21 but only 12 qualify.
+    const d2 = computeMarkerDatum(meta(1), SYNOP_1, DEFAULT_WINDOW, { from: 1940, til: 1960 });
+    expect(d2.n).toBe(12);
+    expect(d2.n).not.toBe(1960 - 1940 + 1); // ≠ 21
+  });
+
+  it("insufficient in range (< 3 qualifying years) → sufficient=false, tempC=null, no throw", () => {
+    // AWS #1350 starts 2008; 2008–2010 has < 3 qualifying in-window years → muted state.
+    let d;
+    expect(() => {
+      d = computeMarkerDatum(meta(1350), AWS_1350, DEFAULT_WINDOW, { from: 2008, til: 2010 });
+    }).not.toThrow();
+    expect(d!.n).toBeLessThan(3);
+    expect(d!.sufficient).toBe(false);
+    expect(d!.tempC).toBeNull(); // "ófullnægjandi gögn"
+    expect(d!.windSpeed).toBeNull();
+    expect(d!.windVariable).toBe(true);
+    expect(d!.hasPrecip).toBe(false);
+  });
+
+  it("omitting yearRange (3-arg call) preserves EXISTING full-range behaviour", () => {
+    // The 4th arg is optional; the 3-arg path must be byte-identical to today.
+    const three = computeMarkerDatum(meta(1), SYNOP_1, DEFAULT_WINDOW);
+    const four = computeMarkerDatum(meta(1), SYNOP_1, DEFAULT_WINDOW, undefined);
+    expect(three).toEqual(four);
+    // And matches the historically-pinned full-range values from the default-window suite.
+    expect(three.tempC!).toBeCloseTo(11.3728, 3);
+    expect(three.n).toBe(77);
+    expect(three.hasPrecip).toBe(true);
+  });
+
+  it("range entirely outside the file's years → n=0, all metrics null/false, never throws/NaN", () => {
+    let d;
+    expect(() => {
+      d = computeMarkerDatum(meta(1), SYNOP_1, DEFAULT_WINDOW, { from: 1800, til: 1810 });
+    }).not.toThrow();
+    expect(d!.n).toBe(0);
+    expect(d!.sufficient).toBe(false);
+    expect(d!.tempC).toBeNull();
+    expect(d!.windSpeed).toBeNull();
+    expect(d!.windVariable).toBe(true);
+    expect(d!.windDir).toBeNull();
+    expect(d!.hasPrecip).toBe(false);
+    expect(Number.isNaN(d!.tempC as number)).toBe(false);
+  });
+});
+
 describe("computeMarkerDatum — synthetic edge fixtures", () => {
   // Build a synthetic derived file from raw rows via encodeDerived (pure, /derive subpath).
   function synth(
