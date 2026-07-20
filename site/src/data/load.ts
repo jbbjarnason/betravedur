@@ -49,23 +49,38 @@ export function assetUrl(base: string, path: string): string {
   return `${base}${p}`;
 }
 
-/** Fetch + parse stations.json. Browser-only (uses fetch). */
-export async function loadStations(base: string): Promise<StationMeta[]> {
-  const res = await fetch(assetUrl(base, "data/stations.json"));
-  return (await res.json()) as StationMeta[];
+/**
+ * Fetch a JSON asset, distinguishing a real HTTP error (404/5xx) from a legitimately
+ * empty payload (WR-05). `fetch` does NOT reject on 4xx/5xx, and a mis-resolved asset
+ * under the `/betravedur/` Pages subpath can return a 404 whose JSON error body
+ * (`{}` / `{"error":...}`) parses successfully and would otherwise flow downstream as if
+ * it were real (empty) data. Checking `res.ok` and throwing a labeled error lets the
+ * caller's per-station / outer catch tell a transport failure apart from "no data".
+ */
+async function fetchJson<T>(url: string, label: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`${label} fetch failed: HTTP ${res.status} ${res.statusText} (${url})`);
+  }
+  return (await res.json()) as T;
 }
 
-/** Fetch + parse manifest.json. Browser-only (uses fetch). */
+/** Fetch + parse stations.json. Browser-only (uses fetch). Throws on a non-ok HTTP status. */
+export async function loadStations(base: string): Promise<StationMeta[]> {
+  return fetchJson<StationMeta[]>(assetUrl(base, "data/stations.json"), "stations.json");
+}
+
+/** Fetch + parse manifest.json. Browser-only (uses fetch). Throws on a non-ok HTTP status. */
 export async function loadManifest(base: string): Promise<Manifest> {
-  const res = await fetch(assetUrl(base, "data/manifest.json"));
-  return (await res.json()) as Manifest;
+  return fetchJson<Manifest>(assetUrl(base, "data/manifest.json"), "manifest.json");
 }
 
 /**
  * Fetch + parse a derived file by its manifest-resolved relative path.
  * `file` MUST come from `resolveDerivedFile` (the hashed name), not a constructed one.
+ * Throws a labeled error on a non-ok HTTP status so a subpath 404 is never silently
+ * treated as an empty station (WR-05).
  */
 export async function loadDerived(base: string, file: string): Promise<DerivedFile> {
-  const res = await fetch(assetUrl(base, `data/${file}`));
-  return (await res.json()) as DerivedFile;
+  return fetchJson<DerivedFile>(assetUrl(base, `data/${file}`), `derived ${file}`);
 }

@@ -4,11 +4,18 @@
 // The production `load.ts` module is fetch-based/browser-safe; here we exercise the
 // PURE resolution + URL functions, feeding the committed JSON directly (read from
 // disk with Node fs ONLY in the test — never imported by the production module).
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { resolveDerivedFile, assetUrl, type Manifest } from "./load.js";
+import {
+  resolveDerivedFile,
+  assetUrl,
+  loadStations,
+  loadManifest,
+  loadDerived,
+  type Manifest,
+} from "./load.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // site/src/data → site/public/data
@@ -66,5 +73,59 @@ describe("assetUrl — BASE_URL prefixing", () => {
 
   it("works with the dev base '/'", () => {
     expect(assetUrl("/", "data/manifest.json")).toBe("/data/manifest.json");
+  });
+});
+
+describe("fetch helpers — res.ok handling (WR-05)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function mockFetch(res: Partial<Response> & { json?: () => Promise<unknown> }): void {
+    vi.stubGlobal("fetch", vi.fn(async () => res as Response));
+  }
+
+  const ok = (body: unknown): Partial<Response> & { json: () => Promise<unknown> } => ({
+    ok: true,
+    status: 200,
+    statusText: "OK",
+    json: async () => body,
+  });
+
+  const notFound = (
+    body: unknown,
+  ): Partial<Response> & { json: () => Promise<unknown> } => ({
+    ok: false,
+    status: 404,
+    statusText: "Not Found",
+    json: async () => body,
+  });
+
+  it("loadDerived throws a labeled error on a 404 (even when the body is valid JSON)", async () => {
+    // A subpath 404 whose body parses as JSON must NOT be treated as empty data.
+    mockFetch(notFound({}));
+    await expect(loadDerived("/betravedur/", "derived/1.abc.json")).rejects.toThrow(
+      /derived derived\/1\.abc\.json fetch failed: HTTP 404/,
+    );
+  });
+
+  it("loadStations throws on a 404 rather than passing a non-array error body downstream", async () => {
+    mockFetch(notFound({ error: "nope" }));
+    await expect(loadStations("/betravedur/")).rejects.toThrow(
+      /stations\.json fetch failed: HTTP 404/,
+    );
+  });
+
+  it("loadManifest throws on a 404", async () => {
+    mockFetch(notFound({}));
+    await expect(loadManifest("/betravedur/")).rejects.toThrow(
+      /manifest\.json fetch failed: HTTP 404/,
+    );
+  });
+
+  it("returns the parsed body on a 200 (the happy path is unaffected)", async () => {
+    mockFetch(ok({ stations: { "1": { file: "derived/1.abc.json" } } }));
+    const m = await loadManifest("/betravedur/");
+    expect(m.stations["1"]!.file).toBe("derived/1.abc.json");
   });
 });
