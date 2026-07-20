@@ -114,6 +114,10 @@ export function hideLoading(): void {
 export function showMapError(heading: string, body: string): void {
   hideLoading();
   const host = ensureHost();
+  // IN-02: the error state SUPERSEDES any empty-stations overlay so at most one state card renders
+  // (the host is flex-centered, so a concurrent map-error + empty-data deploy would otherwise stack
+  // two cards over each other). A map that failed to load is the more actionable failure to surface.
+  host.querySelectorAll(".bv-state--empty").forEach((n) => n.remove());
   if (host.querySelector(".bv-state--error")) return; // one alert is enough
   const overlay = buildOverlay({
     modifier: "bv-state--error",
@@ -133,6 +137,9 @@ export function showMapError(heading: string, body: string): void {
 export function showEmptyState(heading: string, body: string): void {
   hideLoading();
   const host = ensureHost();
+  // IN-02: never paint an empty-stations card over an already-shown map-error alert — the error is
+  // the higher-priority failure and supersedes empty (mirrors showMapError removing empty above).
+  if (host.querySelector(".bv-state--error")) return;
   if (host.querySelector(".bv-state--empty")) return;
   const overlay = buildOverlay({
     modifier: "bv-state--empty",
