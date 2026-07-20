@@ -7,7 +7,9 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./derive": "./src/derive.ts"
+    "./derive": "./src/derive.ts",
+    "./backfill": "./src/backfill.ts",
+    "./rawstore": "./src/rawstore.ts"
   },
   "dependencies": {
     "@betravedur/domain": "*",

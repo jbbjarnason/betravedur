@@ -122,7 +122,13 @@ describe("high-water resume", () => {
     const fetchedSpans: Array<[string, string]> = [];
     const fetchAws = vi.fn(async (_ids: number[], from: string, to: string) => {
       fetchedSpans.push([from, to]);
-      return [obs(5, `${from.slice(0, 4)}-06-15`)];
+      // Return one row per year across the requested span (as the real API would),
+      // so the persisted high-water mark reflects the full fetched range.
+      const y0 = Number(from.slice(0, 4));
+      const y1 = Number(to.slice(0, 4));
+      const rows: DailyObservation[] = [];
+      for (let y = y0; y <= y1; y++) rows.push(obs(5, `${y}-06-15`));
+      return rows;
     });
 
     // startYear omitted -> resume path reads highWaterYear and starts at highWater+1 (2013).
