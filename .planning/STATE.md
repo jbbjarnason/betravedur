@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-20T14:12:31.470Z"
+last_updated: "2026-07-20T14:29:08.601Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 63
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 ## Current Position
 
 Phase: 6 (Station Chart Panel) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-07-20
 
-Progress: [█████████░] 90%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Progress: [█████████░] 90%
 | Phase 05 P02 | 7min | 3 tasks | 9 files |
 | Phase 05 P03 | 12 | 3 tasks | 6 files |
 | Phase 06 P01 | 8min | 3 tasks | 9 files |
+| Phase 06 P02 | 12min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 05] Plan 05-02: score-colored markers — BuGn 4-6px left color-bar (inline --pill-score=scoreColor) over a --hairline floor (Pitfall 3, not a thin ring) + always-visible ink-on-white numeric badge (Icelandic comma); muted/null pills stay off-ramp (T-05-04). Bottom-left legend (BuGn scale + 0-10 ticks + verra/betra) with a native <details> explainer (úrkoma 40% / vindur 30% / hiti 30% + án-úrkomu renormalization, SCORE-03). RECONCILED ramp to BuGn end-to-end (--score-* = scoreColor sampled; UI-SPEC slate table superseded). MAP-03 + SCORE-03.
 - [Phase ?]: Plan 05-03: ranked Bestu staðir panel (SCORE-02) complete — sorted-desc list, row-click easeTo/select via Phase-4 st seam, reciprocal marker+row highlight, no chart panel; all 14 UI-SPEC criteria green; Phase 5 complete.
 - [Phase 06]: [Phase 06] Plan 06-01: per-doy distribution foundation — percentile (type-7) + perDoyDistribution + perDoyPrecip in @betravedur/domain operating on DECODED DailyObservation[] (not DerivedFile) so the domain stays zero-dep; reshape mirrors computeMarkerDatum (qualifyingYears 0.8 + effectiveN N>=3) so panel coverage honesty == map; precip = per-doy MEDIAN total, empty bucket -> {missing:true} explicit gap never a zero box/bar. daylightHours polar-safe via suncalc 2.0.1 (branch alwaysUp/alwaysDown then null sunrise/sunset -> sun noon-altitude), no NaN at Iceland solstices. echarts 6.1.0 + suncalc 2.0.1 pinned exact in site, no @types stubs, no postinstall. panel.spec skeleton: 14 UI-SPEC criteria fixme + build-size chunk-split gate. tsc 0 errors, full unit+E2E green.
+- [Phase 06]: [Phase 06] Plan 06-02: station chart panel SHELL — mountStationPanel subscribes to the single Phase-5 stationId seam (open on non-null, teardown + un-yield on null); close button AND Escape both store.set({stationId:null}) so the existing Phase-4 URL st clearing + marker deselect run for free. Ranked "Bestu staðir" list YIELDS (hide-not-destroy setYielded) while open, restores exactly on close. Marker-click open delegated from #marker-overlay -> setDiscrete stationId (markers.ts stays store-free). Daylight readout (midpoint doy, polar-safe Icelandic copy) + three-granularity no-data (per-chart / án-úrkomu / whole-station Engin gögn) render immediately from the boot StationCache — ZERO data fetch on open (E2E criterion 10). renderChartInto is a hleð riti… stub Plan 03 fills with lazy ECharts. Comma decimal owned via toFixed+replace (is-IS locale fell back to a dot in headless). --chart-temp/wind/precip tokens distinct from --score-*/--accent. tsc 0, full E2E green (61 pass, 5 Plan-03 fixmes), 281 unit pass.
 
 ### Pending Todos
 
@@ -129,6 +131,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-20T14:09:14.949Z
+Last session: 2026-07-20T14:28:17.052Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None
