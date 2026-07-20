@@ -11,6 +11,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { Protocol } from "pmtiles";
 import { buildStyle } from "./style.js";
 import { attributionHtml } from "../ui/attribution.js";
+import { showMapError } from "../ui/states.js";
 
 let protocolRegistered = false;
 
@@ -49,6 +50,15 @@ export function initMap(container: HTMLElement): maplibregl.Map {
     }),
     "bottom-right",
   );
+
+  // UX-05 map-load-error (Phase 3 debt): a MapLibre style / PMTiles / tile failure surfaces here
+  // as a visible TEXT alert over the basemap instead of the silent console.error it used to be.
+  // The raw error is logged (T-07-01: never rendered into the overlay); the overlay shows only the
+  // fixed Icelandic copy. The header + info button stay up (showMapError only paints an overlay).
+  map.on("error", (e) => {
+    console.error("[betravedur] map error", (e as { error?: unknown })?.error ?? e);
+    showMapError("Ekki tókst að hlaða kortið", "Reyndu að hlaða síðunni aftur.");
+  });
 
   return map;
 }

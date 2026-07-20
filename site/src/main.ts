@@ -13,7 +13,9 @@ import "./styles/tokens.css";
 import "./styles/markers.css";
 import "./styles/score.css";
 import "./styles/panel.css";
+import "./styles/trust.css";
 import { renderHeader } from "./ui/header.js";
+import { showLoading, hideLoading, showEmptyState } from "./ui/states.js";
 import { mountLegend } from "./ui/legend.js";
 import { initMap } from "./map/init.js";
 import { type MarkerDatum } from "./data/types.js";
@@ -90,6 +92,7 @@ async function loadStationFiles(): Promise<{
   entries: StationCacheEntry[];
   muted: MarkerDatum[];
   manifest: Manifest;
+  stationCount: number;
 }> {
   const [stations, manifest] = await Promise.all([loadStations(BASE), loadManifest(BASE)]);
 
@@ -113,7 +116,10 @@ async function loadStationFiles(): Promise<{
     if (r.file) entries.push({ meta: r.meta, file: r.file });
     else muted.push(mutedDatum(r.meta));
   }
-  return { entries, muted, manifest };
+  // stationCount = the raw stations.json length (UX-05 empty gate): distinct from entries.length,
+  // which would also be 0 if every station were merely muted (a different, honest state the map
+  // already handles). Only a genuinely EMPTY stations set drives the "Engar veðurstöðvar" overlay.
+  return { entries, muted, manifest, stationCount: stations.length };
 }
 
 /**
@@ -173,7 +179,17 @@ function applyViewport(map: maplibregl.Map, s: Readonly<SelectionState>): void {
 function wireMarkers(map: maplibregl.Map): void {
   const install = async (): Promise<void> => {
     try {
-      const { entries, muted, manifest } = await loadStationFiles();
+      const { entries, muted, manifest, stationCount } = await loadStationFiles();
+
+      // (UX-05 empty stations) stations.json parsed but empty ([]) → an explicit legible state over
+      // the still-rendered basemap, instead of a blank map with no markers. Return early so no empty
+      // marker layer paints. The loading affordance is cleared by showEmptyState. (A non-ok HTTP /
+      // 404 throws in load.ts and is handled by the catch below.)
+      if (stationCount === 0) {
+        showEmptyState("Engar veðurstöðvar", "Engar veðurstöðvar fundust til að sýna á kortinu.");
+        return;
+      }
+
       const cache = buildStationCache(entries);
 
       // (2) Union year bounds + default, then hydrate from the URL (or default when no params).
@@ -193,6 +209,9 @@ function wireMarkers(map: maplibregl.Map): void {
       applyViewport(map, initial);
       attachCompositeRenderer(map); // idempotent (WR-04) — attach once
       renderForState(map, cache, muted, initial); // fills latestData
+      // (UX-05) FIRST PAINT done — remove the initial `hleð…` loading affordance. hideLoading only
+      // clears the loading node, so a concurrent map-error alert (from init.ts) is left in place.
+      hideLoading();
       // Reflect the hydrated/default state back into the URL so a no-params load is shareable.
       writeUrl(initial);
 
@@ -293,8 +312,14 @@ function wireMarkers(map: maplibregl.Map): void {
         store.set({ lng: c.lng, lat: c.lat, zoom: map.getZoom() });
       });
     } catch (err) {
-      // Defensive: the shell (map + header + attribution) stays up even if data load fails.
+      // Defensive (T-07-03, Pitfall 4): the shell (map + header + attribution) stays up even if the
+      // data load fails, and we NEVER white-screen or re-throw. Surface a VISIBLE state instead of
+      // the old silent console.error: a stations fetch failure (empty/404 → load.ts throws) is a
+      // data-load failure, so the empty-stations affordance is the default legible outcome. The raw
+      // error is still logged for diagnostics (never rendered — T-07-01).
       console.error("[betravedur] marker load failed", err);
+      hideLoading();
+      showEmptyState("Engar veðurstöðvar", "Engar veðurstöðvar fundust til að sýna á kortinu.");
     }
   };
   if (map.isStyleLoaded()) void install();
@@ -309,6 +334,13 @@ function boot(): void {
   }
 
   renderHeader(headerMount);
+
+  // (UX-05 initial loading) show the minimal `hleð…` affordance over the map area BEFORE the map
+  // + markers paint, so the boot gap is never a blank screen. install() calls hideLoading() right
+  // after the first renderForState (first marker paint). Mounted after the header so the header +
+  // info button stay above the overlay host (which insets below the 56px header band).
+  showLoading();
+
   const map = initMap(mapMount);
 
   // Mount the score legend (SCORE-03) — static chrome, no store/data dependency, so it mounts

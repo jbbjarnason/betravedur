@@ -1,0 +1,86 @@
+/*
+ * Trust-state overlays (Phase 7, UX-05): the initial loading affordance, the map-load-error
+ * alert, and the empty-stations state. ONE presentational class family (`.bv-state` + modifiers)
+ * so the three states read as one design language — the SAME glass surface treatment as the
+ * Phase 3 header / Phase 4 control bar / Phase 5 legend+ranked / Phase 6 station panel
+ * (rgba(255,255,255,0.92) + blur(8px) + 1px --hairline), --ink heading / --muted-ink body.
+ *
+ * DELIBERATELY references NEITHER the reserved accent red NOR any score-ramp or chart-series
+ * token — these are informational states, never a score/temperature/chart color (UI-SPEC Color;
+ * grep-gated in the plan verify). Under prefers-reduced-motion nothing animates.
+ */
+
+/* The overlay host floats over the map area (z30): below the future info panel <dialog> (z40) and
+   above the standing chrome / bottom sheet (z10/z20). It does not intercept pointer events except
+   on the card itself, so the map stays pannable around an empty/loading overlay. */
+.bv-state-host {
+  position: fixed;
+  inset: 56px 0 0 0; /* clear the 56px header so the header + info button stay reachable */
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* the map behind stays interactive; the card re-enables below */
+}
+
+/* The visually-hidden aria-live region (announces loading/empty/error transitions to AT). */
+.bv-state-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* One centered card, shared surface. `--space-md` padding, --hairline border, blurred white. */
+.bv-state {
+  pointer-events: auto;
+  max-width: min(360px, calc(100vw - 2 * var(--space-md)));
+  margin: 0 var(--space-md);
+  padding: var(--space-md);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+  text-align: center;
+  font-family: var(--font-stack);
+}
+
+/* Heading: Section-title 14px 600 ink. */
+.bv-state__heading {
+  margin: 0 0 var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* Body: 14px 400 muted. The loading card has no heading, so its body is the sole line. */
+.bv-state__body {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-ink);
+}
+
+/* The initial loading affordance is deliberately minimal (a single muted line, no heavy spinner
+   per CONTEXT). Muted small treatment on the same surface. */
+.bv-state--loading .bv-state__body {
+  font-size: 11px;
+  line-height: 1.15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bv-state {
+    transition: none;
+    animation: none;
+  }
+}
