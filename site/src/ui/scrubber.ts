@@ -50,21 +50,17 @@ export function doyLabel(doy: number): string {
   }).format(refDate(doy));
 }
 
-/** Abbreviated Icelandic date, e.g. doy 360 → "26. des" (matches the month tick labels). */
-function doyLabelShort(doy: number): string {
-  const d = refDate(doy);
-  return `${d.getUTCDate()}. ${MONTHS_ABBR[d.getUTCMonth()]}`;
-}
-
 /**
- * The window's two endpoints as an abbreviated Icelandic label, e.g. anchor 360 width 14 →
- * "26. des – 8. jan" (wrapping) or anchor 197 width 14 → "16. júl – 29. júl". The window is
- * [anchor, anchor + widthDays − 1] folded to 1..365.
+ * The window's two endpoints as a long-month Icelandic label with a no-space en-dash, matching
+ * the UI-SPEC Scrubber Anatomy format "20.–26. júlí": anchor 197 width 30 → "16. júlí–15. ágúst",
+ * anchor 360 width 14 → "26. desember–8. janúar" (wrapping). The window is [anchor, anchor +
+ * widthDays − 1] folded to 1..365. Uses doyLabel() (long month) — NOT the abbreviated form — per
+ * the spec's stated example.
  */
 export function windowLabel(anchorDoy: number, widthDays: number): string {
   const startDoy = foldDoy(anchorDoy);
   const endDoy = foldDoy(anchorDoy + widthDays - 1);
-  return `${doyLabelShort(startDoy)} – ${doyLabelShort(endDoy)}`;
+  return `${doyLabel(startDoy)}–${doyLabel(endDoy)}`;
 }
 
 /** ±7-day keyboard page step (one week) documented on the native range. */
