@@ -6,6 +6,8 @@ export default defineConfig({
       "packages/**/test/**/*.test.ts",
       "pipeline/test/**/*.test.ts",
       "test/**/*.test.ts",
+      // Site unit tests live next to source (co-located data-layer specs).
+      "site/src/**/*.test.ts",
     ],
     watch: false,
     coverage: {

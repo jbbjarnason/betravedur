@@ -1,0 +1,70 @@
+// Unit tests for the loader: content-hashed derived-filename resolution from the
+// real committed manifest, and BASE_URL-aware asset URL construction.
+//
+// The production `load.ts` module is fetch-based/browser-safe; here we exercise the
+// PURE resolution + URL functions, feeding the committed JSON directly (read from
+// disk with Node fs ONLY in the test — never imported by the production module).
+import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { resolveDerivedFile, assetUrl, type Manifest } from "./load.js";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+// site/src/data → site/public/data
+const MANIFEST_PATH = join(HERE, "..", "..", "public", "data", "manifest.json");
+const manifest: Manifest = JSON.parse(readFileSync(MANIFEST_PATH, "utf8"));
+
+describe("resolveDerivedFile — content-hashed filename resolution", () => {
+  it("resolves station 1 to its hashed filename (NOT derived/1.json)", () => {
+    const file = resolveDerivedFile(manifest, 1);
+    expect(file).toBe("derived/1.c1cf25669d53.json");
+    expect(file).not.toBe("derived/1.json");
+  });
+
+  it("resolves station 1350 to its hashed filename", () => {
+    expect(resolveDerivedFile(manifest, 1350)).toBe("derived/1350.eaecfc5ae78f.json");
+  });
+
+  it("accepts a numeric id and looks it up by its string key", () => {
+    // manifest keys are strings ("1"); the resolver must coerce.
+    expect(resolveDerivedFile(manifest, 1)).toBe(manifest.stations["1"]!.file);
+  });
+
+  it("returns null for an unknown station id (no throw — defensive decode, ASVS V5)", () => {
+    expect(resolveDerivedFile(manifest, 999999)).toBeNull();
+  });
+
+  it("returns null for a malformed manifest (missing stations) without throwing", () => {
+    expect(resolveDerivedFile({} as unknown as Manifest, 1)).toBeNull();
+    expect(resolveDerivedFile({ stations: {} }, 1)).toBeNull();
+    // entry present but with no `file` key → null, never a throw.
+    expect(resolveDerivedFile({ stations: { "1": {} as never } }, 1)).toBeNull();
+  });
+});
+
+describe("assetUrl — BASE_URL prefixing", () => {
+  it("prefixes stations.json with the supplied base", () => {
+    expect(assetUrl("/betravedur/", "data/stations.json")).toBe(
+      "/betravedur/data/stations.json",
+    );
+  });
+
+  it("prefixes a hashed derived entry with the base", () => {
+    const file = resolveDerivedFile(manifest, 1)!;
+    expect(assetUrl("/betravedur/", `data/${file}`)).toBe(
+      "/betravedur/data/derived/1.c1cf25669d53.json",
+    );
+  });
+
+  it("collapses a double slash when the path already leads with one", () => {
+    // Defensive: base ends with '/', path may or may not lead with '/'.
+    expect(assetUrl("/betravedur/", "/data/stations.json")).toBe(
+      "/betravedur/data/stations.json",
+    );
+  });
+
+  it("works with the dev base '/'", () => {
+    expect(assetUrl("/", "data/manifest.json")).toBe("/data/manifest.json");
+  });
+});
