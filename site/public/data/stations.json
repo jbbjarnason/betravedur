@@ -1,0 +1,24 @@
+[
+  {
+    "station": 1,
+    "name": "Reykjavík",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 64.1288833618,
+    "lon": -21.9081897736,
+    "ele": 60.2000007629,
+    "start": 1920,
+    "ending": null
+  },
+  {
+    "station": 1350,
+    "name": "Keflavíkurflugvöllur",
+    "type": "sj",
+    "owner": "Veðurstofa Íslands",
+    "lat": 63.9828987122,
+    "lon": -22.6005191803,
+    "ele": 50.9000015259,
+    "start": 2008,
+    "ending": null
+  }
+]

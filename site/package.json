@@ -1,0 +1,24 @@
+{
+  "name": "@betravedur/site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "e2e": "playwright test",
+    "copy-data": "tsx scripts/copy-sample-data.ts"
+  },
+  "dependencies": {
+    "@betravedur/domain": "*",
+    "@betravedur/pipeline": "*",
+    "@protomaps/basemaps": "5.7.2",
+    "maplibre-gl": "5.24.0",
+    "pmtiles": "4.4.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "vite": "8.1.5"
+  }
+}
