@@ -44,6 +44,15 @@ export function rankStations(data: ReadonlyArray<MarkerDatum>): MarkerDatum[] {
 export interface RankedListHandle {
   /** Re-read the latest recomputed data, re-rank, and rebuild the rows (no fetch). */
   refresh(): void;
+  /**
+   * YIELD the panel to the station chart panel (Phase 6): `setYielded(true)` hides the whole
+   * `section.ranked-list` (the two right-docked panels never render simultaneously at rest);
+   * `setYielded(false)` restores it. This is HIDE-not-destroy — the collapsed/expanded state,
+   * the row subscriptions, and the selected-row highlight all survive a yield, so on close the
+   * list reappears exactly as it was (UI-SPEC "Ranked-list yield"). It never touches
+   * `refresh()`'s reconcile state or the store subscription.
+   */
+  setYielded(yielded: boolean): void;
 }
 
 /** Copy (UI-SPEC Copywriting Contract — final, Icelandic only). */
@@ -298,8 +307,19 @@ export function mountRankedList(
   // updates come via refresh() from main.ts's recompute hook, not from this subscription.
   store.subscribe(applyHighlight);
 
+  // ── Yield/restore for the Phase-6 station panel ───────────────────────────────
+  // Hide the whole section (not the body, not the state) while the station chart panel is open,
+  // and restore it on close. Toggling `hidden` on the section leaves `collapsed`, the row nodes,
+  // the store subscription, and the reconcile map untouched — a pure show/hide so the list comes
+  // back exactly as the user left it. A `.ranked-list--yielded` class is added redundantly for
+  // any CSS hook, but `hidden` is the load-bearing signal (E2E asserts toBeHidden/toBeVisible).
+  const setYielded = (yielded: boolean): void => {
+    section.hidden = yielded;
+    section.classList.toggle("ranked-list--yielded", yielded);
+  };
+
   applyCollapse();
   refresh();
 
-  return { refresh };
+  return { refresh, setYielded };
 }

@@ -51,6 +51,19 @@
   --score-9: #168846;
   --score-10: #006d2c;
 
+  /*
+   * Chart-series tones (Phase 6, CHART-02) — the THREE distribution-chart tones for the
+   * station panel's temperature/wind candlesticks and precipitation bars. DELIBERATELY
+   * distinct from BOTH the BuGn --score-* ramp above AND the reserved --accent red: a chart
+   * tone must never be mistaken for a score color or the marker temperature numeral. Warm
+   * terracotta (temp) / cool steel (wind) / neutral slate (precip) differ in luminance and on
+   * the warm↔cool axis (not the red–green confusion axis), so the three series stay
+   * distinguishable under color-vision deficiency and in grayscale (UI-SPEC Color).
+   */
+  --chart-temp: #b26a3d; /* temperature candlestick — muted warm terracotta (NOT --accent) */
+  --chart-wind: #3d6e8c; /* wind candlestick — cool steel blue */
+  --chart-precip: #4a5a6a; /* precipitation bars — desaturated slate */
+
   /* Typography */
   --font-stack: -apple-system, "Segoe UI", "Helvetica Neue", "Inter", Arial,
     sans-serif;

@@ -1,0 +1,245 @@
+/*
+ * Station detail panel (Phase 6, CHART-01/03/04) — the right-docked chart panel that opens on
+ * station select. Reuses the Phase 3/4/5 design system VERBATIM: the same surface treatment as
+ * the header / control bar / legend / ranked list (rgba(255,255,255,.92) + blur(8px) + 1px
+ * --hairline), the same ink/muted-ink type roles, the same 2px-ink focus ring, and the same
+ * right-dock geometry the ranked list uses (so the panel reads as its replacement, since the
+ * ranked list YIELDS while the panel is open).
+ *
+ * DELIBERATELY references NEITHER the reserved accent-red token NOR any score-ramp token
+ * (UI-SPEC criterion 11, grep-gated): accent red is reserved to the marker temp numeral, and the
+ * score BuGn ramp must never leak into a chart tone. The chart-series colors are the three
+ * chart-* tones (tokens.css), consumed by the ECharts option module in Plan 03 — this file only
+ * carries chrome/no-data/reading-key styling. The three tones are surfaced here as a tiny
+ * reading-key swatch so the CSS exercises them, without pulling in the reserved/score families.
+ */
+
+.station-panel {
+  position: fixed;
+  right: 0;
+  top: calc(56px + var(--space-lg));
+  bottom: calc(var(--bar-height, 100px) + var(--space-lg));
+  z-index: 10; /* header/control-bar tier, above markers (z5) + canvas (z0) */
+
+  display: flex;
+  flex-direction: column;
+  /* Slightly wider than the 280px ranked list — charts need horizontal room — but still within
+     the Phase 4/5 occlusion budget so the central Iceland station band stays visible to the left. */
+  width: 340px;
+  max-width: calc(100vw - 2 * var(--space-md));
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--hairline);
+  /* Right-docked: round only the left corners so it reads as a panel hanging off the edge. */
+  border-right: 0;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 1px 3px rgba(31, 41, 51, 0.18);
+
+  font-family: var(--font-stack);
+  color: var(--ink);
+  overflow: hidden; /* the inner body owns the scroll */
+}
+
+/* ── Header: station name (title) + close affordance ────────────────────────── */
+.station-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.station-panel__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Section-title role (14px 600) — subordinate to the wordmark, so it reads as chrome. */
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.station-panel__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  /* 44px min hit target (UI-SPEC spacing exception); the visible × glyph is smaller. */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.station-panel__close:hover {
+  background: var(--dominant);
+}
+
+/* App-wide focus convention: ink ring, 2px offset (matches every other interactive control). */
+.station-panel__close:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ── Body: scrollable vertical stack of chart figures + daylight ─────────────── */
+.station-panel__body {
+  flex: 1;
+  min-height: 0; /* allow the body to scroll rather than grow the fixed-height panel */
+  overflow-y: auto;
+  padding: var(--space-md);
+}
+
+/* Each chart figure: title + chart slot (canvas/stub/no-data) + reading key. */
+.station-panel__figure {
+  margin: 0 0 var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.station-panel__figure:last-of-type {
+  border-bottom: 0;
+}
+
+.station-panel__figure-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* The chart slot: where Plan 03 mounts the ECharts <canvas>. Until then it shows the
+   `hleð riti…` stub or a no-data message. A functional min-height so the slot reserves space. */
+.station-panel__chart-slot {
+  margin-top: var(--space-xs);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loading / no-data text inside a chart slot (or a panel-level message): muted, never a blank
+   canvas or a flat zero line (CHART-04 honesty — missing data is always TEXT). */
+.station-panel__nodata {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--muted-ink);
+  text-align: center;
+}
+
+/* The mandatory per-chart plain-Icelandic reading key (real DOM text so AT reads it). */
+.station-panel__reading-key {
+  margin: var(--space-sm) 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-ink);
+}
+
+/* Whole-station empty state (all three metrics insufficient): a panel-level heading + body,
+   rendered instead of the three figures. The daylight readout still renders below it. */
+.station-panel__empty {
+  margin: 0 0 var(--space-md);
+}
+
+.station-panel__empty-heading {
+  margin: 0 0 var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.station-panel__empty-body {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--muted-ink);
+}
+
+/* ── Daylight readout: label + hours value (data-independent, always present) ── */
+.station-panel__daylight {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--hairline);
+}
+
+.station-panel__daylight-label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.station-panel__daylight-value {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  -moz-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+/* A tiny per-series swatch beside a reading key (redundant to the titled figure + geometry —
+   color is never the sole channel). Surfaces the three chart tones here so this stylesheet
+   exercises them without ever touching the reserved-red or score-ramp families. */
+.station-panel__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--space-xs);
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
+.station-panel__swatch--temp {
+  background: var(--chart-temp);
+}
+
+.station-panel__swatch--wind {
+  background: var(--chart-wind);
+}
+
+.station-panel__swatch--precip {
+  background: var(--chart-precip);
+}
+
+/* ── Narrow screens (< 640px): functional over-map full-width overlay (Phase 7 polishes) ──
+ * NOT a draggable bottom sheet — just a functional show/hide the close affordance dismisses.
+ * The header + independently-scrolling figure body are structured so Phase 7 can promote this
+ * to a bottom sheet without restructuring. */
+@media (max-width: 640px) {
+  .station-panel {
+    left: 0;
+    width: auto;
+    max-width: none;
+    border-left: 0;
+    border-radius: 0;
+  }
+}
+
+/* Reduced motion: no panel open/close transition churn (the panel mounts/unmounts instantly). */
+@media (prefers-reduced-motion: reduce) {
+  .station-panel,
+  .station-panel__close {
+    transition: none;
+  }
+}

@@ -12,6 +12,7 @@
 import "./styles/tokens.css";
 import "./styles/markers.css";
 import "./styles/score.css";
+import "./styles/panel.css";
 import { renderHeader } from "./ui/header.js";
 import { mountLegend } from "./ui/legend.js";
 import { initMap } from "./map/init.js";
