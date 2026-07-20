@@ -16,7 +16,27 @@ findings:
   warning: 5
   info: 3
   total: 9
-status: issues_found
+status: fixed
+fixed_at: 2026-07-20T00:00:00Z
+fixed_findings:
+  - id: CR-01
+    commits: [292c77e, c2f5b5c]
+  - id: WR-01
+    commits: [292c77e]
+  - id: WR-02
+    commits: [c2f5b5c]
+  - id: WR-03
+    commits: [c2f5b5c]
+  - id: WR-04
+    commits: [5ff7bc2]
+  - id: WR-05
+    commits: [292c77e]
+  - id: IN-01
+    commits: [7fd60ec]
+notes: >
+  CR-01, WR-01–05, IN-01 fixed in this consolidated pass. IN-02 (O(1) station
+  index) and IN-03 (doyLabel boundary test) were out of the requested fix scope
+  and remain as maintainability notes.
 ---
 
 # Phase 6: Code Review Report
@@ -24,7 +44,7 @@ status: issues_found
 **Reviewed:** 2026-07-20T00:00:00Z
 **Depth:** standard
 **Files Reviewed:** 7
-**Status:** issues_found
+**Status:** fixed
 
 ## Summary
 
@@ -37,6 +57,8 @@ The dominant defect is the ONE the E2E suite cannot catch: **ECharts instances a
 ## Critical Issues
 
 ### CR-01: ECharts instances are never disposed — canvas + instance + global-listener leak on every open/switch/re-open
+
+> **FIXED** (292c77e render side + c2f5b5c lifecycle): `renderBoxplot`/`renderBars` now return a `ChartHandle` owning the ECharts instance + its ResizeObserver; the panel tracks every handle in `liveCharts` and disposes them in `teardown()` AND at the top of `open()` before any re-render, so no instance/canvas/global-registry entry outlives the panel. New E2E (`panel.spec.ts`) opens→closes→reopens and asserts the live-instance count returns to 0 and the document canvas count does not accumulate.
 
 **File:** `site/src/ui/chartPanel.ts:343`, `site/src/ui/chartPanel.ts:414` (and the teardown/re-open paths in `site/src/ui/stationPanel.ts:300-313`)
 
@@ -75,6 +97,8 @@ Alternatively use `echarts.getInstanceByDom(host)?.dispose()` in teardown before
 
 ### WR-01: No resize handling — charts do not reflow with the panel or viewport
 
+> **FIXED** (292c77e): `initChart` wires a `ResizeObserver` on the host that calls `chart.resize()`; it is disconnected in the same dispose path as the instance (CR-01). Guarded for headless/older runtimes.
+
 **File:** `site/src/ui/chartPanel.ts:343,414`
 
 **Issue:** ECharts sizes its canvas to the host's box at `init` time and does not auto-track element resizes; the app must call `chart.resize()` on layout changes. Neither chart wires a `ResizeObserver` on `.station-panel__chart-host` nor a `window` `resize` listener. On the `@media (max-width: 640px)` breakpoint the panel goes full-width (`panel.css:239-247`), but a chart initialized at 340px stays 340px wide — clipped/stretched until the panel is re-opened. Any viewport resize while the panel is open leaves stale-sized canvases.
@@ -88,6 +112,8 @@ ro.observe(container);
 Guard `ResizeObserver` existence for the headless runtime if needed.
 
 ### WR-02: Focus does not return to the launcher on a station-to-station switch, and can return to a detached node
+
+> **FIXED** (c2f5b5c): `open()` captures the launcher (`document.activeElement`) BEFORE detaching the old panel and only adopts it as `returnFocusTo` when it is a live, non-panel node — so a re-select returns focus to the original marker/row instead of dropping to `<body>`.
 
 **File:** `site/src/ui/stationPanel.ts:496`, `site/src/ui/stationPanel.ts:307`
 
@@ -111,6 +137,8 @@ const open = (stationId: number): void => {
 
 ### WR-03: No focus trap — Tab escapes the modal-style panel to the map/DOM behind it
 
+> **FIXED** (c2f5b5c): the panel `keydown` handler now traps `Tab`/`Shift+Tab`, cycling focus at the first/last focusable (falling back to the panel container) so keyboard/SR users stay within the panel until they close it.
+
 **File:** `site/src/ui/stationPanel.ts:483-498`
 
 **Issue:** The panel behaves like a modal (it yields the ranked list, moves focus in, closes on Escape) but installs no focus trap. Only `Escape` is handled (line 483-488); `Tab`/`Shift+Tab` are free to move focus out of the panel into the map canvas, the control bar, and the (hidden-but-not-inert) rest of the page. A keyboard/SR user tabbing forward leaves the panel without closing it, landing on controls behind an overlay that visually occludes them. The ranked list is hidden via `hidden` (inert), but the map and control bar are not.
@@ -129,6 +157,8 @@ section.addEventListener("keydown", (ev) => {
 
 ### WR-04: Per-doy box rendered from a single value shows false precision (no per-doy N floor)
 
+> **FIXED** (5ff7bc2): added a per-doy `MIN_PER_DOY = 3` floor in `distribution.ts` — a doy backed by fewer than 3 qualifying-year values is emitted as `{ doy, missing:true }` (an explicit gap) in BOTH `perDoyDistribution` and `perDoyPrecip`, never a degenerate min==p50==max box/bar. New unit tests pin the floor (2 values → gap, 3 → renders) for boxes and bars.
+
 **File:** `packages/domain/src/distribution.ts:117-133`
 
 **Issue:** The N≥3 gate is applied only at the STATION level (`effectiveN(qYears)` in `bucketByDoy`, line 80). Per doy, any bucket with ≥1 value renders a full 5-number box. A doy that happens to have exactly one qualifying-year observation produces `min == p10 == p50 == p90 == max` (`percentile` returns `sorted[0]` for a length-1 array, line 53) — a visually "confident" zero-width box drawn from a single sample, indistinguishable from a doy backed by many years. The station passes the gate (≥3 qualifying years overall), but individual doys inside the window can be backed by far fewer values (a year qualifies at 80% window coverage, so a given doy may be present in only one of the qualifying years). This undercuts the RESEARCH Pitfall 7 "coverage honesty" the module is designed to enforce: the box edges imply a distribution that does not exist for that day.
@@ -140,6 +170,8 @@ if (!vals || vals.length < MIN_PER_DOY) { perDoy.push({ doy, missing: true }); c
 If single-value boxes ARE intended, document it explicitly in the `PerDoyBox` contract so the "honesty" claim is not overstated. Same consideration applies to `perDoyPrecip` (a single-year median is just that year's value).
 
 ### WR-05: Boxplot tooltip formatter silently returns empty on any value array shorter than 6 — brittle coupling to an internal ECharts param shape
+
+> **FIXED** (292c77e): the tooltip formatter now reads `params.data` (the source `[min,p10,p50,p90,max]` array we supplied) with an explicit 5-length/`"-"` guard, instead of ECharts' internal dimension-prefixed processed `value`.
 
 **File:** `site/src/ui/chartPanel.ts:303-315`
 
@@ -160,6 +192,8 @@ This ties the tooltip to the data YOU passed, not ECharts' internal reshaping.
 ## Info
 
 ### IN-01: Root `package.json` uses caret ranges for the two new deps while `site/package.json` pins exact
+
+> **FIXED** (7fd60ec): root `package.json` now pins `echarts: 6.1.0` and `suncalc: 2.0.1` exactly, matching the site workspace; the lockfile was regenerated (`--package-lock-only`, resolved versions unchanged).
 
 **File:** `package.json:29`, `package.json:32`
 
