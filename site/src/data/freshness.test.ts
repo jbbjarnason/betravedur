@@ -69,6 +69,36 @@ describe("newestDataDate — max(lastFetched) across manifest.stations", () => {
   it("tolerates a missing/undefined stations object", () => {
     expect(newestDataDate({} as Manifest)).toBeNull();
   });
+
+  it("selects the TRUE chronological newest across mixed ISO precisions/offsets (WR-03)", () => {
+    // A lexicographic string `>` picks the WRONG entry here: `"2026-07-20T09:00:00+02:00"` sorts
+    // string-greater than `"2026-07-20T08:00:00.000Z"` even though +02:00 == 07:00Z is EARLIER,
+    // and `"2026-07-20T07:00:00Z"` (no millis) sorts string-less than the ".625Z" form despite
+    // being later than the ".594Z" entry. Parsed-timestamp selection returns the real newest.
+    const manifest: Manifest = {
+      stations: {
+        // 08:00Z — the true newest by wall-clock.
+        newest: { file: "n.json", lastFetched: "2026-07-20T08:00:00.000Z" },
+        // 09:00+02:00 == 07:00Z — string-greatest but chronologically EARLIER than 08:00Z.
+        offset: { file: "o.json", lastFetched: "2026-07-20T09:00:00+02:00" },
+        // 07:30Z, no millis — a different field width than the ".000Z" entries.
+        noMillis: { file: "m.json", lastFetched: "2026-07-20T07:30:00Z" },
+      },
+    };
+    expect(newestDataDate(manifest)).toBe("2026-07-20T08:00:00.000Z");
+  });
+
+  it("still ignores unparseable entries when selecting by parsed timestamp (WR-03)", () => {
+    const manifest: Manifest = {
+      stations: {
+        bad: { file: "b.json", lastFetched: "not-a-date" },
+        good: { file: "g.json", lastFetched: "2026-03-03T03:03:03+00:00" },
+        empty: { file: "e.json", lastFetched: "" },
+      },
+    };
+    // The only parseable entry wins even though it carries a +00:00 offset (not a bare `Z`).
+    expect(newestDataDate(manifest)).toBe("2026-03-03T03:03:03+00:00");
+  });
 });
 
 describe("formatIcelandicDate — hand-rolled Icelandic human date (UTC)", () => {

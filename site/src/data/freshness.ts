@@ -30,23 +30,32 @@ const IS_MONTHS = [
 ] as const;
 
 /**
- * The newest data date = MAX `lastFetched` across `manifest.stations`. ISO-8601 UTC strings sort
- * lexicographically in the same order they sort chronologically, so a plain string `>` comparison
- * finds the chronologically-latest without parsing. Returns null when there are no stations or no
- * PARSEABLE `lastFetched` (empty/malformed strings are ignored, never counted as a date). Never
- * throws — a missing/undefined stations object degrades to null.
+ * The newest data date = MAX `lastFetched` across `manifest.stations`, selected by PARSED timestamp
+ * (WR-03). A raw lexicographic string `>` is only correct when every `lastFetched` shares an
+ * identical ISO format (same `Z` designator, same fractional-second precision, same field widths);
+ * the pipeline type (`lastFetched?: string`) enforces none of this, so a future entry with a `+00:00`
+ * offset or without milliseconds would sort WRONG lexically even while passing the per-entry validity
+ * gate — silently reporting a false freshness. We compare `Date.parse`/`getTime()` instead, keeping
+ * the original string only for the winner. Returns null when there are no stations or no PARSEABLE
+ * `lastFetched` (empty/malformed strings are ignored, never counted). Never throws — a missing/
+ * undefined stations object degrades to null.
  */
 export function newestDataDate(manifest: Manifest): string | null {
   const stations = manifest?.stations;
   if (!stations || typeof stations !== "object") return null;
 
   let newest: string | null = null;
+  let newestT = -Infinity;
   for (const entry of Object.values(stations)) {
     const iso = entry?.lastFetched;
     // Only consider a non-empty string that parses to a real date (guards "" and "not-a-date").
     if (typeof iso !== "string" || iso.length === 0) continue;
-    if (Number.isNaN(new Date(iso).getTime())) continue;
-    if (newest === null || iso > newest) newest = iso;
+    const t = new Date(iso).getTime();
+    if (Number.isNaN(t)) continue;
+    if (t > newestT) {
+      newestT = t;
+      newest = iso;
+    }
   }
   return newest;
 }
