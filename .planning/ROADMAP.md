@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Selection & Instant Recompute** - Period and year-range selectors that recompute the map instantly client-side, with honest "meðaltal N ára" and shareable URL state (completed 2026-07-20)
 - [x] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer (completed 2026-07-20)
 - [x] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling (completed 2026-07-20)
-- [ ] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout
+- [x] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout (completed 2026-07-20)
 - [ ] **Phase 8: Nightly Pipeline & Repo Hardening** - Idempotent nightly GitHub Actions cron that fetches, appends, aggregates, and deploys, with monitoring and bounded repo growth
 
 ## Phase Details
@@ -140,7 +140,7 @@ Plans:
 Plans:
 - [x] 07-01-PLAN.md — Trust-states foundation: Wave-0 test harness + freshness/bottom-sheet pure helpers + the three UX-05 state seams (loading / map-error / empty-stations)
 - [x] 07-02-PLAN.md — Info/trust panel (UX-04) + attribution-solve-once: i button + native <dialog> ("ekki spá" + ATTRIBUTION + uppfært freshness) + first-visit localStorage; delete controls.css hacks for --attrib-safe-bottom
-- [ ] 07-03-PLAN.md — Mobile bottom sheet (UX-03): matchMedia-gated Pointer-Events drag controller + ranked/legend chips + responsive control bar + attribution reflow above the sheet peek
+- [x] 07-03-PLAN.md — Mobile bottom sheet (UX-03): matchMedia-gated Pointer-Events drag controller + ranked/legend chips + responsive control bar + attribution reflow above the sheet peek
 **UI hint**: yes
 
 ### Phase 8: Nightly Pipeline & Repo Hardening
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Selection & Instant Recompute | 3/3 | Complete   | 2026-07-20 |
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
 | 6. Station Chart Panel | 3/3 | Complete   | 2026-07-20 |
-| 7. Responsive UX & Trust States | 2/3 | In Progress|  |
+| 7. Responsive UX & Trust States | 3/3 | Complete   | 2026-07-20 |
 | 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
