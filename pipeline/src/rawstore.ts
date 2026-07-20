@@ -38,8 +38,31 @@ const FIELD_ORDER = [
   "r",
 ] as const;
 
+/**
+ * Reject any station id that is not a non-negative integer BEFORE it is interpolated into a
+ * filesystem path. `station` originates from API-derived `DailyObservation.station` and from
+ * `Number(argv)` in the aggregate CLI; `Number(...)` happily yields negatives/fractions and
+ * `String(station)` of such a value is not constrained to `[0-9]+`. Without this guard a
+ * crafted or buggy id (e.g. `-1`, `1.5`, or a non-integer that stringifies with path
+ * separators) could write outside the intended `raw/` subtree (CR-01, path traversal).
+ */
+export function assertStationId(station: number): void {
+  if (!Number.isInteger(station) || station < 0) {
+    throw new Error(`invalid station id: ${String(station)}`);
+  }
+}
+
+/** Reject any year that is not a non-negative integer before path construction (CR-01). */
+export function assertYear(year: number): void {
+  if (!Number.isInteger(year) || year < 0) {
+    throw new Error(`invalid year: ${String(year)}`);
+  }
+}
+
 /** Absolute path to a station-year partition: {root}/raw/{station}/{year}.ndjson. */
 export function partitionPath(root: string, station: number, year: number): string {
+  assertStationId(station);
+  assertYear(year);
   return join(root, "raw", String(station), `${year}.ndjson`);
 }
 
@@ -79,13 +102,31 @@ function serializeLine(o: DailyObservation): string {
  * Rows are returned in stored (date-sorted) order.
  */
 export function readPartition(root: string, station: number, year: number): DailyObservation[] {
+  assertStationId(station);
+  assertYear(year);
   const path = partitionPath(root, station, year);
   if (!existsSync(path)) return [];
   const text = readFileSync(path, "utf8");
   const out: DailyObservation[] = [];
+  let lineNo = 0;
+  let skipped = 0;
   for (const line of text.split("\n")) {
+    lineNo += 1;
     if (line.trim() === "") continue;
-    out.push(JSON.parse(line) as DailyObservation);
+    // A truncated/partially-written partition (interrupted nightly write, disk-full, or a
+    // hand-edited file on the `data` branch) must NOT abort the whole aggregate run with an
+    // uncaught SyntaxError (WR-06). Skip the offending line with a diagnosable warning —
+    // mirroring readManifest's graceful corruption handling — rather than crashing an
+    // unrelated station's aggregation.
+    try {
+      out.push(JSON.parse(line) as DailyObservation);
+    } catch {
+      skipped += 1;
+      console.warn(`[rawstore] skipping malformed line ${lineNo} in ${path}`);
+    }
+  }
+  if (skipped > 0) {
+    console.warn(`[rawstore] ${skipped} malformed line(s) skipped in ${path}`);
   }
   return out;
 }
@@ -97,6 +138,9 @@ export function readPartition(root: string, station: number, year: number): Dail
  * a byte-identical file — the store is idempotent.
  */
 export function upsertPartition(root: string, station: number, rows: DailyObservation[]): void {
+  // Validate the station id even on the empty-rows fast path, so an invalid id never slips
+  // through just because there is nothing to write (CR-01).
+  assertStationId(station);
   if (rows.length === 0) return;
 
   // Group incoming rows by calendar year so each partition is written once.
@@ -134,6 +178,7 @@ export function upsertPartition(root: string, station: number, rows: DailyObserv
  * re-run fetches only newer years.
  */
 export function highWaterYear(root: string, station: number): number | null {
+  assertStationId(station);
   const dir = join(root, "raw", String(station));
   if (!existsSync(dir)) return null;
   let max: number | null = null;

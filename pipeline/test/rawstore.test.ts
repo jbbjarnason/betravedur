@@ -10,7 +10,7 @@
 //   E2. resume wiring   -> backfillStation reads the high-water mark and fetches ONLY newer
 //                          years (the highWaterYear->startYear handoff, not deferred to 02-04).
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, existsSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { DailyObservation } from "@betravedur/domain";
@@ -110,6 +110,62 @@ describe("raw store", () => {
     upsertPartition(root, 42, [obs(42, "2008-05-01"), obs(42, "2011-05-01")]);
     expect(readFileSync(partitionPath(root, 42, 2008)).equals(before2008)).toBe(true);
     expect(readFileSync(partitionPath(root, 42, 2011)).equals(before2011)).toBe(true);
+  });
+});
+
+describe("CR-01: station/year validation at the store boundary (path traversal)", () => {
+  // Craft ids that would escape or malform the raw/ subtree if interpolated unchecked.
+  const badStations = [-1, 1.5, NaN, Infinity, "../evil" as unknown as number];
+
+  it("partitionPath rejects non-integer / negative station ids", () => {
+    for (const bad of badStations) {
+      expect(() => partitionPath(root, bad as number, 2010)).toThrow(/invalid station id/);
+    }
+  });
+
+  it("partitionPath rejects non-integer / negative years", () => {
+    for (const bad of [-1, 1.5, NaN, Infinity]) {
+      expect(() => partitionPath(root, 1, bad)).toThrow(/invalid year/);
+    }
+  });
+
+  it("upsertPartition rejects a bad station id even with rows to write", () => {
+    expect(() => upsertPartition(root, -1, [obs(-1, "2010-01-01")])).toThrow(/invalid station id/);
+    // ...and even on the empty-rows fast path (must not slip through).
+    expect(() => upsertPartition(root, -1, [])).toThrow(/invalid station id/);
+  });
+
+  it("readPartition rejects a bad station id", () => {
+    expect(() => readPartition(root, 1.5, 2010)).toThrow(/invalid station id/);
+    expect(() => readPartition(root, 1, -1)).toThrow(/invalid year/);
+  });
+
+  it("highWaterYear rejects a bad station id", () => {
+    expect(() => highWaterYear(root, -1)).toThrow(/invalid station id/);
+  });
+
+  it("a valid non-negative integer station/year still works", () => {
+    expect(() => partitionPath(root, 0, 0)).not.toThrow();
+    upsertPartition(root, 0, [obs(0, "2010-01-01")]);
+    expect(readPartition(root, 0, 2010).length).toBe(1);
+  });
+});
+
+describe("WR-06: readPartition tolerates a corrupt line", () => {
+  it("skips a malformed NDJSON line instead of crashing the whole read", () => {
+    // Write a partition file directly with one good line, one garbage line, one good line.
+    const path = partitionPath(root, 3, 2010);
+    mkdirSync(join(root, "raw", "3"), { recursive: true });
+    const good1 = JSON.stringify({ ...obs(3, "2010-01-01"), r: null });
+    const good2 = JSON.stringify({ ...obs(3, "2010-01-03"), r: null });
+    writeFileSync(path, `${good1}\n{ this is not valid json\n${good2}\n`);
+
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const rows = readPartition(root, 3, 2010);
+    warn.mockRestore();
+
+    // The two good rows survive; the corrupt line is skipped, not fatal.
+    expect(rows.map((r) => r.date)).toEqual(["2010-01-01", "2010-01-03"]);
   });
 });
 
