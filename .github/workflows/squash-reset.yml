@@ -62,3 +62,9 @@ jobs:
           # The ONLY force-push: explicit `origin data` ref, on the asserted `data` branch.
           # NEVER an unqualified force-push, NEVER another branch.
           git push --force origin data
+
+      # Always tear down the data-branch worktree (WR-02): never leave ./data-wt behind. Runs
+      # from the repo root (not ./data-wt) and can never fail the run.
+      - name: Remove data worktree
+        if: always()
+        run: git worktree remove ./data-wt --force || true
