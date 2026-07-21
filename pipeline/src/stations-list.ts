@@ -60,6 +60,40 @@ export function specsFor(stations: StationMeta[]): string {
 }
 
 /**
+ * Historical floor for a fresh full_backfill when a station's registry `start` is missing or
+ * implausible. 1949 is the earliest year present in the seed SYNOP station (Reykjavík #1) and a
+ * safe lower bound for the daily API — years before real data 404 and are skipped cheaply.
+ */
+export const HISTORY_FLOOR_YEAR = 1949;
+
+/**
+ * Like `specsFor` but for the BACKFILL loop: one `${kind}:${id}:${startYear}` line per survivor.
+ *
+ * WHY the extra `:start` (the fix for the national-sweep gap): `backfillStation` resolves a FRESH
+ * station (no on-disk high-water) to `y0 = nowYear` — so calling `backfill <kind> <id>` with no
+ * start year fetches ONLY the current partial year. The full_backfill workflow needs each station
+ * swept from its real `start`, so the enumeration emits the start year and the workflow passes it
+ * as the CLI's optional `[startYear]`. `aggregate` still consumes the plain `kind:id` form
+ * (`specsFor`) — the workflow strips the trailing `:start` for the aggregate call, so the two
+ * contracts stay separate.
+ *
+ * `start` is guarded: a non-finite or implausibly-early value (< HISTORY_FLOOR_YEAR) falls back to
+ * HISTORY_FLOOR_YEAR so a bad registry row can never emit `NaN` or push the backfill to nowYear.
+ */
+export function backfillSpecsFor(stations: StationMeta[]): string {
+  return stations
+    .map((s) => {
+      const spec = toAggregateSpec(s);
+      if (spec === null) return null;
+      const start =
+        Number.isFinite(s.start) && s.start >= HISTORY_FLOOR_YEAR ? s.start : HISTORY_FLOOR_YEAR;
+      return `${spec}:${start}`;
+    })
+    .filter((s): s is string => s !== null)
+    .join("\n");
+}
+
+/**
  * CLI entry for `workflow_dispatch full_backfill=true`: enumerate the national station set
  * (empty `ids` -> the full `/stations` registry) and print one `<aws|synop>:<id>` spec per
  * line to stdout. The nightly workflow captures this list and drives `backfill` + `aggregate`
@@ -69,7 +103,9 @@ export function specsFor(stations: StationMeta[]): string {
  */
 export async function main(): Promise<void> {
   const stations = await enumerateStations([]);
-  const specs = specsFor(stations);
+  // Emit the BACKFILL form (`kind:id:start`) so the full_backfill loop sweeps each station from
+  // its real start year; the workflow strips `:start` to derive the `kind:id` aggregate specs.
+  const specs = backfillSpecsFor(stations);
   if (specs.length > 0) process.stdout.write(specs + "\n");
 }
 

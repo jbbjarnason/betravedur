@@ -76,15 +76,34 @@ jobs:
           if [ "${{ inputs.full_backfill }}" = "true" ]; then
             # full national sweep (dispatch-only): enumerate the national station set via the
             # stations-list CLI (npx tsx — NOT bare `node <file>.ts`; type-stripping is fragile
-            # on the pinned Node 22), then backfill + aggregate EVERY <aws|synop>:<id> spec.
+            # on the pinned Node 22). The CLI emits `<aws|synop>:<id>:<start>` per line so each
+            # FRESH station is swept from its real start year — WITHOUT the `:start`, a fresh
+            # station (no on-disk high-water) defaults to the current year only (backfill.ts),
+            # which is why the first national run left stations.json at 2 markers.
             specs=$(npx tsx pipeline/src/stations-list.ts)
+            # Resilient per-station backfill: one station's hard error (e.g. a 503 throttle
+            # propagates as an error, never []) must NOT abort the whole national sweep — the
+            # high-water resume self-heals a failed station on the next run. Collect failures and
+            # continue; the aggregate then runs over the FULL enumerated set (empty/failed shells
+            # fail the >=3-qualifying-years gate harmlessly). `if !` keeps errexit from firing.
+            failed=""
             for spec in $specs; do
-              kind=${spec%%:*}   # aws | synop
-              id=${spec##*:}     # station id
-              npm run backfill -- --root ./data-wt "$kind" "$id"
+              kind=${spec%%:*}          # aws | synop
+              rest=${spec#*:}           # id:start
+              id=${rest%%:*}            # station id
+              start=${rest##*:}         # start year
+              if ! npm run backfill -- --root ./data-wt "$kind" "$id" "$start"; then
+                echo "::warning::backfill failed for ${kind}:${id} (start ${start}) — continuing sweep; high-water resume self-heals next run"
+                failed="${failed} ${kind}:${id}"
+              fi
             done
+            # Derive the plain `<kind>:<id>` aggregate spec list (strip the trailing `:start`).
+            aggspecs=$(printf '%s\n' $specs | sed 's/:[0-9]\{1,\}$//')
             # touched-only aggregate over the full enumerated spec list in one call.
-            npm run aggregate -- --root ./data-wt $specs
+            npm run aggregate -- --root ./data-wt $aggspecs
+            if [ -n "$failed" ]; then
+              echo "::warning::national sweep completed with failed stations:${failed}"
+            fi
           else
             # nightly incremental: resume each known seed station from high-water+1.
             npm run backfill -- --root ./data-wt synop 1

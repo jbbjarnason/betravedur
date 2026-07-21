@@ -105,12 +105,25 @@ describe("nightly.yml — full_backfill genuinely enumerates + backfills the nat
     expect(raw.includes("2>/dev/null")).toBe(false);
   });
 
-  it("loops the enumerated specs into backfill and aggregate", () => {
-    // A loop over the emitted specs drives backfill per station...
+  it("loops the enumerated specs into backfill (WITH start year) and aggregate", () => {
+    // A loop over the emitted `<kind>:<id>:<start>` specs drives backfill per station, PASSING
+    // the start year so a fresh station is swept from its real history (not just the current
+    // year — the national-sweep gap this fixes).
     expect(/for spec in \$specs/.test(code)).toBe(true);
-    expect(/npm run backfill -- --root \.\/data-wt "\$kind" "\$id"/.test(code)).toBe(true);
-    // ...and aggregate runs over the full enumerated spec list.
-    expect(/npm run aggregate -- --root \.\/data-wt \$specs/.test(code)).toBe(true);
+    expect(
+      /npm run backfill -- --root \.\/data-wt "\$kind" "\$id" "\$start"/.test(code),
+    ).toBe(true);
+    // The start year must actually be parsed out of each spec (the `:start` suffix).
+    expect(/start=\$\{rest##\*:\}/.test(code)).toBe(true);
+    // Aggregate runs over the enumerated set with the `:start` suffix stripped to `kind:id`.
+    expect(/aggspecs=\$\(printf '%s\\n' \$specs \| sed/.test(code)).toBe(true);
+    expect(/npm run aggregate -- --root \.\/data-wt \$aggspecs/.test(code)).toBe(true);
+  });
+
+  it("keeps the national sweep resilient — one station failure does not abort it", () => {
+    // A single station's hard error (e.g. a propagated 503) must not kill the whole sweep;
+    // the loop guards backfill with `if !` and continues (high-water resume self-heals).
+    expect(/if ! npm run backfill/.test(code)).toBe(true);
   });
 });
 
