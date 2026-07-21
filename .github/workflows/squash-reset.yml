@@ -1,0 +1,64 @@
+# squash-reset — bounds `.git` growth on the orphan `data` branch.
+#
+# The nightly pipeline appends a commit to `data` each night; over years that history
+# grows unboundedly (T-08-11 DoS). This job collapses `data` to a single commit while
+# preserving a byte-identical working tree (proven Phase 2, 02-04 E7).
+#
+# FORCE-PUSH SAFETY (RESEARCH Pitfall 3 / T-08-10): this workflow is the ONLY writer that
+# force-pushes, and it force-pushes ONLY the `data` branch, with an explicit ref, AFTER
+# asserting the current branch IS `data`. It NEVER references or force-pushes `main`.
+# It carries `contents: write` ONLY — no pages/id-token; this job does not deploy.
+#
+# Cadence: documented-manual (workflow_dispatch) is the recommended default; an OPTIONAL
+# monthly cron automates it off-peak. See PIPELINE.md §8.
+name: squash-reset
+
+on:
+  workflow_dispatch: {}
+  # Optional monthly automation (off-peak, 1st of the month, 05:17 UTC).
+  # Documented-manual is the recommended cadence; this cron is a convenience.
+  schedule:
+    - cron: "17 5 1 * *"
+
+# Least privilege: push to `data` only. NO pages / id-token — this job never deploys.
+permissions:
+  contents: write
+
+# Share the nightly pipeline's data-branch group so a squash never races a nightly push.
+concurrency:
+  group: betravedur-data-branch
+  cancel-in-progress: false
+
+jobs:
+  squash-reset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code (read-only)
+        uses: actions/checkout@v4
+
+      - name: Materialize the data branch worktree
+        run: |
+          git fetch origin data --depth=1
+          git worktree add ./data-wt data
+
+      - name: Squash-reset the data branch (force-push scoped to data only)
+        working-directory: ./data-wt
+        run: |
+          set -euo pipefail
+          # ASSERT we are on `data` before ANY force-push (T-08-10 branch-corruption guard).
+          # If this worktree is not on `data`, abort — never force-push an unexpected branch.
+          test "$(git rev-parse --abbrev-ref HEAD)" = "data"
+
+          git config user.name  "betravedur-bot"
+          git config user.email "bot@users.noreply.github.com"
+
+          # Collapse history to a single commit, preserving the working tree byte-for-byte.
+          git checkout --orphan data-fresh
+          git add -A
+          git commit -m "data: squashed backfill $(date +%F)"
+          git branch -D data
+          git branch -m data-fresh data
+
+          # The ONLY force-push: explicit `origin data` ref, on the asserted `data` branch.
+          # NEVER an unqualified force-push, NEVER another branch.
+          git push --force origin data
