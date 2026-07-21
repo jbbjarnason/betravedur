@@ -77,6 +77,116 @@
     "ending": 1970
   },
   {
+    "station": 178,
+    "name": "Stykkishólmur",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.0740280151,
+    "lon": -22.7338790894,
+    "ele": 13.1999998093,
+    "start": 1845,
+    "ending": null
+  },
+  {
+    "station": 206,
+    "name": "Reykhólar",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.4481201172,
+    "lon": -22.1997509003,
+    "ele": 27,
+    "start": 1948,
+    "ending": 2004
+  },
+  {
+    "station": 222,
+    "name": "Hvallátur",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.5287017822,
+    "lon": -24.4565906525,
+    "ele": 17,
+    "start": 1947,
+    "ending": 1989
+  },
+  {
+    "station": 223,
+    "name": "Breiðavík",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.5498504639,
+    "lon": -24.3509807587,
+    "ele": 20,
+    "start": 1989,
+    "ending": 2004
+  },
+  {
+    "station": 224,
+    "name": "Kvígindisdalur",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.5561981201,
+    "lon": -24.0111694336,
+    "ele": 49,
+    "start": 1927,
+    "ending": 2004
+  },
+  {
+    "station": 234,
+    "name": "Hólar í Dýrafirði",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.8669815063,
+    "lon": -23.5618495941,
+    "ele": 30,
+    "start": 1983,
+    "ending": 2024
+  },
+  {
+    "station": 250,
+    "name": "Galtarviti",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.1629562378,
+    "lon": -23.570690155,
+    "ele": 20,
+    "start": 1953,
+    "ending": 1994
+  },
+  {
+    "station": 252,
+    "name": "Bolungarvík",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.1610031128,
+    "lon": -23.253200531,
+    "ele": 17.7000007629,
+    "start": 1994,
+    "ending": 2018
+  },
+  {
+    "station": 260,
+    "name": "Æðey",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.0998764038,
+    "lon": -22.6599502563,
+    "ele": 5,
+    "start": 1946,
+    "ending": 2012
+  },
+  {
+    "station": 285,
+    "name": "Hornbjargsviti",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.4169998169,
+    "lon": -22.3829994202,
+    "ele": 27,
+    "start": 1946,
+    "ending": 1995
+  },
+  {
     "station": 293,
     "name": "Litla-Ávík",
     "type": "sk",
@@ -97,6 +207,17 @@
     "ele": 5,
     "start": 1971,
     "ending": 1995
+  },
+  {
+    "station": 309,
+    "name": "Þóroddsstaðir",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.233001709,
+    "lon": -21.0830001831,
+    "ele": 40,
+    "start": 1966,
+    "ending": 1984
   },
   {
     "station": 310,
@@ -121,6 +242,28 @@
     "ending": 1981
   },
   {
+    "station": 341,
+    "name": "Blönduós",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.6580810547,
+    "lon": -20.3026008606,
+    "ele": 23,
+    "start": 1981,
+    "ending": 2003
+  },
+  {
+    "station": 360,
+    "name": "Sauðárkrókur",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 65.75,
+    "lon": -19.6499996185,
+    "ele": 5,
+    "start": 1954,
+    "ending": 1978
+  },
+  {
     "station": 361,
     "name": "Bergstaðir",
     "type": "sk",
@@ -130,6 +273,28 @@
     "ele": 43,
     "start": 1978,
     "ending": 2018
+  },
+  {
+    "station": 400,
+    "name": "Sauðanesviti",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.1852035522,
+    "lon": -18.9533996582,
+    "ele": 30,
+    "start": 1990,
+    "ending": null
+  },
+  {
+    "station": 402,
+    "name": "Siglunes",
+    "type": "sk",
+    "owner": "Veðurstofa Íslands",
+    "lat": 66.1829986572,
+    "lon": -18.8330001831,
+    "ele": 8,
+    "start": 1968,
+    "ending": 1990
   },
   {
     "station": 404,
