@@ -41,6 +41,19 @@ marks, so they resumed full history and passed the gate.
   paced ≤4 req/s). Verify deployed `stations.json` ≫ 2 and the live map shows a national marker
   field. (See STATE / continue-here for the live-verification result.)
 
+## Additional bugs found while verifying the deploy path (same go-live goal)
+
+- **Bug 2 — nightly clobbers stations.json (commit `62e6945`).** `stations.json` is *regenerated*
+  (not accumulated) each aggregate run, from only that run's specs. So the incremental nightly
+  (`aggregate synop:1 aws:1350`) would shrink a populated national `stations.json` back to 2
+  markers on the very next 03:37 cron. Fixed: `aggregate.main()` now rebuilds `stations.json`
+  from the WHOLE manifest via `fullStoreQualifyingCounts` (reuse touched counts + decode untouched
+  derived files; one batched `fetchStations` call for registry meta). +3 tests.
+- **Contrast — muted marker pill (commit `7246847`).** Deeper-verify WCAG audit found
+  `--marker-empty-fg #9aa5ae` on `--marker-empty-bg` = 2.32:1 (AA needs 4.5). Darkened to
+  `#646e77` (4.8:1). All other text passes AA (muted-ink 5.82:1 on the 0.97 glass; score colors
+  are decorative + numerically redundant).
+
 ## Notes / follow-ups
 
 - Explicit-start backfill re-fetches from `start` on every full_backfill run (no mid-run resume
