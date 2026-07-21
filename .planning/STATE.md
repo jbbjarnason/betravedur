@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-07-19)
 
 ## Current Position
 
-Phase: 8 (Nightly Pipeline & Repo Hardening) — EXECUTING
+Phase: 8 (Nightly Pipeline & Repo Hardening) — COMPLETE
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete
 Last activity: 2026-07-21
 
 Progress: [██████████] 96%
@@ -119,6 +119,7 @@ Recent decisions affecting current work:
 - [Phase 07]: Plan 07-02: info/trust panel (UX-04) — native <dialog> (i button top-right) with the prominent "Þetta er sögulegt meðaltal, ekki spá." lead + domain-ATTRIBUTION CC BY 4.0/OSM/Protomaps credit + Icelandic "uppfært {date}" (createElement/textContent only, real <a> anchors — T-07-04 no innerHTML); first-visit auto-open once via localStorage bv:info-dismissed, permalink-guarded (location.search.length>1 suppresses). ATTRIBUTION-SOLVE-ONCE: the three controls.css hacks (--bar-height lift, 60vw cap, .panel-open push) DELETED, replaced by one --attrib-safe-bottom safe-zone rule; compact:true (i) control + always-legible info-panel credit satisfy the CC BY 4.0 collapse-behind-(i) allowance. Info-panel unit test uses a pure infoPanelSections content model (Node vitest, no jsdom/new dep). E2E: info.spec 6-9/18 active (6 at 1280+390), shell.spec harmonized licensing 10-12 green before/after; prior-phase specs seed bv:info-dismissed so the auto-open modal never intercepts clicks. 82 E2E pass, 8 skip (Plan-03 fixmes), 308 unit, tsc 0, no new deps.
 - [Phase ?]: [Phase 07] Plan 07-03: mobile bottom sheet (UX-03) — filled attachSheet with a matchMedia(640px)-gated Pointer-Events drag controller (setPointerCapture, translateY peek↔expanded via snapNearest, NON-MODAL so the map stays pannable, keyboard toggle via toggleTarget); per-open attach/detach in stationPanel (Pitfall 1). panel.css promotes .station-panel to a bottom sheet (svh clamps, z20, .station-panel__handle grabber). Mobile 'Bestu staðir'/'Einkunn' chips (ranked force-collapsed by setYielded while the sheet is open). onSnap raises --attrib-safe-bottom to the sheet top so the CC BY 4.0/OSM credit stays above the peek; Tab focus-trap gated to desktop. controls.css <640px reflow => no overflow at 390. responsive.spec 1-5/10-12/17/19 green; full E2E 92 pass/0 fail, 312 unit, tsc 0, no new deps. Phase 7 COMPLETE.
 - [Phase ?]: [Phase 08] Plan 08-02: nightly.yml operationalizes the Phase-2 pipeline — off-peak cron 37 4 + workflow_dispatch full_backfill, test/typecheck GATE before any push, --root ./data-wt worktree wiring, skip-empty commit, guarded heartbeat, deploy-pages@v4; fast-forward push origin data only (zero --force, never main). workflow.test.ts gates every invariant via zero-dep text/regex + line-index ordering proof + quote-aware inline-comment stripping. DATA-03.
+- [Phase ?]: [Phase 08] Plan 08-03: repo hardening — squash-reset.yml (workflow_dispatch + optional monthly cron 17 5 1 * *, contents:write ONLY, no pages/id-token) bounds .git growth by asserting abbrev-ref HEAD == data BEFORE the only force-push (git push --force origin data, explicit ref; never main); shares the betravedur-data-branch concurrency group so a squash never races a nightly push; checkout pinned @v4. PIPELINE.md §8 documents the two live prerequisites (push repo to GitHub — data branch's first push comes from the workflow — + Pages Source=GitHub Actions), off-peak cron 37 4, full_backfill one-command national seed, HEARTBEAT_URL graceful no-op + 60-day-disable keepalive, and the squash cadence; the Phase-2 push-deferred-to-Phase-8 note is resolved (§1-7 intact). squash-workflow.test.ts is the T-08-10 gate: zero-dep text parse, comment-strip, proves branch-assertion-before-force-push + scoped-to-origin-data + no main + no pages/id-token. Full suite 353 pass/3 skip, tsc 0, zero new deps. Phase 8 COMPLETE (DATA-03).
 
 ### Pending Todos
 
@@ -143,5 +144,5 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-07-21T06:54:50.670Z
-Stopped at: Completed 06-03-PLAN.md
+Stopped at: Completed 08-03-PLAN.md
 Resume file: None

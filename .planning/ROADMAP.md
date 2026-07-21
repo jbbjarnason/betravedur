@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Score Coloring & Ranking** - Markers colored by combined score with a legend, a ranked "best stations" list, and a transparent score explainer (completed 2026-07-20)
 - [x] **Phase 6: Station Chart Panel** - Station-click chart panel with distribution candlesticks for temp/wind, precipitation bars, daylight hours, and explicit no-data handling (completed 2026-07-20)
 - [x] **Phase 7: Responsive UX & Trust States** - Mobile-responsive layout, "historical not forecast" info panel with attribution/freshness, and loading/empty/no-data states throughout (completed 2026-07-20)
-- [ ] **Phase 8: Nightly Pipeline & Repo Hardening** - Idempotent nightly GitHub Actions cron that fetches, appends, aggregates, and deploys, with monitoring and bounded repo growth
+- [x] **Phase 8: Nightly Pipeline & Repo Hardening** - Idempotent nightly GitHub Actions cron that fetches, appends, aggregates, and deploys, with monitoring and bounded repo growth
 
 ## Phase Details
 
@@ -157,7 +157,7 @@ Plans:
 Plans:
 - [x] 08-01-PLAN.md — Wave 0 foundation: --root flag on all pipeline CLIs (data dir vs branch collision fix) + missed-night self-heal test + full_backfill station enumeration + ship-set copy (no raw/)
 - [x] 08-02-PLAN.md — nightly.yml workflow (off-peak cron + full_backfill dispatch + concurrency + least-privilege perms + test-gate + skip-empty + guarded heartbeat + deploy-pages@v4) + workflow-assertion test
-- [ ] 08-03-PLAN.md — Repo hardening: squash-reset.yml (force-push scoped to data, branch-asserted, never main) + PIPELINE.md live prereqs & squash cadence + force-push-scoping gate test
+- [x] 08-03-PLAN.md — Repo hardening: squash-reset.yml (force-push scoped to data, branch-asserted, never main) + PIPELINE.md live prereqs & squash cadence + force-push-scoping gate test
 
 ## Progress
 
