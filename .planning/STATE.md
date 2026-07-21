@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: milestone_complete
-stopped_at: v1.0 milestone complete — all 8 phases verified, milestone audit passed
-last_updated: "2026-07-21T06:54:55.351Z"
+stopped_at: v1.0 shipped+deployed+live; v1.1 polish quick task 260721-okx complete
+last_updated: "2026-07-21T18:10:00.000Z"
 last_activity: 2026-07-21
 progress:
   total_phases: 8
@@ -133,6 +133,12 @@ Recent decisions affecting current work:
 - Phase 1 gate: sunshine/cloud-cover sensor coverage unconfirmed — determines whether SUN-01 (v2) is ever viable.
 - Phase 2 concern: PMTiles Iceland extract size (est. 20–80 MB) unverified — run an actual extract early to pick maxzoom.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260721-okx | v1.1 polish: attribution occlusion, glass opacity, h1 landmark, focus-return, close aria-label, invalid ?st= drop, aria nits | 2026-07-21 | 4ac3cde | [260721-okx-v1-1-polish-fixes](./quick/260721-okx-v1-1-polish-fixes/) |
+
 ## Deferred Items
 
 Items acknowledged and carried forward from previous milestone close:
@@ -143,6 +149,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-21T06:54:50.670Z
-Stopped at: Completed 08-03-PLAN.md
+Last session: 2026-07-21T18:10:00.000Z
+Stopped at: v1.1 quick task 260721-okx complete; national backfill pipeline gap under repair (see quick 260721)
 Resume file: None
