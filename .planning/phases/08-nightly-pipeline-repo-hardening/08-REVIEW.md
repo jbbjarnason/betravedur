@@ -14,7 +14,14 @@ findings:
   warning: 3
   info: 3
   total: 6
-status: issues_found
+status: fixed
+fixed:
+  WR-01: 7579602
+  WR-02: 7579602, c4ecb4f
+  WR-03: 0641155
+  IN-01: 1bea5a3
+  IN-02: 1bea5a3
+  IN-03: deferred (scope-expanding; helper now reachable but wrap-on-failure left optional)
 ---
 
 # Phase 8: Code Review Report
@@ -66,6 +73,15 @@ intended, but the branch is misleading as written.
 
 ### WR-01: `full_backfill=true` branch does not enumerate/backfill the national set; the `node -e` line is dead
 
+**FIXED (7579602):** The dead `node -e "import(...)" 2>/dev/null || true` line is gone. Added a
+`main()` CLI + pure `specsFor()` helper to `stations-list.ts`; the dispatch branch now runs
+`npx tsx pipeline/src/stations-list.ts` (never bare `node <file>.ts` — Node-22 type-stripping is
+fragile) to enumerate the national set (`enumerateStations([])` -> full `/stations` registry,
+filtered to AWS/SYNOP), then loops each `<aws|synop>:<id>` spec through `npm run backfill` and
+aggregates the full spec list. The nightly (cron / full_backfill=false) path stays the incremental
+2-seed resume. `workflow.test.ts` asserts the branch uses tsx + loops backfill/aggregate and that
+the dead `node -e`/`2>/dev/null` line is gone; `stations-list.test.ts` covers `specsFor`.
+
 **File:** `.github/workflows/nightly.yml:75-84`
 **Issue:** The `full_backfill=true` branch differs from the nightly branch only by one extra line:
 ```bash
@@ -99,6 +115,12 @@ At minimum, drop `2>/dev/null` so a broken module surfaces, and use `npx tsx` no
 
 ### WR-02: `./data-wt` worktree is never cleaned up and is not gitignored
 
+**FIXED (7579602 nightly step, c4ecb4f gitignore+squash):** Added `data-wt/` to `.gitignore` and an
+always-run `- name: Remove data worktree / if: always()` cleanup step to BOTH `nightly.yml` and
+`squash-reset.yml`. The nightly cleanup uses a plain (non-forced) `git worktree remove ./data-wt || true`
+to preserve the file-wide zero-force-push invariant (squash-reset, which owns force-pushes, uses
+`--force`). `workflow.test.ts` asserts the always-run cleanup and that nightly stays `--force`-free.
+
 **File:** `.github/workflows/nightly.yml:65-68`, `.github/workflows/squash-reset.yml:39-42`;
 `/Users/jonb/Projects/betravedur/.gitignore`
 **Issue:** Both workflows do `git worktree add ./data-wt data` inside the main checkout but never
@@ -124,6 +146,12 @@ data-wt/
 ```
 
 ### WR-03: `copyShipSet` stages into a committed source dir (`site/public/data`) without clearing stale files
+
+**FIXED (0641155):** `copyShipSet` now `rmSync(to, { recursive: true, force: true })` for each
+ship-set target BEFORE copying, so a stale content-hashed `derived/{station}.{hash}.json` already
+committed in `site/public/data` can no longer survive into `site/dist`. Guarantees dest == src for
+the ship-set. `ship.test.ts` gained a regression asserting a pre-seeded `1350.OLDHASH.json` and a
+stale `stations.json` are removed/overwritten.
 
 **File:** `pipeline/src/ship.ts:31-44`; `.github/workflows/nightly.yml:110`
 **Issue:** `copyShipSet` copies `derived/` with `cpSync(..., { recursive: true })` and copies the
@@ -155,6 +183,8 @@ export function copyShipSet(srcRoot: string, destDir: string): void {
 
 ### IN-01: `resolveRoot` accepts a repeated `--root`; last one silently wins
 
+**FIXED (1bea5a3):** `resolveRoot` now `console.warn`s on a second `--root` (still last-wins).
+
 **File:** `pipeline/src/rawstore.ts:38-49`
 **Issue:** `resolveRoot(["--root", "a", "--root", "b"])` returns `root: "b"` with no warning. Not a
 correctness bug (last-wins is a reasonable CLI convention and downstream parsing is unaffected),
@@ -162,6 +192,9 @@ but a duplicated flag in a workflow edit would be silently swallowed rather than
 **Fix:** Optional — throw or `console.warn` on a second `--root`. Low priority.
 
 ### IN-02: `resolveRoot` does not validate the `--root` value (accepts `--root --foo` or empty string)
+
+**FIXED (1bea5a3):** `resolveRoot` now rejects an empty value or one that starts with `-`
+(`--root --kind`) with the usage error. `root-flag.test.ts` covers empty, next-flag, and repeat.
 
 **File:** `pipeline/src/rawstore.ts:40-45`
 **Issue:** The only guard is `value === undefined`. `resolveRoot(["--root", "--kind"])` treats
@@ -177,6 +210,11 @@ if (value === undefined || value === "" || value.startsWith("-")) {
 ```
 
 ### IN-03: `enumerateStations` has no explicit handling for a failed `/stations` fetch
+
+**DEFERRED:** Now that WR-01 wires the helper into CI, a `/stations` failure would fail-loud in the
+dispatch (acceptable — a broken national fetch SHOULD abort the sweep). The optional contextual
+re-wrap was skipped as scope-expanding per the fix instructions; the propagated error already
+carries the `stations <status>: <body>` message from `fetchStations`.
 
 **File:** `pipeline/src/stations-list.ts:38-46`
 **Issue:** If the injected/real `fetchStations` rejects (the real one throws
