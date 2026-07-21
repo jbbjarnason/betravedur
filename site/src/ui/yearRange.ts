@@ -49,6 +49,9 @@ export function createYearRange(opts: YearRangeOptions): YearRangeHandle {
   const fromSel = document.createElement("select");
   fromSel.className = "year-range__select";
   fromSel.id = "year-from";
+  // C.3: explicit aria-label (belt-and-suspenders alongside the <label for> association) so the
+  // select has a self-contained, unambiguous Icelandic accessible name.
+  fromSel.setAttribute("aria-label", "Frá ári");
 
   const tilLabel = document.createElement("label");
   tilLabel.className = "year-range__label";
@@ -58,6 +61,7 @@ export function createYearRange(opts: YearRangeOptions): YearRangeHandle {
   const tilSel = document.createElement("select");
   tilSel.className = "year-range__select";
   tilSel.id = "year-til";
+  tilSel.setAttribute("aria-label", "Til árs");
 
   const clampFrom = Math.min(Math.max(opts.initialFrom, opts.min), opts.max);
   const clampTil = Math.min(Math.max(opts.initialTil, opts.min), opts.max);

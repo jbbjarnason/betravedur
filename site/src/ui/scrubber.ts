@@ -162,6 +162,10 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
     // aria-valuenow to the a11y tree from `value`, but not as a queryable DOM attribute; setting
     // it here makes the restored anchor assertable (UX-02 crafted-URL restore E2E).
     range.setAttribute("aria-valuenow", String(foldDoy(doy)));
+    // C.2: expose the human window label as aria-valuetext so a screen reader reads a date window
+    // (e.g. "16. júlí–15. ágúst") instead of the raw day-of-year number. Reuses the exact label
+    // the visible readout shows.
+    range.setAttribute("aria-valuetext", label);
     paintTrack(doy);
   };
 

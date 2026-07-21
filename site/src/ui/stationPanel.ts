@@ -395,8 +395,13 @@ export function mountStationPanel(
     // captured marker-pill launcher is usually a DETACHED node by teardown — falling to <body>
     // would strand the keyboard user. Never fall to <body>: if the launcher is gone, focus a
     // STABLE always-present element (the top-right info (i) button, else the map container).
-    if (returnFocusTo && document.contains(returnFocusTo)) {
-      returnFocusTo.focus();
+    // A valid return target is a live, focusable element that is NOT <body> — the launcher may be
+    // a detached marker pill (overlay re-render) OR <body> itself (a store-driven open with no live
+    // launcher, e.g. a permalink), and focusing <body> leaves the keyboard user stranded.
+    const validReturn =
+      returnFocusTo && returnFocusTo !== document.body && document.contains(returnFocusTo);
+    if (validReturn) {
+      returnFocusTo!.focus();
     } else {
       const fallback =
         document.querySelector<HTMLElement>(".info-button") ??
@@ -695,7 +700,12 @@ export function mountStationPanel(
     // element — so a station→station switch keeps returning focus to the original marker/row, and
     // never to a removed node (which would drop focus to <body>). Capturing document.activeElement
     // HERE (post-append) would point at the old panel's close button on a switch — the fixed bug.
-    if (launcher && !section.contains(launcher) && document.contains(launcher)) {
+    if (
+      launcher &&
+      launcher !== document.body && // a store-driven open (permalink) has <body> active — not a launcher
+      !section.contains(launcher) &&
+      document.contains(launcher)
+    ) {
       returnFocusTo = launcher;
     }
     // Move focus to the close button so keyboard/SR users land in the new content (and Escape is

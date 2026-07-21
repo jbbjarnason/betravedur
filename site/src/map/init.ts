@@ -51,6 +51,25 @@ export function initMap(container: HTMLElement): maplibregl.Map {
     "bottom-right",
   );
 
+  // v1.1 attribution-occlusion fix: with compact:true MapLibre still AUTO-EXPANDS the credit to a
+  // full-width, wrapping bar whenever the map is wide (offsetWidth > 640) by adding
+  // `maplibregl-compact-show` at boot. That expanded bar slides under the bottom-left legend AND the
+  // bottom-right ranked list at desktop widths (a licensing-legibility bug). Strip the auto-added
+  // `-show` once the control mounts so the credit boots COLLAPSED to the small `(i)` toggle — the
+  // only state that never occludes a panel. The user can still click `(i)` to expand it (MapLibre
+  // re-adds `-show`), and the info panel always carries the full CC BY 4.0 / OSM / Protomaps /
+  // Veðurstofa credit as the licensing backstop. Runs after the control's DOM is in place.
+  const collapseCredit = (): void => {
+    map
+      .getContainer()
+      .querySelectorAll(".maplibregl-ctrl-attrib.maplibregl-compact-show")
+      .forEach((el) => el.classList.remove("maplibregl-compact-show"));
+  };
+  // The control appends its DOM synchronously on addControl; collapse now and again after the first
+  // idle so a late layout pass (which can re-trigger MapLibre's auto-show) is also caught.
+  collapseCredit();
+  map.once("idle", collapseCredit);
+
   // UX-05 map-load-error (Phase 3 debt): a MapLibre style / PMTiles / tile failure surfaces here
   // as a visible TEXT alert over the basemap instead of the silent console.error it used to be.
   // The raw error is logged (T-07-01: never rendered into the overlay); the overlay shows only the

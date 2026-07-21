@@ -274,6 +274,14 @@ export function mountRankedList(
     // Score: rankStations only yields score !== null rows, so the `as number` is sound.
     const scoreText = formatScore(datum.score as number);
     if (scoreEl.textContent !== scoreText) scoreEl.textContent = scoreText;
+
+    // C.1: give the row button a distinct human-readable accessible name so a screen reader reads
+    // "1. Reykjavík, einkunn 8,5" instead of the concatenated span text "1.Reykjavík8,5". Matches
+    // the marker aria phrasing (markers.ts: "...einkunn ${formatScore(score)}"). Rebuilt here on
+    // every recompute so rank/name/score/missingRain changes stay reflected. Set via aria-label
+    // string assignment only (no innerHTML) — T-05-05 name-injection discipline preserved.
+    const rainSuffix = datum.missingRain ? `, ${COPY.aununrkomu}` : "";
+    btn.setAttribute("aria-label", `${rank}. ${datum.name}, einkunn ${scoreText}${rainSuffix}`);
   };
 
   // ── Refresh: re-rank + reconcile rows in place (or render the empty state) ─────

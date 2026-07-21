@@ -208,7 +208,9 @@ test.describe("Phase 7 responsive/attribution criteria (07-UI-SPEC §Acceptance-
     await waitForShell(page);
     // Chips are compact toggles, not permanently-docked panels.
     const rankedChip = page.getByRole("button", { name: "Bestu staðir" });
-    const legendChip = page.getByRole("button", { name: "Einkunn" });
+    // exact: the ranked-row buttons now carry "…, einkunn 8,5" accessible names (v1.1 C.1), so a
+    // substring "Einkunn" match would be ambiguous — the legend chip's name is exactly "Einkunn".
+    const legendChip = page.getByRole("button", { name: "Einkunn", exact: true });
     await expect(rankedChip).toBeVisible();
     await expect(legendChip).toBeVisible();
     // Tapping "Bestu staðir" reveals the list body; tapping "Einkunn" reveals the legend body.

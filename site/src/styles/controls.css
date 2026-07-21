@@ -295,6 +295,28 @@
   margin-bottom: calc(var(--attrib-safe-bottom, 0px) + var(--space-sm));
 }
 
+/* v1.1 attribution-occlusion fix (the real live behavior): with `compact:true` MapLibre STILL
+ * auto-expands the credit to a full-width, multi-line bar whenever the map is wide enough
+ * (offsetWidth > 640) — it does NOT stay a single-line `(i)` toggle on desktop. A full-width,
+ * variable-height credit bar slides underneath BOTH the bottom-left legend and the bottom-right
+ * ranked list (measured: it wrapped to 3-4 lines at 768/390 and overlapped both panels). No fixed
+ * safe-band can clear a wrapped credit whose height changes with width. init.ts now strips the
+ * auto-added `maplibregl-compact-show` at boot so the credit boots COLLAPSED to the small `(i)`
+ * toggle in the bottom-right corner — the state that never occludes a panel. When the user clicks
+ * `(i)`, MapLibre re-adds `-show` and this rule lets the fly-out expand normally (it is a transient
+ * the user opts into, and the full CC BY 4.0 / OSM / Protomaps / Veðurstofa credit is always in the
+ * info panel as the licensing backstop). We right-align + cap the OPEN fly-out so it stays in the
+ * bottom-right quadrant and does not sprawl the full width under the left legend. */
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib.maplibregl-compact-show {
+  max-width: min(62vw, 340px);
+  text-align: right;
+  margin-left: auto;
+}
+.maplibregl-ctrl-bottom-right .maplibregl-ctrl-attrib.maplibregl-compact-show
+  .maplibregl-ctrl-attrib-inner {
+  text-align: right;
+}
+
 /* ── Reduced motion: instant swaps, no easing (continues the Phase 3 marker rule) ──────── */
 @media (prefers-reduced-motion: reduce) {
   .control-bar,
