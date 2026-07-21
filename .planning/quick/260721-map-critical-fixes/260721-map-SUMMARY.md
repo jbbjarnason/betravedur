@@ -44,5 +44,20 @@ the live site, fixed with a fast localhost dev loop, verified.
 - Unit (vitest): 373 passed; site `tsc --noEmit`: 0.
 - Full Playwright E2E: green (after the two flake fixes — see the final verify run).
 
+## Follow-up: national marker density (found during live verification)
+
+The national map (375 stations) rendered ~109 overlapping pills at the country overview — a
+cluttered wall (invisible on the 2-sample preview the E2E uses). Live-tuned against the real data:
+- `markers.ts`: zoom-adaptive collision `text-padding` (`["interpolate",["linear"],["zoom"],5,32,8,8,11,2]`)
+  → ~22 readable markers at the overview, more revealed on zoom-in. Ranked list still lists all.
+- `markers.ts`: scored stations win the collision over muted "ófullnægjandi gögn" pills
+  (`collisionPriority`), so the overview surfaces useful scores; insufficient stations still show
+  where they are the only option.
+- `score.spec` crit 8/9: frame the SW samples before asserting on a specific decluttered marker.
+- Commit `3cd8868`. Full E2E 91 passed / 0 failed after.
+
 ## Deferred (unchanged)
 - Protomaps "ICELAND"/"Ísland" label duplication (known basemap-flavor limitation).
+- Consider prioritizing scored markers even more / a legend note that muted = insufficient for the
+  current window (many stations are muted for a narrow default week + 2017 baseline — honest, but
+  a wider default baseline or window would surface more scores on first load).
