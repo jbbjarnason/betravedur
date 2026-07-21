@@ -13,7 +13,7 @@
 //   D. raw never shipped: the ship output set is exactly derived/ + stations.json +
 //      manifest.json — `raw/` is not among the ship-listed outputs.
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, existsSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { DailyObservation, StationType, WindowSpec } from "@betravedur/domain";
@@ -31,6 +31,7 @@ import {
   aggregateAll,
   countQualifyingYears,
   fullStoreQualifyingCounts,
+  pruneOrphanedDerived,
   shipOutputs,
   SUMMER_WINDOW_START_DOY,
   SUMMER_WINDOW_END_DOY,
@@ -289,6 +290,48 @@ describe("fullStoreQualifyingCounts: stations.json reflects the WHOLE store, not
     };
     const full = fullStoreQualifyingCounts(root, manifest, new Map());
     expect(full.get(AWS_STATION)).toBe(0);
+  });
+});
+
+describe("derived storage stays lean — no stale content-hash accumulation", () => {
+  it("pruneOrphanedDerived removes files the manifest does not reference, keeps referenced ones", () => {
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, [2020]));
+    let manifest: Manifest = { stations: {} };
+    manifest = aggregateStation(root, AWS_STATION, "sj" as StationType, manifest);
+    const kept = manifest.stations[AWS_STATION]!.file; // "derived/1350.<hash>.json"
+
+    // Simulate stale orphans left by earlier runs (older content-hash versions + a foreign id).
+    writeFileSync(join(root, "derived", `${AWS_STATION}.deadbeef00.json`), "{}\n");
+    writeFileSync(join(root, "derived", "9999.cafebabe11.json"), "{}\n");
+    expect(readdirSync(join(root, "derived")).length).toBe(3);
+
+    const removed = pruneOrphanedDerived(root, manifest);
+    expect(removed.sort()).toEqual(
+      [`derived/${AWS_STATION}.deadbeef00.json`, "derived/9999.cafebabe11.json"].sort(),
+    );
+    // Only the manifest-referenced file survives.
+    const left = readdirSync(join(root, "derived"));
+    expect(left).toEqual([kept.replace("derived/", "")]);
+    expect(existsSync(join(root, kept))).toBe(true);
+  });
+
+  it("re-aggregating a station whose content changed deletes the SUPERSEDED derived file", () => {
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, [2020]));
+    let manifest: Manifest = { stations: {} };
+    manifest = aggregateStation(root, AWS_STATION, "sj" as StationType, manifest);
+    const oldFile = manifest.stations[AWS_STATION]!.file;
+    expect(existsSync(join(root, oldFile))).toBe(true);
+
+    // Add another year → different content → new hash → the old file must be pruned on write.
+    upsertPartition(root, AWS_STATION, seedRows(AWS_STATION, [2021]));
+    manifest = aggregateStation(root, AWS_STATION, "sj" as StationType, manifest);
+    const newFile = manifest.stations[AWS_STATION]!.file;
+
+    expect(newFile).not.toBe(oldFile); // content changed → new hash
+    expect(existsSync(join(root, newFile))).toBe(true);
+    expect(existsSync(join(root, oldFile))).toBe(false); // superseded file gone
+    // Exactly one derived file remains for the station.
+    expect(readdirSync(join(root, "derived")).length).toBe(1);
   });
 });
 

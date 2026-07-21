@@ -24,6 +24,7 @@ import {
   readFileSync,
   writeFileSync,
   existsSync,
+  rmSync,
 } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import type {
@@ -219,8 +220,41 @@ export function aggregateStationWithDerived(
     assertUnderRoot(root, outPath);
     mkdirSync(dirname(outPath), { recursive: true });
     writeFileSync(outPath, bytes);
+    // Prune the SUPERSEDED derived file so old content-hash versions never accumulate. Without
+    // this, every content change (a re-fetch, a fuller history) leaves the previous
+    // `derived/{station}.{oldhash}.json` on disk — `git add -A` then commits it to the data branch
+    // AND `copyShipSet` ships the whole derived/ dir, bloating the repo + the Pages deploy with
+    // files the manifest no longer references.
+    if (existing && existing.file !== next.stations[station]!.file) {
+      const stalePath = join(root, existing.file);
+      assertUnderRoot(root, stalePath);
+      rmSync(stalePath, { force: true });
+    }
   }
   return { manifest: next, derived };
+}
+
+/**
+ * Self-healing sweep: remove every `derived/*.json` NOT referenced by the manifest. Belt-and-
+ * suspenders over the per-write prune above — it also cleans orphans left by earlier runs (or a
+ * crash between a derived write and the manifest update), guaranteeing `derived/` on disk equals
+ * exactly the manifest-referenced set after each aggregate. Returns the removed relative paths.
+ */
+export function pruneOrphanedDerived(root: string, manifest: Manifest): string[] {
+  const derivedDir = join(root, "derived");
+  if (!existsSync(derivedDir)) return [];
+  const referenced = new Set(Object.values(manifest.stations).map((e) => e.file));
+  const removed: string[] = [];
+  for (const name of readdirSync(derivedDir)) {
+    if (!name.endsWith(".json")) continue;
+    const rel = `derived/${name}`;
+    if (referenced.has(rel)) continue;
+    const p = join(root, rel);
+    assertUnderRoot(root, p);
+    rmSync(p, { force: true });
+    removed.push(rel);
+  }
+  return removed;
 }
 
 /**
@@ -324,11 +358,16 @@ export async function main(argv: string[]): Promise<void> {
 
   writeFileSync(join(root, "stations.json"), serializeStationsJson(entries));
 
+  // Self-healing prune: drop any derived/*.json the manifest no longer references so stale
+  // content-hash versions never accumulate on the data branch / in the Pages payload.
+  const pruned = pruneOrphanedDerived(root, manifest);
+
   const sizes = specs
     .map((s) => `${s.id}(${manifest.stations[s.id]?.hash ?? "—"})`)
     .join(", ");
   console.log(
-    `[aggregate] ${specs.length} station(s) -> derived/ + manifest.json + stations.json; hashes: ${sizes}`,
+    `[aggregate] ${specs.length} station(s) -> derived/ + manifest.json + stations.json` +
+      `${pruned.length ? ` (pruned ${pruned.length} orphaned derived)` : ""}; hashes: ${sizes}`,
   );
 }
 
