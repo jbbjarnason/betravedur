@@ -14,10 +14,6 @@ A visitor picks a time-of-year period and instantly sees, on a map, where in Ice
 
 ### Validated
 
-(None yet — ship to validate)
-
-### Validated
-
 <!-- Shipped v1.0 — all 8 phases verified, milestone audit passed 2026-07-21. -->
 
 - ✓ Interactive map of Iceland (pan/zoom, station callout markers, zoom-dependent density) — v1.0 (Phase 3)
@@ -68,13 +64,13 @@ A visitor picks a time-of-year period and instantly sees, on a map, where in Ice
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Historical climatology, not forecasts | Forecasts are covered by gottvedur.is; the gap is "where has weather been good" | — Pending |
-| Veðurstofan as data source | Real station measurements over reanalysis grids; official Icelandic source | — Pending |
-| Combined weather score (temp + rain + wind) | Single at-a-glance ranking for "where to go"; possibly user-adjustable weights later | — Pending |
-| Static site + GitHub Pages + nightly Actions | Zero hosting cost, zero ops; data committed to repo | — Pending |
-| Candlesticks for temp & wind, bars for rain | User's preferred visual language; rain encoding still open | — Pending |
-| Chart panel on station click | Keeps map context while showing detail, like gottvedur.is feel | — Pending |
-| Icelandic-only | Primary audience is Icelanders planning domestic trips | — Pending |
+| Historical climatology, not forecasts | Forecasts are covered by gottvedur.is; the gap is "where has weather been good" | ✓ Good |
+| Veðurstofan as data source | Real station measurements over reanalysis grids; official Icelandic source | ✓ Good |
+| Combined weather score (temp + rain + wind) | Single at-a-glance ranking for "where to go"; possibly user-adjustable weights later | ✓ Good |
+| Static site + GitHub Pages + nightly Actions | Zero hosting cost, zero ops; data committed to repo | ✓ Good |
+| Candlesticks for temp & wind, bars for rain | User's preferred visual language; rain encoding still open | ✓ Good |
+| Chart panel on station click | Keeps map context while showing detail, like gottvedur.is feel | ✓ Good |
+| Icelandic-only | Primary audience is Icelanders planning domestic trips | ✓ Good |
 
 ## Evolution
 
