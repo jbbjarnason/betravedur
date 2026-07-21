@@ -8,16 +8,24 @@
 import { layers, namedFlavor } from "@protomaps/basemaps";
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 
-/** UI-SPEC Color: Dominant (60%) map base tone. */
-const DOMINANT = "#e8ebed";
+/**
+ * Two muted base tones so the COASTLINE stays legible (the whole point of a station map).
+ * Earlier both land and water were muted to a single --dominant, which erased Iceland's shape:
+ * the map read as a flat gray field with floating labels. Keeping the land clearly LIGHTER than
+ * the sea restores figure-ground — Iceland reads as a light landmass on a cooler, darker sea —
+ * while both stay muted enough that the white station callouts remain the visual figure.
+ */
+const LAND = "#eef1f2"; /* light neutral land — near white, but not white (callouts still pop) */
+const SEA = "#cdd7de"; /* cooler, darker sea so the coast is clearly visible against the land */
 
 /** BASE_URL is statically replaced by Vite ("/betravedur/" in prod, "/" in dev). */
 const BASE = import.meta.env.BASE_URL;
 
 /**
- * Push the grayscale flavor's background/water/land fills toward --dominant so the
- * basemap reads muted. Targets layers by id substring (protomaps v4 schema); a pure
- * paint override, leaving geometry/labels untouched.
+ * Recolor the grayscale flavor to the two muted base tones. Water-family fills (+ the low-zoom
+ * background, which IS the open sea before water polygons load) become SEA; land-family fills
+ * become LAND. Targets layers by id substring (protomaps v4 schema); a pure paint override that
+ * leaves geometry/labels untouched.
  */
 function muteToDominant(
   baseLayers: LayerSpecification[],
@@ -25,20 +33,24 @@ function muteToDominant(
   return baseLayers.map((layer): LayerSpecification => {
     const id = layer.id;
     if (layer.type === "background") {
+      // The background shows through as the open ocean at every zoom — make it the SEA tone so
+      // the sea reads consistently even where water polygons are sparse / not yet loaded.
       return {
         ...layer,
-        paint: { ...layer.paint, "background-color": DOMINANT },
+        paint: { ...layer.paint, "background-color": SEA },
       };
+    }
+    if (layer.type === "fill" && id.includes("water")) {
+      return { ...layer, paint: { ...layer.paint, "fill-color": SEA } };
     }
     if (
       layer.type === "fill" &&
-      (id.includes("water") ||
-        id.includes("earth") ||
+      (id.includes("earth") ||
         id.includes("landcover") ||
         id.includes("landuse") ||
         id.includes("natural"))
     ) {
-      return { ...layer, paint: { ...layer.paint, "fill-color": DOMINANT } };
+      return { ...layer, paint: { ...layer.paint, "fill-color": LAND } };
     }
     return layer;
   });

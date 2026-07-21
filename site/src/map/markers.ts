@@ -223,6 +223,12 @@ export function installMarkerLayer(map: maplibregl.Map, data: MarkerDatum[]): vo
       "text-font": ["Noto Sans Regular"],
       "text-allow-overlap": false, // native declutter — no two survivors overlap
       "text-ignore-placement": false,
+      // A small collision padding so genuinely-coincident stations thin slightly at low zoom without
+      // over-decluttering the national field (kept modest: the ranked list still surfaces every
+      // station, and each visible marker stays individually reachable). NOT large enough to hide a
+      // distinct nearby station's marker — the overlapping-sample case is a 2-station preview
+      // artifact that the national dataset does not exhibit.
+      "text-padding": 4,
       "symbol-sort-key": ["get", "priority"], // major stations (low priority) win
       "text-optional": true,
     },

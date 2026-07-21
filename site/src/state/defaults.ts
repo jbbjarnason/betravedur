@@ -56,7 +56,7 @@ export function yearBounds(manifest: Manifest): YearBounds {
  *  - widthDays = 7 (1 vika),
  *  - yearTil = bounds.max, yearFrom = max(bounds.min, bounds.max - 9) (last 10 yr, clamped),
  *  - stationId = null (no station preselected),
- *  - viewport = the init.ts Iceland framing (lng -19, lat 65, zoom 6).
+ *  - viewport = the init.ts Iceland framing (lng -18.7, lat 64.9, zoom 5.4 — whole island + sea margin).
  * `now` defaults to `new Date()`; passing a fixed date makes the anchor deterministic in tests.
  */
 export function defaultSelection(bounds: YearBounds, now: Date = new Date()): SelectionState {
@@ -70,8 +70,8 @@ export function defaultSelection(bounds: YearBounds, now: Date = new Date()): Se
     yearFrom,
     yearTil,
     stationId: null,
-    lng: -19.0,
-    lat: 65.0,
-    zoom: 6,
+    lng: -18.7,
+    lat: 64.9,
+    zoom: 5.4, // frame the WHOLE island with a sea margin on load (matches init.ts framing)
   };
 }

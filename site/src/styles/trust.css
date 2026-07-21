@@ -109,8 +109,10 @@
 }
 
 /* ── Info "i" button: persistent top-right, in the 56px header band (z10, clears the wordmark) ──
- * Transparent → --dominant on hover; the standard 2px ink focus ring. NEVER accent. The 24×24
- * glyph sits inside a ≥44px hit target (min-width/height 44px). Ink stroke on the glyph. */
+ * SUBTLE by default: a muted-ink glyph at reduced opacity so it reads as a quiet affordance, not a
+ * competing control — it strengthens to full muted-ink on hover/focus. Transparent → --dominant on
+ * hover; the standard 2px ink focus ring. NEVER accent. The 24×24 glyph sits inside a ≥44px hit
+ * target (min-width/height 44px). Still meets the 44px tap target + a visible focus ring. */
 .info-button {
   position: fixed;
   top: 6px; /* vertically centres the 44px target in the 56px header band */
@@ -125,8 +127,14 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--ink); /* the glyph strokes/fills currentColor = ink; never accent */
+  color: var(--muted-ink); /* muted glyph — quiet affordance, never accent/ink */
+  opacity: 0.7; /* subtle at rest… */
   cursor: pointer;
+  transition: opacity 120ms ease, background 120ms ease;
+}
+.info-button:hover,
+.info-button:focus-visible {
+  opacity: 1; /* …crisp on interaction */
 }
 .info-button:hover {
   background: var(--dominant);

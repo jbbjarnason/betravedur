@@ -155,12 +155,12 @@ describe("paramsToState clamps (ASVS V5)", () => {
 
   it("clamps viewport lat/lng within Iceland maxBounds and zoom within [4,12]", () => {
     const s = paramsToState("v=1000,-1000,999", BOUNDS, FALLBACK);
-    expect(s.lat).toBe(67.5);
-    expect(s.lng).toBe(-26);
+    expect(s.lat).toBe(70.5);
+    expect(s.lng).toBe(-35);
     expect(s.zoom).toBe(12);
     const s2 = paramsToState("v=0,0,0", BOUNDS, FALLBACK);
-    expect(s2.lat).toBe(62.5);
-    expect(s2.lng).toBe(-12);
+    expect(s2.lat).toBe(59.0);
+    expect(s2.lng).toBe(-3);
     expect(s2.zoom).toBe(4);
   });
 });

@@ -49,9 +49,9 @@ describe("defaultSelection (SEL-02) — today's week over the last 10 years", ()
     expect(s.yearTil).toBe(2026);
     expect(s.yearFrom).toBe(2017); // max(1949, 2026-9)
     expect(s.stationId).toBeNull();
-    expect(s.lng).toBe(-19.0);
-    expect(s.lat).toBe(65.0);
-    expect(s.zoom).toBe(6);
+    expect(s.lng).toBe(-18.7);
+    expect(s.lat).toBe(64.9);
+    expect(s.zoom).toBe(5.4);
   });
 
   it("clamps yearFrom to bounds.min when fewer than 10 years are available", () => {

@@ -28,10 +28,10 @@ const ALLOWED_WIDTHS = [7, 14, 21, 30] as const;
 type AllowedWidth = (typeof ALLOWED_WIDTHS)[number];
 
 /** Iceland viewport clamp bounds (mirrors map/init.ts maxBounds + min/max zoom). */
-const LNG_MIN = -26;
-const LNG_MAX = -12;
-const LAT_MIN = 62.5;
-const LAT_MAX = 67.5;
+const LNG_MIN = -35;
+const LNG_MAX = -3;
+const LAT_MIN = 59.0;
+const LAT_MAX = 70.5;
 const ZOOM_MIN = 4;
 const ZOOM_MAX = 12;
 

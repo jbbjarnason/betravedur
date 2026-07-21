@@ -29,13 +29,18 @@ export function initMap(container: HTMLElement): maplibregl.Map {
 
   const map = new maplibregl.Map({
     container,
-    center: [-19.0, 65.0], // UI-SPEC: Iceland
-    zoom: 6,
-    minZoom: 4,
+    center: [-18.7, 64.9], // UI-SPEC: Iceland (centroid of the island incl. the NW peninsula)
+    zoom: 5.4, // frame the whole island with a margin of sea on load
+    minZoom: 4.2, // allow a real zoom-OUT (whole island + surrounding sea); was clamped to ~6
     maxZoom: 12,
+    // A GENEROUS bound (island + a wide sea margin) instead of a tight box. The old
+    // [-26,62.5]..[-12,67.5] box was so tight MapLibre clamped the minimum zoom to ~6, so the map
+    // physically could not zoom out. This looser bound keeps the view over the North-Atlantic
+    // neighbourhood (never lets you wander off to blank tiles) while leaving room to zoom out and
+    // pan around the coast. minZoom (not the bound) now governs how far out you can go.
     maxBounds: [
-      [-26, 62.5],
-      [-12, 67.5],
+      [-35, 59.0],
+      [-3, 70.5],
     ],
     dragRotate: false, // flat north-up station map
     pitchWithRotate: false,

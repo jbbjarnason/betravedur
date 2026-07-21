@@ -45,11 +45,29 @@ async function waitForMarkers(page: Page): Promise<void> {
   );
 }
 
-/** Open the panel by clicking the first rendered marker pill; returns its station id. */
+/**
+ * Open the panel by clicking a REACHABLE marker pill; returns its station id.
+ *
+ * The committed 2-station sample (Reykjavík #1, Keflavík #1350) sits in the SW and the pills can
+ * overlap at the default framing, so the first pill in DOM order may have its centre covered by its
+ * neighbour — exactly what a real user clicking the overlap experiences (they hit the top pill).
+ * Pick the pill that is actually hit-testable at its own centre (the top one), mirroring real
+ * pointer behaviour, rather than a covered pill Playwright's actionability check can never resolve.
+ * The national dataset does not exhibit this overlap; this only makes the preview-build helper
+ * robust.
+ */
 async function openPanelViaMarker(page: Page): Promise<string> {
-  const pill = page.locator(PILL).first();
-  const station = (await pill.getAttribute("data-station")) ?? "";
-  await pill.click();
+  const station = await page.evaluate(() => {
+    const pills = [...document.querySelectorAll<HTMLElement>("#marker-overlay [data-station]")];
+    for (const el of pills) {
+      const r = el.getBoundingClientRect();
+      const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      if (top && el.contains(top)) return el.getAttribute("data-station"); // hit-testable
+    }
+    return pills[0]?.getAttribute("data-station") ?? null;
+  });
+  if (!station) throw new Error("no reachable marker pill to open the panel");
+  await page.locator(`${PILL}[data-station="${station}"]`).click();
   await page.locator(PANEL).waitFor({ state: "visible", timeout: 5_000 });
   return station;
 }

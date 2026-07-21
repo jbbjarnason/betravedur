@@ -121,6 +121,19 @@
   font-weight: 400;
 }
 
+/* Overlapping-marker reachability: when two nearby stations' pills overlap (the collision layer
+ * declutters by the tiny text-proxy footprint, but the rendered pills are far wider), the pill
+ * underneath is unclickable — its centre is covered by the neighbour on top. Raising the
+ * hovered/focused/selected pill above its siblings brings it to the front so a pointer OR keyboard
+ * user can always reach it (and Playwright's hover-then-click hit-test resolves to it). Pure
+ * z-order within the overlay; no layout shift. */
+.marker-pill:hover,
+.marker-pill:focus,
+.marker-pill:focus-visible,
+.marker-pill--selected {
+  z-index: 2;
+}
+
 /* Focus-ready outline skeleton (activated in Phase 6; no handler now). */
 .marker-pill:focus-visible {
   outline: 2px solid var(--ink);

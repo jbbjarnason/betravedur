@@ -115,8 +115,11 @@ test.describe("Phase 7 info/trust criteria (07-UI-SPEC §Acceptance-Checkable Vi
     // Dismiss → the localStorage dismissed-hint flag `bv:info-dismissed` is set.
     await page.locator(`${INFO_PANEL} [aria-label="Loka"]`).click();
     await expect(panel).toBeHidden();
-    const dismissed = await page.evaluate(() => localStorage.getItem("bv:info-dismissed"));
-    expect(dismissed).toBe("1");
+    // Poll for the persisted flag: the <dialog> `close` handler writes it, but under load the write
+    // can land a tick after `toBeHidden` resolves — a bare immediate read was flaky.
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem("bv:info-dismissed")))
+      .toBe("1");
     // Reload (same context) → NOT auto-opened, but the button still opens it on demand.
     await page.reload();
     await waitForInfoChrome(page);

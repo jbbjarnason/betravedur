@@ -162,16 +162,18 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
       // Widen the range so at least one station's mean (hence score) shifts.
       store.set({ yearFrom: Math.max(1949, s.yearFrom - 20) });
     });
-    // Let the debounced recompute (120ms) + idle re-render settle.
-    await page.waitForTimeout(600);
-
-    const after = await readBadges();
-
-    // At least one station present in both frames changed its badge value.
-    const changed = Object.keys(before).some(
-      (st) => st in after && after[st] !== before[st],
-    );
-    expect(changed).toBe(true);
+    // Poll until at least one badge changes: the debounced recompute (120ms) + idle re-render
+    // varies under full-suite CPU load, so a fixed wait is flaky (the change lands ~450ms but can
+    // slip past a 600ms deadline). Poll to a generous ceiling instead — deterministic, not timed.
+    await expect
+      .poll(
+        async () => {
+          const now = await readBadges();
+          return Object.keys(before).some((st) => st in now && now[st] !== before[st]);
+        },
+        { timeout: 5_000 },
+      )
+      .toBe(true);
 
     // No /data/ fetch fired during the recolor (pure client-side read of the store).
     expect(dataRequests).toBe(0);
