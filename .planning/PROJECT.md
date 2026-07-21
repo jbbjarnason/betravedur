@@ -16,20 +16,29 @@ A visitor picks a time-of-year period and instantly sees, on a map, where in Ice
 
 (None yet — ship to validate)
 
+### Validated
+
+<!-- Shipped v1.0 — all 8 phases verified, milestone audit passed 2026-07-21. -->
+
+- ✓ Interactive map of Iceland (pan/zoom, station callout markers, zoom-dependent density) — v1.0 (Phase 3)
+- ✓ Station markers show historical averages: temperature, wind (speed + direction arrow), precipitation indicator — v1.0 (Phase 3, wind-direction bug fixed Phase 3)
+- ✓ Period selector: 1/2/3-week or 1-month time-of-year window — v1.0 (Phase 4)
+- ✓ Baseline year-range picker (e.g. 2010–2015) — v1.0 (Phase 4)
+- ✓ Every average states "meðaltal N ára" from real coverage, not the picker span — v1.0 (Phases 1+4)
+- ✓ Combined weather score (temp + rain + wind, renormalized) colors/ranks stations — v1.0 (Phases 1+5)
+- ✓ Clicking a station opens a chart panel: distribution boxplots for temp/wind, rain as bars, + daylight hours — v1.0 (Phase 6)
+- ✓ Data sourced from Veðurstofa Íslands station observations (CC BY 4.0 confirmed) — v1.0 (Phases 1+2)
+- ✓ Nightly GitHub Actions workflow fetches + appends new observations, auto-deploys — v1.0 (Phase 8)
+- ✓ Fully static site — no backend — v1.0 (Phase 3)
+- ✓ Hosted on GitHub Pages (deploy workflow wired; go-live needs push + Pages=Actions) — v1.0 (Phase 8)
+- ✓ Icelandic-language UI with slogan "Leitin að betra veðri" — v1.0 (all phases)
+- ✓ Score legend + transparent "hvernig er einkunnin reiknuð?" explainer + ranked "Bestu staðir" list — v1.0 (Phase 5)
+- ✓ Shareable URL state (period + years + station + viewport) — v1.0 (Phase 4)
+- ✓ Mobile bottom sheet + "sögulegt meðaltal, ekki spá" info panel + loading/empty/error states — v1.0 (Phase 7)
+
 ### Active
 
-- [ ] Interactive map of Iceland (gottvedur.is/kort-style: pan/zoom, station callout markers, zoom-dependent station density)
-- [ ] Station markers show historical averages: temperature, wind (speed + direction arrow), precipitation/condition indicator
-- [ ] Period selector: choose a time-of-year window of 1 week, 2 weeks, 3 weeks, or 1 month (climatology — the period is a time-of-year, not a specific year)
-- [ ] Baseline year-range picker: user selects which years the averages are computed over (e.g. 2010–2015)
-- [ ] Every average visibly states how many years it is based on (e.g. "meðaltal 14 ára")
-- [ ] Combined weather score (temperature + rain + wind) used to color/rank stations for "where has it been best"
-- [ ] Clicking a station opens a chart panel: candlestick charts for temperature and wind per day across the chosen years, rain as bars (or similar) underneath
-- [ ] Data sourced from Veðurstofa Íslands station observations
-- [ ] Nightly GitHub Actions workflow fetches new observations and appends them to the repo's data
-- [ ] Fully static site — no backend, no server-side runtime
-- [ ] Hosted on GitHub Pages
-- [ ] Icelandic-language UI
+(None — v1.0 milestone complete. Next milestone: full national backfill go-live + any v1.x features.)
 
 ### Out of Scope
 
@@ -85,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-19 after initialization*
+*Last updated: 2026-07-21 after v1.0 milestone completion (all 8 phases shipped + audited)*
