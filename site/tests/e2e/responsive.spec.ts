@@ -192,7 +192,7 @@ test.describe("Phase 7 responsive/attribution criteria (07-UI-SPEC §Acceptance-
     // Sheet close + drag handle (Plan 03) — each ≥44px pressable.
     await selectStation(page);
     for (const sel of [
-      `${PANEL} [aria-label="Loka"]`,
+      `${PANEL} [aria-label="Loka spjaldi"]`,
       `${PANEL} button[aria-label="Stækka eða minnka spjald"]`,
     ]) {
       const b = await page.locator(sel).boundingBox();

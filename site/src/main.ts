@@ -209,12 +209,26 @@ function wireMarkers(map: maplibregl.Map): void {
 
       const cache = buildStationCache(entries);
 
+      // (T-okx-01) The full set of station ids the map knows about — every scored entry plus every
+      // muted station. url.ts's paramsToState stays PURE/defensive (yields an integer or null); the
+      // known-id validation lives HERE, at the two seams where the parsed state reaches the store
+      // (boot below + popstate). An attacker-supplied `?st=<unknown>` is coerced to null before it
+      // reaches the store, so no empty station panel ever opens.
+      const knownStationIds = new Set<number>([
+        ...entries.map((e) => e.meta.station),
+        ...muted.map((m) => m.station),
+      ]);
+      const dropUnknownStation = (state: SelectionState): SelectionState =>
+        state.stationId !== null && !knownStationIds.has(state.stationId)
+          ? { ...state, stationId: null }
+          : state;
+
       // (2) Union year bounds + default, then hydrate from the URL (or default when no params).
       const bounds = yearBounds(manifest);
       const fallback = defaultSelection(bounds);
-      const initial: SelectionState = location.search
-        ? paramsToState(location.search, bounds, fallback)
-        : fallback;
+      const initial: SelectionState = dropUnknownStation(
+        location.search ? paramsToState(location.search, bounds, fallback) : fallback,
+      );
       const store = createStore(initial);
 
       // Expose the store for E2E driving (no-network proof, URL-restore assertions). The map
@@ -310,7 +324,7 @@ function wireMarkers(map: maplibregl.Map): void {
 
       // (6) popstate: the ONLY URL→store read after boot. Re-hydrate + restore the viewport.
       window.addEventListener("popstate", () => {
-        const restored = paramsToState(location.search, bounds, store.get());
+        const restored = dropUnknownStation(paramsToState(location.search, bounds, store.get()));
         store.set(restored);
         applyViewport(map, restored);
       });

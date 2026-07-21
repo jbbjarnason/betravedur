@@ -42,7 +42,7 @@ import type { MarkerDatum } from "../data/types.js";
 
 /** Copy — UI-SPEC Copywriting Contract, final Icelandic strings (verbatim). */
 const COPY = {
-  close: "Loka",
+  close: "Loka spjaldi",
   dragHandle: "Stækka eða minnka spjald",
   daylightLabel: "Dagsbirta",
   daylightUnit: "klst.",
@@ -390,9 +390,23 @@ export function mountStationPanel(
     // Attribution legibility (UI licensing): the right-docked panel no longer covers the
     // bottom-right MapLibre credit, so drop the offset class.
     document.body.classList.remove("panel-open");
-    // Return focus to the element that launched the panel (the marker pill / ranked row), else
-    // let it fall to <body> — continues the Phase-5 select-seam focus intent.
-    if (returnFocusTo && document.contains(returnFocusTo)) returnFocusTo.focus();
+    // Return focus to the element that launched the panel (the marker pill / ranked row). The
+    // marker overlay is re-rendered on every map move/idle (markers.ts replaceChildren), so a
+    // captured marker-pill launcher is usually a DETACHED node by teardown — falling to <body>
+    // would strand the keyboard user. Never fall to <body>: if the launcher is gone, focus a
+    // STABLE always-present element (the top-right info (i) button, else the map container).
+    if (returnFocusTo && document.contains(returnFocusTo)) {
+      returnFocusTo.focus();
+    } else {
+      const fallback =
+        document.querySelector<HTMLElement>(".info-button") ??
+        (() => {
+          const mapEl = document.getElementById("map");
+          if (mapEl && !mapEl.hasAttribute("tabindex")) mapEl.setAttribute("tabindex", "-1");
+          return mapEl;
+        })();
+      fallback?.focus();
+    }
     returnFocusTo = null;
   };
 

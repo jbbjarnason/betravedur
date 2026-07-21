@@ -114,6 +114,9 @@ header.app-header {
 }
 
 header.app-header .wordmark {
+  /* The wordmark is an <h1>: reset the UA heading margin so promoting <span>→<h1> is
+     visually identical. font-size/weight/line-height stay driven by this rule. */
+  margin: 0;
   font-size: var(--display-size);
   font-weight: var(--display-weight);
   line-height: 1.2;

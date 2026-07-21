@@ -274,12 +274,12 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
   );
 
   test(
-    "criterion 7: close (aria-label 'Loka') removes the panel, clears URL 'st', restores the ranked list [06-02]",
+    "criterion 7: close (aria-label 'Loka spjaldi') removes the panel, clears URL 'st', restores the ranked list [06-02]",
     async ({ page }) => {
       await waitForMarkers(page);
       await openPanelViaMarker(page);
       // Ranked list is yielded while open (see criterion 8).
-      await page.locator(`${PANEL} [aria-label="Loka"]`).click();
+      await page.locator(`${PANEL} [aria-label="Loka spjaldi"]`).click();
       await expect(page.locator(PANEL)).toHaveCount(0);
       // URL 'st' param cleared.
       const stParam = await page.evaluate(() => new URLSearchParams(location.search).get("st"));

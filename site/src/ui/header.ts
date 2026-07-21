@@ -11,7 +11,10 @@ export function renderHeader(mount: HTMLElement): void {
   mount.classList.add("app-header");
   mount.setAttribute("role", "banner");
 
-  const wordmark = document.createElement("span");
+  // The wordmark is the page's single <h1> landmark (a11y: exactly one top-level heading).
+  // Visual style comes entirely from the class-scoped `header.app-header .wordmark` rule; the
+  // UA h1 margin is reset in tokens.css so promoting <span>→<h1> is visually identical.
+  const wordmark = document.createElement("h1");
   wordmark.className = "wordmark";
   wordmark.textContent = WORDMARK;
 
