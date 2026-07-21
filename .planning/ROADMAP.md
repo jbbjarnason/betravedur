@@ -153,7 +153,11 @@ Plans:
   2. On new data the workflow aggregates touched stations, commits to the data branch, builds, and deploys to Pages automatically
   3. The pipeline runs off-peak with an external heartbeat so a silent stall is detectable, and the UI surfaces the resulting freshness date
   4. Nightly commits do not balloon .git history — data-branch partitioning / squash strategy keeps the repo within Pages limits
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0 foundation: --root flag on all pipeline CLIs (data dir vs branch collision fix) + missed-night self-heal test + full_backfill station enumeration + ship-set copy (no raw/)
+- [ ] 08-02-PLAN.md — nightly.yml workflow (off-peak cron + full_backfill dispatch + concurrency + least-privilege perms + test-gate + skip-empty + guarded heartbeat + deploy-pages@v4) + workflow-assertion test
+- [ ] 08-03-PLAN.md — Repo hardening: squash-reset.yml (force-push scoped to data, branch-asserted, never main) + PIPELINE.md live prereqs & squash cadence + force-push-scoping gate test
 
 ## Progress
 
@@ -169,4 +173,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Score Coloring & Ranking | 3/3 | Complete   | 2026-07-20 |
 | 6. Station Chart Panel | 3/3 | Complete   | 2026-07-20 |
 | 7. Responsive UX & Trust States | 3/3 | Complete   | 2026-07-20 |
-| 8. Nightly Pipeline & Repo Hardening | 0/TBD | Not started | - |
+| 8. Nightly Pipeline & Repo Hardening | 0/3 | Planned | - |
