@@ -43,7 +43,7 @@
   max-width: min(360px, calc(100vw - 2 * var(--space-md)));
   margin: 0 var(--space-md);
   padding: var(--space-md);
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--hairline);
@@ -95,9 +95,17 @@
  * + OSM guidance permit collapsing attribution behind an (i) button as long as the full credit is
  * findable, and it is: the info panel above carries the complete credit as the licensing backstop.
  * Plan 03 raises `--attrib-safe-bottom` to the mobile sheet peek top; this file owns the desktop
- * baseline (the control-bar height). */
+ * baseline (the control-bar height).
+ *
+ * v1.1 attribution-occlusion fix: `--panel-safe-bottom` is the SINGLE band the bottom-docked side
+ * panels (bottom-left legend, right-docked ranked list) must clear so the compact bottom-right
+ * CC BY 4.0 / OSM credit is NEVER occluded at any width. It extends `--attrib-safe-bottom` by a
+ * gap (--space-lg) plus a 32px credit-height allowance (the compact `(i)` credit is ~28-30px
+ * tall). This is the "reserve one band" philosophy applied to the panels — no per-surface hacks;
+ * score.css keys both panel `bottom` values off this one token. */
 :root {
   --attrib-safe-bottom: var(--bar-height, 100px);
+  --panel-safe-bottom: calc(var(--attrib-safe-bottom, 100px) + var(--space-lg) + 32px);
 }
 
 /* ── Info "i" button: persistent top-right, in the 56px header band (z10, clears the wordmark) ──
@@ -137,7 +145,7 @@
   padding: var(--space-md);
   border: 1px solid var(--hairline);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 2px 12px rgba(31, 41, 51, 0.22);
