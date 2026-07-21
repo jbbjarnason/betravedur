@@ -30,6 +30,7 @@ import {
   aggregateStationWithDerived,
   aggregateAll,
   countQualifyingYears,
+  fullStoreQualifyingCounts,
   shipOutputs,
   SUMMER_WINDOW_START_DOY,
   SUMMER_WINDOW_END_DOY,
@@ -233,6 +234,61 @@ describe("aggregate: full-chain raw -> derived -> decode -> domain", () => {
     expect(ship).toContain("stations.json");
     expect(ship).toContain("manifest.json");
     expect(ship).not.toContain("raw");
+  });
+});
+
+describe("fullStoreQualifyingCounts: stations.json reflects the WHOLE store, not just touched specs", () => {
+  it("decodes every manifest station's derived file so an incremental run cannot shrink stations.json", () => {
+    // Build a 2-station store: AWS with 4 fully-covered summer years (qualifies), SYNOP with 2.
+    // summerRows at fraction 1.0 clears the 80% summer-coverage gate for each year.
+    for (const y of [2018, 2019, 2020, 2021]) {
+      upsertPartition(root, AWS_STATION, summerRows(AWS_STATION, y, 1.0));
+    }
+    for (const y of [2020, 2021]) {
+      upsertPartition(root, SYNOP_STATION, summerRows(SYNOP_STATION, y, 1.0));
+    }
+    let manifest: Manifest = { stations: {} };
+    manifest = aggregateStation(root, AWS_STATION, "sj" as StationType, manifest);
+    manifest = aggregateStation(root, SYNOP_STATION, "sk" as StationType, manifest);
+
+    // An incremental run "touched" only SYNOP — its count is passed in; AWS is untouched.
+    const touched = new Map<number, number>([[SYNOP_STATION, 2]]);
+    const full = fullStoreQualifyingCounts(root, manifest, touched);
+
+    // AWS (untouched) is recomputed from its on-disk derived file — NOT dropped.
+    expect(full.get(AWS_STATION)).toBe(4);
+    // SYNOP keeps the freshly-computed touched count (reused, not re-decoded).
+    expect(full.get(SYNOP_STATION)).toBe(2);
+    // Every manifest station is represented.
+    expect(new Set(full.keys())).toEqual(new Set([AWS_STATION, SYNOP_STATION]));
+  });
+
+  it("reuses a touched count verbatim instead of re-decoding (touched wins)", () => {
+    for (const y of [2018, 2019, 2020, 2021]) {
+      upsertPartition(root, AWS_STATION, summerRows(AWS_STATION, y, 1.0));
+    }
+    let manifest: Manifest = { stations: {} };
+    manifest = aggregateStation(root, AWS_STATION, "sj" as StationType, manifest);
+    // A sentinel touched count that does NOT match the on-disk data proves reuse (no re-decode).
+    const full = fullStoreQualifyingCounts(root, manifest, new Map([[AWS_STATION, 99]]));
+    expect(full.get(AWS_STATION)).toBe(99);
+  });
+
+  it("contributes 0 (never throws) for a manifest entry whose derived file is missing", () => {
+    // Hand-craft a manifest that references a derived file that was never written.
+    const manifest: Manifest = {
+      stations: {
+        [AWS_STATION]: {
+          file: "derived/1350.deadbeef.json",
+          hash: "deadbeef",
+          from: 2000,
+          to: 2000,
+          lastFetched: "2026-01-01T00:00:00.000Z",
+        },
+      },
+    };
+    const full = fullStoreQualifyingCounts(root, manifest, new Map());
+    expect(full.get(AWS_STATION)).toBe(0);
   });
 });
 

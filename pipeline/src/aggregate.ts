@@ -130,6 +130,42 @@ export function countQualifyingYears(rows: DailyObservation[]): number {
 }
 
 /**
+ * Qualifying-years count for EVERY station in the manifest — not just this run's touched specs.
+ *
+ * WHY (the stations.json durability fix): stations.json is REGENERATED (not accumulated) on every
+ * aggregate call. If we build it from only the current run's specs, an incremental nightly
+ * (`aggregate synop:1 aws:1350`) shrinks stations.json back to the seed set — silently reverting a
+ * populated national map to 2 markers on the very next cron. So stations.json must reflect the
+ * WHOLE store: reuse the freshly-computed counts for touched stations, and decode each UNTOUCHED
+ * station's already-committed derived file to count its qualifying years (no network, no re-encode).
+ *
+ * A derived file that is missing or unparseable contributes a 0 count (the station simply fails the
+ * >=3 gate and drops out) rather than throwing — a single corrupt file must not abort the whole
+ * stations.json rebuild.
+ */
+export function fullStoreQualifyingCounts(
+  root: string,
+  manifest: Manifest,
+  touched: Map<number, number>,
+): Map<number, number> {
+  const out = new Map<number, number>(touched);
+  for (const idStr of Object.keys(manifest.stations)) {
+    const id = Number(idStr);
+    if (out.has(id)) continue; // touched this run — reuse the count already computed from fresh bytes
+    const entry = manifest.stations[id];
+    if (!entry) continue;
+    try {
+      const bytes = readFileSync(join(root, entry.file), "utf8");
+      const rows = decodeDerived(JSON.parse(bytes) as DerivedFile);
+      out.set(id, countQualifyingYears(rows));
+    } catch {
+      out.set(id, 0); // missing/corrupt derived -> 0 qualifying -> excluded (never throws)
+    }
+  }
+  return out;
+}
+
+/**
  * Aggregate ONE station: read all raw partitions, encode the derived file, content-hash it,
  * update the manifest, and write derived/{station}.{hash}.json ONLY when the hash changed
  * (touched-only). Returns the updated manifest (input is never mutated — updateManifest is pure).
@@ -275,10 +311,16 @@ export async function main(argv: string[]): Promise<void> {
   manifest = finalManifest;
 
   // Regenerate stations.json from the no-splice registry (fetched at the edge in Plan 03 style).
+  // DURABILITY (stations.json is regenerated, not accumulated): build it from the WHOLE store, not
+  // just this run's specs — otherwise an incremental nightly shrinks the national marker set back
+  // to the seed stations. `fullStoreQualifyingCounts` reuses the fresh touched counts and decodes
+  // every untouched station's derived file; `fetchStations` batches all ids into ONE /stations
+  // request, so the registry fetch stays a single call even for the full national set.
   const { fetchStations } = await import("@betravedur/fetch");
-  const ids = specs.map((s) => s.id);
-  const registry: StationMeta[] = await fetchStations(ids);
-  const entries = buildStationsJson(registry, qualifyingCounts);
+  const fullCounts = fullStoreQualifyingCounts(root, manifest, qualifyingCounts);
+  const allIds = Object.keys(manifest.stations).map((id) => Number(id));
+  const registry: StationMeta[] = await fetchStations(allIds);
+  const entries = buildStationsJson(registry, fullCounts);
 
   writeFileSync(join(root, "stations.json"), serializeStationsJson(entries));
 
