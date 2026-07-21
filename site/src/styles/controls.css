@@ -72,6 +72,8 @@
 .scrubber__range {
   appearance: none;
   -webkit-appearance: none;
+  flex: 1 1 auto; /* fill the row between the ‹ / › week buttons */
+  min-width: 0;
   width: 100%;
   height: 44px; /* 44px hit area; the visual track is 4px, centred */
   margin: 0;
@@ -137,12 +139,14 @@
   user-select: none;
 }
 
-/* ── Narrow-screen stepper (hidden on wide screens; swapped in under ~640px) ──────────── */
-.scrubber__stepper {
-  display: none;
+/* ── Scrubber control row: the ‹ week / slider / week › group on one line ─────────────── */
+.scrubber__control {
+  display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
+
+/* Week incrementor buttons (‹ / ›) — 44px touch target, flank the slider. */
 
 .scrubber__step {
   min-width: 44px;
@@ -240,8 +244,10 @@
   .scrubber__ticks {
     display: none;
   }
-  .scrubber__stepper {
-    display: flex;
+  /* The slider track collapses; the two ‹ / › week buttons remain and centre on their row,
+     with the window date readout above — a compact week stepper. */
+  .scrubber__control {
+    justify-content: center;
   }
   /* The stepper block takes a full row (it wraps the readout above), then the width group + year
      selects share the next row. Each child may shrink/wrap so nothing overflows innerWidth

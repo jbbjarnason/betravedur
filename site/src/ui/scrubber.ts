@@ -1,11 +1,13 @@
 // Day-of-year scrubber (SEL-01 anchor): a native <input type="range" min=1 max=365> restyled
-// to the Phase 3 tokens, plus an Icelandic date readout, month tick labels, and a narrow-screen
-// ‹ [date] › stepper. Framework-free: this module builds DOM + takes an onAnchorChange callback;
-// it does NOT import the store (controlBar.ts wires the callback to store.set).
+// to the Phase 3 tokens, plus an Icelandic date readout, month tick labels, and ‹ / › WEEK
+// incrementor buttons (±7 days) flanking the slider. Framework-free: this module builds DOM +
+// takes an onAnchorChange callback; it does NOT import the store (controlBar.ts wires it).
 //
 // The window is [anchor, anchor + widthDays − 1] folded to 1..365 (wrapping late-Dec windows
 // are legal — the domain owns the wrap). The date readout shows the window form "20.–26. júlí"
-// via windowLabel; the range fires `input` (continuous) and the stepper buttons step ±1.
+// via windowLabel; the range fires `input` (continuous), ArrowLeft/Right nudge ±1 day, and the
+// ‹ / › buttons (and PageUp/PageDown) step ±7 days — one week. On narrow screens the slider
+// track collapses and the two week buttons remain as the compact stepper.
 
 /** Lowercase 3-letter Icelandic month abbreviations, indexed 0..11 (UI-SPEC tick labels). */
 const MONTHS_ABBR = [
@@ -26,6 +28,27 @@ const MONTHS_ABBR = [
 /** Day-of-year (1-based) of the 1st of each month in the non-leap 2001 reference year. */
 const MONTH_START_DOY = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335] as const;
 
+/**
+ * Icelandic full month names for the day-then-month readout ("16. júlí"). Hand-rolled — NOT
+ * `Intl.DateTimeFormat("is-IS")`, which silently falls back to English month names + en-US
+ * ordering on a runtime without full is-IS ICU data (we observed "July 21" in the browser). Owning
+ * the strings guarantees Icelandic everywhere, mirroring the codebase's `formatIce` number pattern.
+ */
+const MONTHS_FULL = [
+  "janúar",
+  "febrúar",
+  "mars",
+  "apríl",
+  "maí",
+  "júní",
+  "júlí",
+  "ágúst",
+  "september",
+  "október",
+  "nóvember",
+  "desember",
+] as const;
+
 /** Fold any integer day-of-year into 1..365 (the domain's leap-folded doy range). */
 function foldDoy(doy: number): number {
   return (((doy - 1) % 365) + 365) % 365 + 1;
@@ -40,14 +63,12 @@ function refDate(doy: number): Date {
 
 /**
  * Icelandic full date for a day-of-year, day-then-lowercase-month, e.g. doy 197 → "16. júlí".
- * Uses Intl "is-IS" over the fixed non-leap 2001 reference (UI-SPEC / RESEARCH-verified).
+ * Hand-rolled over the fixed non-leap 2001 reference (see MONTHS_FULL) so the readout is Icelandic
+ * regardless of the runtime's ICU locale data — never the "July 21" en-US fallback.
  */
 export function doyLabel(doy: number): string {
-  return new Intl.DateTimeFormat("is-IS", {
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  }).format(refDate(doy));
+  const d = refDate(doy);
+  return `${d.getUTCDate()}. ${MONTHS_FULL[d.getUTCMonth()]}`;
 }
 
 /**
@@ -118,23 +139,24 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
     ticks.appendChild(t);
   }
 
-  // Narrow-screen ‹ [date] › stepper (CSS shows it under ~640px; buttons step anchor ±1).
-  const stepper = document.createElement("div");
-  stepper.className = "scrubber__stepper";
+  // Week incrementor: ‹ / › buttons that step the anchor by one WEEK (7 days). They flank the
+  // slider on desktop and stand in for it when the track collapses on narrow screens. Kept in the
+  // `scrubber__step` class (the E2E targets it). Fine ±1-day control still lives on the slider
+  // (ArrowLeft/Right / drag); these give a precise "previous/next week" nudge.
   const prev = document.createElement("button");
   prev.type = "button";
   prev.className = "scrubber__step";
-  prev.setAttribute("aria-label", "Fyrri dagur");
+  prev.setAttribute("aria-label", "Fyrri vika");
   prev.textContent = "‹";
-  const stepReadout = document.createElement("span");
-  stepReadout.className = "scrubber__readout";
-  stepReadout.setAttribute("aria-live", "polite");
   const next = document.createElement("button");
   next.type = "button";
   next.className = "scrubber__step";
-  next.setAttribute("aria-label", "Næsti dagur");
+  next.setAttribute("aria-label", "Næsta vika");
   next.textContent = "›";
-  stepper.append(prev, stepReadout, next);
+  // The slider and its two flanking week buttons share one row.
+  const control = document.createElement("div");
+  control.className = "scrubber__control";
+  control.append(prev, range, next);
 
   const paintTrack = (doy: number): void => {
     // Paint the selected-window span (anchor → anchor+width) as an --ink region on the
@@ -157,7 +179,6 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
   const syncReadouts = (doy: number): void => {
     const label = windowLabel(doy, width);
     readout.textContent = label;
-    stepReadout.textContent = doyLabel(doy);
     // Mirror the value into an explicit aria-valuenow DOM attribute. A native range exposes
     // aria-valuenow to the a11y tree from `value`, but not as a queryable DOM attribute; setting
     // it here makes the restored anchor assertable (UX-02 crafted-URL restore E2E).
@@ -195,10 +216,11 @@ export function createScrubber(opts: ScrubberOptions): ScrubberHandle {
     }
   });
 
-  prev.addEventListener("click", () => emit(Number(range.value) - 1));
-  next.addEventListener("click", () => emit(Number(range.value) + 1));
+  // ‹ / › step the anchor by one week (±7 days), the same delta as PageUp/PageDown.
+  prev.addEventListener("click", () => emit(Number(range.value) - PAGE_STEP_DAYS));
+  next.addEventListener("click", () => emit(Number(range.value) + PAGE_STEP_DAYS));
 
-  block.append(readout, range, ticks, stepper);
+  block.append(readout, control, ticks);
   syncReadouts(foldDoy(opts.initialDoy));
 
   return {
