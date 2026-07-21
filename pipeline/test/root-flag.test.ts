@@ -5,7 +5,7 @@
 // land in an explicit worktree, not the ambiguous `data` dir. resolveRoot is the seam that
 // pulls the explicit root off argv (or PIPELINE_ROOT env) and hands the remaining argv back
 // untouched so downstream spec/id parsing is unaffected.
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { resolveRoot, DEFAULT_ROOT } from "../src/rawstore.js";
 
 describe("resolveRoot: --root routes pipeline writes/reads to the intended dir", () => {
@@ -41,5 +41,22 @@ describe("resolveRoot: --root routes pipeline writes/reads to the intended dir",
 
   it("throws a usage error when --root is the final token (missing value)", () => {
     expect(() => resolveRoot(["aws:1", "--root"], {})).toThrow(/--root/);
+  });
+
+  it("rejects an empty --root value (IN-02)", () => {
+    expect(() => resolveRoot(["--root", "", "aws:1"], {})).toThrow(/--root/);
+  });
+
+  it("rejects a --root value that is actually the next flag (IN-02)", () => {
+    expect(() => resolveRoot(["--root", "--kind", "aws:1"], {})).toThrow(/--root/);
+  });
+
+  it("last-wins on a repeated --root and warns (IN-01)", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { root, rest } = resolveRoot(["--root", "a", "--root", "b", "aws:1"], {});
+    expect(root).toBe("b");
+    expect(rest).toEqual(["aws:1"]);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
   });
 });

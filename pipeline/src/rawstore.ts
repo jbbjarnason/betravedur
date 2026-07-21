@@ -38,8 +38,16 @@ export function resolveRoot(
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--root") {
       const value = argv[i + 1];
-      if (value === undefined) {
-        throw new Error("usage: --root <dir> requires a directory value");
+      // IN-02: reject a missing/empty value or a value that is actually the next flag
+      // (`--root --kind`), which would otherwise be taken as the root dir and, if empty,
+      // scatter `raw/...` writes relative to CWD.
+      if (value === undefined || value === "" || value.startsWith("-")) {
+        throw new Error("usage: --root <dir> requires a non-empty directory value");
+      }
+      // IN-01: a repeated --root silently last-wins; warn so a duplicated flag in a workflow
+      // edit is visible rather than swallowed.
+      if (root !== undefined) {
+        console.warn(`[rawstore] --root specified more than once; using the last value "${value}"`);
       }
       root = value;
       i += 1; // skip the value token too
