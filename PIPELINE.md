@@ -173,10 +173,10 @@ is byte-identical** — the working tree is fully preserved.
 - The `data` branch is **single-writer, force-push-owned by the pipeline**. It never has PRs and
   the squash-reset **force-pushes ONLY `data`**.
 - **NEVER force-push `main`.** The two-step recipe leaves the `main` worktree untouched by design.
-- **Push / force-push to a remote is deferred to Phase 8.** In Phase 2 the `data` branch is a
-  **local** commit only (this satisfies DATA-07 here). No remote is configured, and nothing that
-  touches `main` is ever force-pushed. Push and force-push safety are wired and exercised in
-  Phase 8 (nightly cron), not here.
+- **Push / force-push to a remote is owned by Phase 8.** In Phase 2 the `data` branch was a
+  **local** commit only (satisfying DATA-07 there). Phase 8 gives `data` its first push and wires
+  the nightly append + the scoped squash-reset force-push. No remote push ever touches `main`.
+  See **§8** for the live prerequisites and the exercised force-push safety.
 
 ---
 
@@ -187,3 +187,75 @@ pipeline and the browser re-group via `groupBySeasonYear` **after** `decodeDeriv
 "December head owns the season-year" wrap logic lives. Storing calendar years and re-grouping on
 decode keeps a wrapping Dec→Jan window's per-season N and mean identical to the raw-row domain
 path (locked by the wrapping round-trip test).
+
+---
+
+## 8. Nightly automation (Phase 8)
+
+Phase 8 schedules the pipeline in GitHub Actions: an off-peak cron ingests new observations,
+commits deltas to the orphan `data` branch, builds the site over the fresh derived files, and
+deploys to GitHub Pages. The data *logic* is unchanged from §1–§7 — Phase 8 is pure orchestration.
+
+### (a) Live prerequisites — do these ONCE before the first run
+
+The repo currently has **no git remote** (`git remote -v` is empty) and the `data` branch is
+**local-only** (Phase 2 never pushed it). Two one-time human setup steps unblock the first live run:
+
+1. **Push the repo to GitHub.** Create the GitHub repo and push `main`. The `data` branch gets its
+   **first push automatically** from the nightly workflow (the incremental commit step force-adds
+   `origin data` on first run); or push it manually once (`git push -u origin data`) to seed it.
+   Nothing the workflow does ever pushes or force-pushes `main`.
+2. **Set GitHub Pages Source = "GitHub Actions"** (Settings → Pages → Source), **not**
+   "Deploy from a branch". This creates the `github-pages` deployment environment the deploy job
+   targets via `actions/deploy-pages@v4`. Without this the deploy job cannot publish.
+
+Until both are done the workflow YAML is valid but the first run cannot complete — these are
+user-setup prerequisites, not code.
+
+### (b) How the nightly workflow works (`.github/workflows/nightly.yml`)
+
+- **Trigger:** off-peak cron `37 4 * * *` (never `0 0` — highest drop probability), plus
+  `workflow_dispatch` for manual re-runs / self-heal / 60-day-disable recovery.
+- **Data-branch wiring:** the job materializes the `data` branch as a `./data-wt` worktree
+  (`git fetch origin data`; `git worktree add ./data-wt data`) and runs the pipeline CLIs with
+  `--root ./data-wt` so relative writes land inside the worktree — **not** the `./data` dir on
+  `main` (the name-collision Pitfall closed in Plan 08-01).
+- **Incremental resume:** each known station backfills from its per-station high-water mark
+  (`highWater + 1`), so a missed night **self-heals** — the resume fetches the whole gap, not just
+  yesterday.
+- **Skip-empty:** because `aggregate.ts` re-derives only touched stations and serialization is
+  byte-stable, a night with no new data produces **no diff** → **no commit** (`git status
+  --porcelain` gates the commit; no empty commits).
+- **Build & deploy:** the ship set (`derived/`, `stations.json`, `manifest.json` — never `raw/`,
+  §5) is copied from `./data-wt` into `site/public/data/`, then `vite build` runs and
+  `actions/deploy-pages@v4` publishes `site/dist/`.
+
+### (c) Full national backfill — the one-command seed
+
+Run the workflow via **`workflow_dispatch` with `full_backfill: true`** **once** to seed the whole
+national station set from scratch (enumerate all stations → paced backfill each → aggregate all).
+The default cron run is always incremental; `full_backfill` is the manual seed trigger and is
+**not** run automatically. (Enumeration is wired in `stations-list.ts`; the national sweep is
+operator-triggered.)
+
+### (d) Monitoring
+
+- **Optional `HEARTBEAT_URL` repo secret** (healthchecks.io-style dead-man's switch): the workflow
+  pings it on a successful run. When the secret is **unset the ping is a no-op** and the run stays
+  green — it degrades gracefully.
+- **Actions status UI** shows each scheduled run. Note GitHub's **60-day auto-disable**: a repo
+  with no commits for 60 days has its scheduled workflow silently disabled — a **successful nightly
+  `data` commit resets that timer**, so keeping the ingest green is itself the keepalive.
+
+### (e) Squash-reset cadence (`.github/workflows/squash-reset.yml`)
+
+Nightly appends grow `.git` over years (T-08-11). The **recommended cadence is documented-manual**:
+run the `squash-reset` workflow via `workflow_dispatch` when `.git` warrants it. An **optional
+monthly cron** (`17 5 1 * *`) automates it — monthly comfortably bounds KB-scale nightly deltas.
+
+**Force-push safety (restated, T-08-10):** the squash-reset is the ONLY force-pushing writer. It
+**asserts the current branch IS `data`** (`git rev-parse --abbrev-ref HEAD == data`) **before** any
+force-push, and force-pushes **ONLY `git push --force origin data`** (explicit ref). It **never**
+references or force-pushes `main`, and carries `contents: write` only (no deploy permissions). The
+squash preserves a **byte-identical working tree** (proven 02-04 E7). The `squash-workflow.test.ts`
+gate asserts this scoping so a mis-scoped force-push can never merge.
