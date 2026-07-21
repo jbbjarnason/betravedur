@@ -44,7 +44,7 @@ import {
   readPartition,
   highWaterYear,
   assertStationId,
-  DEFAULT_ROOT,
+  resolveRoot,
 } from "./rawstore.js";
 import {
   contentHash,
@@ -241,14 +241,16 @@ export function aggregateAll(
  * omits dv). Registry StationMeta (for stations.json) is loaded lazily from @betravedur/fetch.
  */
 export async function main(argv: string[]): Promise<void> {
-  const root = DEFAULT_ROOT;
+  // Pull the explicit --root off argv FIRST (RESEARCH Pitfall 1: the relative `data` dir
+  // collides with the `data` branch). `rest` is the `<aws|synop>:<id>` spec list.
+  const { root, rest } = resolveRoot(argv);
   const manifestPath = join(root, "manifest.json");
   let manifest = readManifest(manifestPath);
 
   // Parse `<aws|synop>:<id>` specs. Require explicit type per station so column omission
   // (AWS omits r, SYNOP omits dv) is correct.
   const specs: { type: StationType; id: number }[] = [];
-  for (const arg of argv) {
+  for (const arg of rest) {
     const [kind, idStr] = arg.split(":");
     const id = Number(idStr);
     if ((kind !== "aws" && kind !== "synop") || !Number.isInteger(id)) {

@@ -138,22 +138,25 @@ export async function backfillStation(
  * high-water mark when startYear is omitted. Kept out of the tested code path.
  */
 export async function main(argv: string[]): Promise<void> {
-  const [kindArg, idArg, startArg] = argv;
+  const { upsertPartition, highWaterYear, resolveRoot } = await import("./rawstore.js");
+  // Pull the explicit --root off argv FIRST (RESEARCH Pitfall 1: `data` dir vs `data` branch).
+  // Everything after strips down to the positional `<kind> <id> [startYear]` spec.
+  const { root, rest } = resolveRoot(argv);
+  const [kindArg, idArg, startArg] = rest;
   if (kindArg !== "aws" && kindArg !== "synop") {
-    throw new Error(`usage: backfill <aws|synop> <stationId> [startYear] (got kind "${kindArg}")`);
+    throw new Error(`usage: backfill [--root <dir>] <aws|synop> <stationId> [startYear] (got kind "${kindArg}")`);
   }
   const id = Number(idArg);
   if (!Number.isInteger(id)) {
-    throw new Error(`usage: backfill <aws|synop> <stationId> [startYear] (bad stationId "${idArg}")`);
+    throw new Error(`usage: backfill [--root <dir>] <aws|synop> <stationId> [startYear] (bad stationId "${idArg}")`);
   }
   const startYear = startArg !== undefined ? Number(startArg) : undefined;
 
-  const { upsertPartition, highWaterYear, DEFAULT_ROOT } = await import("./rawstore.js");
   const hw = await backfillStation(kindArg, id, startYear, {
     fetchAws: fetchAwsDay,
     fetchSynop: fetchSynopDay,
-    upsertPartition: (station, rows) => upsertPartition(DEFAULT_ROOT, station, rows),
-    highWaterYear: (station) => highWaterYear(DEFAULT_ROOT, station),
+    upsertPartition: (station, rows) => upsertPartition(root, station, rows),
+    highWaterYear: (station) => highWaterYear(root, station),
   });
   console.log(`[backfill:${kindArg}] station ${id} complete; high-water year = ${hw}`);
 }

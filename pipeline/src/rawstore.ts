@@ -20,6 +20,37 @@ import type { DailyObservation } from "@betravedur/domain";
 export const DEFAULT_ROOT = "data";
 
 /**
+ * Resolve the pipeline store root from CLI argv (RESEARCH Pitfall 1: the relative `data`
+ * DIR collides with the `data` BRANCH, so a run on `main` can silently write into the wrong
+ * place). Precedence: an explicit `--root <dir>` arg > `env.PIPELINE_ROOT` > `DEFAULT_ROOT`.
+ *
+ * The `--root <dir>` pair is stripped from the returned `rest` so downstream spec/id parsing
+ * (aggregate `<aws|synop>:<id>`, backfill `<kind> <id> [startYear]`) is unaffected. The
+ * workflow runs `npm run backfill -- --root ./data-wt ...` so relative writes land in the
+ * worktree, not the ambiguous `data` dir.
+ */
+export function resolveRoot(
+  argv: string[],
+  env: NodeJS.ProcessEnv = process.env,
+): { root: string; rest: string[] } {
+  const rest: string[] = [];
+  let root: string | undefined;
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--root") {
+      const value = argv[i + 1];
+      if (value === undefined) {
+        throw new Error("usage: --root <dir> requires a directory value");
+      }
+      root = value;
+      i += 1; // skip the value token too
+      continue;
+    }
+    rest.push(argv[i]!);
+  }
+  return { root: root ?? env.PIPELINE_ROOT ?? DEFAULT_ROOT, rest };
+}
+
+/**
  * The 10 persisted keys, in FIXED serialization order. Building each record in this exact
  * order (rather than spreading arbitrary input) is what guarantees byte-stable NDJSON and
  * prunes every non-DailyObservation field the API might carry.
