@@ -10,7 +10,7 @@
 
 - [x] **DATA-01**: Pipeline fetches daily station observations (temp mean/max/min, wind mean/max/gust + direction, precipitation) from the Veðurstofa Íslands open API (`api.vedur.is/weather/`)
 - [x] **DATA-02**: One-time backfill ingests available per-station daily history deep enough to support baseline year ranges like 2010–2015
-- [ ] **DATA-03**: Nightly GitHub Actions cron appends new observations idempotently (upsert by station+date, gap-fill on missed runs, safe to re-run, off-peak schedule)
+- [x] **DATA-03**: Nightly GitHub Actions cron appends new observations idempotently (upsert by station+date, gap-fill on missed runs, safe to re-run, off-peak schedule)
 - [x] **DATA-04**: Pipeline precomputes per-station, per-year, day-of-year summaries as static files the client can aggregate over any {period × year-range} selection without a backend
 - [x] **DATA-05**: Aggregation statistics are correct: wind direction uses circular mean, missing precipitation is treated as missing (never zero), and every average tracks actual data coverage
 - [x] **DATA-06**: Station metadata registry keys on station ID with active-date windows (handles moves, closures, and network churn without splicing records)
@@ -109,7 +109,7 @@ Which phases cover which requirements.
 | UX-03 | Phase 7 | Complete |
 | UX-04 | Phase 7 | Complete |
 | UX-05 | Phase 7 | Complete |
-| DATA-03 | Phase 8 | Pending |
+| DATA-03 | Phase 8 | Complete |
 
 ---
 *Requirements scoped from .planning/research/FEATURES.md (MVP definition) + questioning session, 2026-07-19*
