@@ -138,6 +138,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260721-okx | v1.1 polish: attribution occlusion, glass opacity, h1 landmark, focus-return, close aria-label, invalid ?st= drop, aria nits | 2026-07-21 | 4ac3cde | [260721-okx-v1-1-polish-fixes](./quick/260721-okx-v1-1-polish-fixes/) |
+| 260721-fbh | full_backfill fetches each station's full history from its start year (fixes national map stuck at 2 markers) | 2026-07-21 | cb8b820 | [260721-fbh-full-history-backfill](./quick/260721-fbh-full-history-backfill/) |
 
 ## Deferred Items
 
