@@ -12,7 +12,7 @@
 // those named outputs, so raw/ can never leak into the build input.
 //
 // Node built-ins only (fs/path) — never bundled into the browser.
-import { cpSync, copyFileSync, mkdirSync, existsSync } from "node:fs";
+import { cpSync, copyFileSync, mkdirSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -27,13 +27,21 @@ export const SHIP_OUTPUTS = ["derived", "stations.json", "manifest.json"] as con
  * recursively plus the two JSON files. NEVER copies raw/ — only SHIP_OUTPUTS are walked, and
  * `raw` is not among them. A missing output is skipped (e.g. a run with no SYNOP stations may
  * lack nothing here, but a partial store must not crash the stage).
+ *
+ * Each ship-set target in `destDir` is CLEARED before copy (WR-03): `destDir` is the committed
+ * `site/public/data`, and `derived/{station}.{hash}.json` filenames are content-hashed, so an
+ * old hash file already present would NOT be overwritten and would survive stale into `site/dist`.
+ * Removing the target first guarantees dest == src for the ship-set (no stale/duplicate derived
+ * files accumulate), not merely dest ⊇ src.
  */
 export function copyShipSet(srcRoot: string, destDir: string): void {
   mkdirSync(destDir, { recursive: true });
   for (const name of SHIP_OUTPUTS) {
+    const to = join(destDir, name);
+    // Drop any stale prior content (esp. content-hashed derived/*.json) before copying.
+    rmSync(to, { recursive: true, force: true });
     const from = join(srcRoot, name);
     if (!existsSync(from)) continue;
-    const to = join(destDir, name);
     if (name === "derived") {
       // Recursive dir copy for derived/{station}.{hash}.json.
       cpSync(from, to, { recursive: true });

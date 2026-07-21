@@ -65,4 +65,22 @@ describe("copyShipSet: stages the ship-set, NEVER raw/", () => {
     expect(existsSync(join(fresh, "manifest.json"))).toBe(true);
     expect(existsSync(join(fresh, "raw"))).toBe(false);
   });
+
+  it("clears stale content-hashed derived/*.json already in dest (WR-03)", () => {
+    // dest already carries an OLD hash file for station 1350 (committed site/public/data).
+    mkdirSync(join(dest, "derived"), { recursive: true });
+    writeFileSync(join(dest, "derived", "1350.OLDHASH.json"), '{"schema":0}');
+    // and a stale top-level JSON that a later run no longer produces bytes for.
+    writeFileSync(join(dest, "stations.json"), '[{"stale":true}]');
+
+    copyShipSet(src, dest);
+
+    // The stale hash file must be GONE (not shipped alongside the fresh one).
+    expect(existsSync(join(dest, "derived", "1350.OLDHASH.json"))).toBe(false);
+    // The fresh hash files are present.
+    expect(existsSync(join(dest, "derived", "1350.abc123.json"))).toBe(true);
+    expect(existsSync(join(dest, "derived", "1.def456.json"))).toBe(true);
+    // Top-level JSON reflects the new bytes, not the stale ones.
+    expect(readFileSync(join(dest, "stations.json"), "utf8")).toBe("[]");
+  });
 });
