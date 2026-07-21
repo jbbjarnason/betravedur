@@ -44,3 +44,39 @@ export async function enumerateStations(
   const stations = await fetchStations(ids);
   return stations.filter((s) => toAggregateSpec(s) !== null);
 }
+
+/**
+ * Pure spec projection for the dispatch loop: map an enumerated station set to the
+ * newline-joined `<aws|synop>:<id>` list the backfill/aggregate CLIs consume. Every station
+ * here already survived `enumerateStations`' filter, so `toAggregateSpec` is non-null for all;
+ * the `!== null` guard keeps this total (never emits an empty `synop:` line). Tested pure so
+ * the CI wiring can be proven offline.
+ */
+export function specsFor(stations: StationMeta[]): string {
+  return stations
+    .map(toAggregateSpec)
+    .filter((s): s is string => s !== null)
+    .join("\n");
+}
+
+/**
+ * CLI entry for `workflow_dispatch full_backfill=true`: enumerate the national station set
+ * (empty `ids` -> the full `/stations` registry) and print one `<aws|synop>:<id>` spec per
+ * line to stdout. The nightly workflow captures this list and drives `backfill` + `aggregate`
+ * over each spec (via `npx tsx`, never bare `node <file>.ts` — type-stripping is version-
+ * fragile on the pinned Node 22). This is what makes a dispatched full_backfill genuinely
+ * sweep the national set rather than the two hardcoded seed stations.
+ */
+export async function main(): Promise<void> {
+  const stations = await enumerateStations([]);
+  const specs = specsFor(stations);
+  if (specs.length > 0) process.stdout.write(specs + "\n");
+}
+
+// Guarded CLI invocation (skipped when imported by tests).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}

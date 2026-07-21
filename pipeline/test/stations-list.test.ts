@@ -5,7 +5,7 @@
 // WIRED (the dispatch path uses it) but the full national backfill is NOT run this phase.
 import { describe, it, expect, vi } from "vitest";
 import type { StationMeta } from "@betravedur/domain";
-import { enumerateStations, toAggregateSpec } from "../src/stations-list.js";
+import { enumerateStations, toAggregateSpec, specsFor } from "../src/stations-list.js";
 
 function meta(station: number, type: StationMeta["type"]): StationMeta {
   return {
@@ -61,5 +61,21 @@ describe("enumerateStations: national set pass-through/filter (mocked fetch)", (
     expect(out.map((s) => s.station)).toEqual([1, 1350]);
     // And each survivor maps to a spec.
     expect(out.map(toAggregateSpec)).toEqual(["synop:1", "aws:1350"]);
+  });
+});
+
+describe("specsFor: enumerated national set -> dispatch spec list (WR-01)", () => {
+  it("emits one <aws|synop>:<id> spec per line for the survivors", () => {
+    expect(specsFor([meta(1, "sk"), meta(1350, "sj")])).toBe("synop:1\naws:1350");
+  });
+
+  it("drops any residual non-mappable station (never emits an empty synop:/aws: line)", () => {
+    expect(specsFor([meta(1, "sk"), meta(9, "ur"), meta(1350, "sj")])).toBe(
+      "synop:1\naws:1350",
+    );
+  });
+
+  it("returns an empty string for an empty set", () => {
+    expect(specsFor([])).toBe("");
   });
 });

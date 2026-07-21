@@ -96,6 +96,37 @@ describe("nightly.yml — pipeline --root wiring", () => {
   });
 });
 
+describe("nightly.yml — full_backfill genuinely enumerates + backfills the national set (WR-01)", () => {
+  it("enumerates the national set via the stations-list CLI using npx tsx (not bare node)", () => {
+    // The full_backfill branch must RUN the enumeration helper, not import-for-side-effects.
+    expect(/npx tsx pipeline\/src\/stations-list\.ts/.test(code)).toBe(true);
+    // The old dead line (import-and-discard, error-swallowing) must be gone.
+    expect(/node -e .*stations-list\.ts/.test(raw)).toBe(false);
+    expect(raw.includes("2>/dev/null")).toBe(false);
+  });
+
+  it("loops the enumerated specs into backfill and aggregate", () => {
+    // A loop over the emitted specs drives backfill per station...
+    expect(/for spec in \$specs/.test(code)).toBe(true);
+    expect(/npm run backfill -- --root \.\/data-wt "\$kind" "\$id"/.test(code)).toBe(true);
+    // ...and aggregate runs over the full enumerated spec list.
+    expect(/npm run aggregate -- --root \.\/data-wt \$specs/.test(code)).toBe(true);
+  });
+});
+
+describe("nightly.yml — data worktree cleanup (WR-02)", () => {
+  it("always-removes ./data-wt after the job (never left behind)", () => {
+    // Plain (non-forced) remove — preserves the file-wide zero-force-push invariant.
+    expect(/git worktree remove \.\/data-wt(?! --force)/.test(code)).toBe(true);
+    expect(raw.includes("git worktree remove ./data-wt --force")).toBe(false);
+    const removeIdx = lines.findIndex((l) => /git worktree remove \.\/data-wt/.test(l));
+    // guarded by if: always() so a failed backfill still cleans up.
+    const guard = lines[removeIdx - 1] ?? "";
+    const guard2 = lines[removeIdx - 2] ?? "";
+    expect(/if:\s*always\(\)/.test(guard) || /if:\s*always\(\)/.test(guard2)).toBe(true);
+  });
+});
+
 describe("nightly.yml — skip-empty commit", () => {
   it("gates the commit on git status --porcelain and emits changed true/false", () => {
     expect(/git status --porcelain/.test(raw)).toBe(true);

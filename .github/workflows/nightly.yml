@@ -70,21 +70,27 @@ jobs:
       # Incremental resume (high-water+1 self-heals any missed nights) for the seed stations, OR
       # the full national enumeration when dispatched with full_backfill=true. Both write to the
       # worktree via --root ./data-wt (RESEARCH Pitfall 1 fix).
-      - name: Backfill
+      - name: Backfill + aggregate
         run: |
+          set -euo pipefail
           if [ "${{ inputs.full_backfill }}" = "true" ]; then
-            # full national set: enumerate stations then backfill each (wire-only helper).
-            node -e "import('./pipeline/src/stations-list.ts')" 2>/dev/null || true
-            npm run backfill -- --root ./data-wt synop 1
-            npm run backfill -- --root ./data-wt aws 1350
+            # full national sweep (dispatch-only): enumerate the national station set via the
+            # stations-list CLI (npx tsx — NOT bare `node <file>.ts`; type-stripping is fragile
+            # on the pinned Node 22), then backfill + aggregate EVERY <aws|synop>:<id> spec.
+            specs=$(npx tsx pipeline/src/stations-list.ts)
+            for spec in $specs; do
+              kind=${spec%%:*}   # aws | synop
+              id=${spec##*:}     # station id
+              npm run backfill -- --root ./data-wt "$kind" "$id"
+            done
+            # touched-only aggregate over the full enumerated spec list in one call.
+            npm run aggregate -- --root ./data-wt $specs
           else
             # nightly incremental: resume each known seed station from high-water+1.
             npm run backfill -- --root ./data-wt synop 1
             npm run backfill -- --root ./data-wt aws 1350
+            npm run aggregate -- --root ./data-wt synop:1 aws:1350
           fi
-
-      - name: Aggregate (touched-only)
-        run: npm run aggregate -- --root ./data-wt synop:1 aws:1350
 
       # Skip-empty: touched-only aggregate + byte-stable serialization means an unchanged station
       # produces no diff. A night with no new observations produces no commit.
@@ -123,6 +129,15 @@ jobs:
         env:
           HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
         run: '[ -n "$HEARTBEAT_URL" ] && curl -fsS -m 10 "$HEARTBEAT_URL" || true'
+
+      # Always tear down the data-branch worktree (WR-02): never leave ./data-wt behind in the
+      # main checkout (it is gitignored, but an explicit removal keeps the tree clean). Uses a
+      # plain (non-forced) remove to preserve the file-wide zero-force-push invariant — the
+      # nightly commits/pushes its delta, so the worktree is clean by here; `|| true` means an
+      # aborted mid-run (uncommitted worktree) can never fail the job, it just skips cleanup.
+      - name: Remove data worktree
+        if: always()
+        run: git worktree remove ./data-wt || true
 
   deploy:
     needs: ingest-build
