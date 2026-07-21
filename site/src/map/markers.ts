@@ -72,6 +72,19 @@ function tempLabel(d: MarkerDatum): string {
 }
 
 /**
+ * Sort key added on top of a station's structural `priority`, so at a decluttered overview the
+ * survivors are the USEFUL (scored) stations rather than "ófullnægjandi gögn" pills. Lower wins
+ * MapLibre's `symbol-sort-key` collision. A scored, sufficient station keeps its structural
+ * priority; a muted/insufficient station is pushed after every scored one (+MUTED_OFFSET) so it
+ * only survives where no scored station competes for the same spot — insufficient coverage is
+ * still shown honestly where it is the only option, never fabricated away.
+ */
+const MUTED_SORT_OFFSET = 100000;
+function collisionPriority(d: MarkerDatum): number {
+  return d.sufficient && d.score !== null ? d.priority : d.priority + MUTED_SORT_OFFSET;
+}
+
+/**
  * Build the GeoJSON FeatureCollection that drives the symbol collision layer.
  * One feature per datum; the `label` is the collision-footprint proxy (rendered
  * invisibly), and the full datum is serialized into properties so the composite
@@ -86,7 +99,7 @@ export function toFeatureCollection(data: MarkerDatum[]): MarkerFeatureCollectio
       properties: {
         label: tempLabel(d),
         station: d.station,
-        priority: d.priority,
+        priority: collisionPriority(d), // scored stations win the overview declutter
         datum: JSON.stringify(d),
       },
     })),
@@ -223,12 +236,13 @@ export function installMarkerLayer(map: maplibregl.Map, data: MarkerDatum[]): vo
       "text-font": ["Noto Sans Regular"],
       "text-allow-overlap": false, // native declutter — no two survivors overlap
       "text-ignore-placement": false,
-      // A small collision padding so genuinely-coincident stations thin slightly at low zoom without
-      // over-decluttering the national field (kept modest: the ranked list still surfaces every
-      // station, and each visible marker stays individually reachable). NOT large enough to hide a
-      // distinct nearby station's marker — the overlapping-sample case is a 2-station preview
-      // artifact that the national dataset does not exhibit.
-      "text-padding": 4,
+      // ZOOM-ADAPTIVE collision padding (MAP-04 readable density). The proxy glyph is tiny but the
+      // rendered pill is ~10× wider, so with ~375 national stations a small padding leaves a
+      // cluttered wall of overlapping pills at the country overview. A large padding at low zoom
+      // thins the field to a readable set (~two dozen at the default zoom), and it relaxes as you
+      // zoom in so more stations reveal — the intended zoom-adaptive density. The ranked "Bestu
+      // staðir" list still surfaces EVERY qualifying station, so decluttered markers are never lost.
+      "text-padding": ["interpolate", ["linear"], ["zoom"], 5, 32, 8, 8, 11, 2],
       "symbol-sort-key": ["get", "priority"], // major stations (low priority) win
       "text-optional": true,
     },

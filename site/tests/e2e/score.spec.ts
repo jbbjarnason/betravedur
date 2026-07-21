@@ -347,6 +347,20 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     page,
   }) => {
     await waitForMarkers(page);
+    // Frame the SW samples so BOTH scored stations actually render as markers: the zoom-adaptive
+    // collision padding declutters the country overview, so a scored station can be in the ranked
+    // list yet have no marker at the default zoom — which would falsely trip the row⊆scored-markers
+    // check below. fitBounds separates the two SW fixture stations so the marker set is complete.
+    await page.evaluate(() => {
+      (window as unknown as { __map: { fitBounds: (b: number[][], o: unknown) => void } }).__map.fitBounds(
+        [
+          [-22.7, 63.9],
+          [-21.8, 64.2],
+        ],
+        { padding: 120, duration: 0 },
+      );
+    });
+    await page.waitForTimeout(800);
     // The exclusion INVARIANT asserted positively on every run: every muted (score:null /
     // ófullnægjandi gögn) marker must be absent from the ranked list, i.e. the row set is a
     // subset of the SCORED markers only. (The 2-station SW fixture rarely renders a naturally
@@ -388,6 +402,25 @@ test.describe("Phase 5 acceptance criteria (05-UI-SPEC §Acceptance-Checkable Vi
     );
     await expect(badgedRow).toBeVisible();
     const station = await badgedRow.getAttribute("data-station");
+
+    // Zoom-adaptive collision padding thins the marker field at the country overview, so a
+    // specific station's marker may be decluttered at the default zoom. Frame the SW sample
+    // stations (where the committed án-úrkomu station sits) so its marker is actually placed
+    // before we assert on it — same fitBounds pattern the evidence test uses.
+    await page.evaluate(() => {
+      (window as unknown as { __map: { fitBounds: (b: number[][], o: unknown) => void } }).__map.fitBounds(
+        [
+          [-22.7, 63.9],
+          [-21.8, 64.2],
+        ],
+        { padding: 120, duration: 0 },
+      );
+    });
+    await page.waitForFunction(
+      (st) => document.querySelector(`#marker-overlay [data-station="${st}"]`) !== null,
+      station,
+      { timeout: 5_000 },
+    );
 
     // Its marker pill is COLORED (has the scored class + a real --pill-score), not muted.
     const pill = page.locator(`#marker-overlay [data-station="${station}"]`);
