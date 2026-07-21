@@ -198,3 +198,4 @@
 {"station":1,"date":"2026-07-17","doy":198,"t":9.7,"tx":null,"tn":null,"f":3,"fx":4.6,"fg":7,"dv":null,"r":3.1}
 {"station":1,"date":"2026-07-18","doy":199,"t":10.2,"tx":null,"tn":null,"f":1.8,"fx":4.6,"fg":7.5,"dv":null,"r":0.6}
 {"station":1,"date":"2026-07-19","doy":200,"t":10.8,"tx":null,"tn":null,"f":3.1,"fx":5,"fg":7.5,"dv":null,"r":3.1}
+{"station":1,"date":"2026-07-20","doy":201,"t":11.2,"tx":null,"tn":null,"f":4.2,"fx":6.7,"fg":11.1,"dv":null,"r":6.1}

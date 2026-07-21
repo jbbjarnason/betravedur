@@ -1,18 +1,18 @@
 {
   "stations": {
     "1": {
-      "file": "derived/1.c1cf25669d53.json",
-      "hash": "c1cf25669d53",
+      "file": "derived/1.359fe581a508.json",
+      "hash": "359fe581a508",
       "from": 1949,
       "to": 2026,
-      "lastFetched": "2026-07-20T07:18:37.625Z"
+      "lastFetched": "2026-07-21T19:47:19.026Z"
     },
     "4": {
-      "file": "derived/4.23bb14826fee.json",
-      "hash": "23bb14826fee",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.186Z"
+      "file": "derived/4.2054047a7949.json",
+      "hash": "2054047a7949",
+      "from": 2016,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:19.051Z"
     },
     "96": {
       "file": "derived/96.8c50aa118b3d.json",
@@ -22,53 +22,53 @@
       "lastFetched": "2026-07-21T17:46:01.187Z"
     },
     "108": {
-      "file": "derived/108.8078202f1dfb.json",
-      "hash": "8078202f1dfb",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.187Z"
+      "file": "derived/108.78685a9fba97.json",
+      "hash": "78685a9fba97",
+      "from": 1988,
+      "to": 2017,
+      "lastFetched": "2026-07-21T19:47:19.067Z"
     },
     "130": {
-      "file": "derived/130.cc0785fe5485.json",
-      "hash": "cc0785fe5485",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.188Z"
+      "file": "derived/130.5fb0b3ede744.json",
+      "hash": "5fb0b3ede744",
+      "from": 1986,
+      "to": 1988,
+      "lastFetched": "2026-07-21T19:47:19.075Z"
     },
     "155": {
-      "file": "derived/155.672d012d58fa.json",
-      "hash": "672d012d58fa",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.188Z"
+      "file": "derived/155.e875868d25e3.json",
+      "hash": "e875868d25e3",
+      "from": 1981,
+      "to": 1988,
+      "lastFetched": "2026-07-21T19:47:19.079Z"
     },
     "164": {
-      "file": "derived/164.6fd6115d1138.json",
-      "hash": "6fd6115d1138",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.188Z"
+      "file": "derived/164.9b081e85ac33.json",
+      "hash": "9b081e85ac33",
+      "from": 1994,
+      "to": 1998,
+      "lastFetched": "2026-07-21T19:47:19.082Z"
     },
     "165": {
-      "file": "derived/165.564fd1deec9a.json",
-      "hash": "564fd1deec9a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.188Z"
+      "file": "derived/165.806b274718f4.json",
+      "hash": "806b274718f4",
+      "from": 1989,
+      "to": 1994,
+      "lastFetched": "2026-07-21T19:47:19.087Z"
     },
     "170": {
-      "file": "derived/170.234a5fed1172.json",
-      "hash": "234a5fed1172",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.189Z"
+      "file": "derived/170.0c4a49b5158d.json",
+      "hash": "0c4a49b5158d",
+      "from": 1970,
+      "to": 1994,
+      "lastFetched": "2026-07-21T19:47:19.099Z"
     },
     "171": {
-      "file": "derived/171.57f5c895965d.json",
-      "hash": "57f5c895965d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.189Z"
+      "file": "derived/171.128c146eebcc.json",
+      "hash": "128c146eebcc",
+      "from": 1949,
+      "to": 1970,
+      "lastFetched": "2026-07-21T19:47:19.111Z"
     },
     "172": {
       "file": "derived/172.95a143eacffc.json",
@@ -162,18 +162,18 @@
       "lastFetched": "2026-07-21T17:46:01.195Z"
     },
     "293": {
-      "file": "derived/293.1c89a4873bc3.json",
-      "hash": "1c89a4873bc3",
-      "from": 2026,
+      "file": "derived/293.48f2c0487626.json",
+      "hash": "48f2c0487626",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.200Z"
+      "lastFetched": "2026-07-21T19:47:19.139Z"
     },
     "295": {
-      "file": "derived/295.8f5aea2930f0.json",
-      "hash": "8f5aea2930f0",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.200Z"
+      "file": "derived/295.7cb652ce7d77.json",
+      "hash": "7cb652ce7d77",
+      "from": 1971,
+      "to": 1994,
+      "lastFetched": "2026-07-21T19:47:19.153Z"
     },
     "309": {
       "file": "derived/309.867bba86bc74.json",
@@ -183,25 +183,25 @@
       "lastFetched": "2026-07-21T17:46:01.196Z"
     },
     "310": {
-      "file": "derived/310.14a702b1682f.json",
-      "hash": "14a702b1682f",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.201Z"
+      "file": "derived/310.5db3e1f4c67e.json",
+      "hash": "5db3e1f4c67e",
+      "from": 1984,
+      "to": 1998,
+      "lastFetched": "2026-07-21T19:47:19.162Z"
     },
     "313": {
-      "file": "derived/313.027209a1b2de.json",
-      "hash": "027209a1b2de",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.201Z"
+      "file": "derived/313.c01c3eb97384.json",
+      "hash": "c01c3eb97384",
+      "from": 2003,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.165Z"
     },
     "340": {
-      "file": "derived/340.a88f7d0139d7.json",
-      "hash": "a88f7d0139d7",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.201Z"
+      "file": "derived/340.cd5db1c5634f.json",
+      "hash": "cd5db1c5634f",
+      "from": 1967,
+      "to": 1981,
+      "lastFetched": "2026-07-21T19:47:19.172Z"
     },
     "341": {
       "file": "derived/341.f30e1589c07b.json",
@@ -225,11 +225,11 @@
       "lastFetched": "2026-07-21T17:46:01.202Z"
     },
     "361": {
-      "file": "derived/361.7d11f504edbf.json",
-      "hash": "7d11f504edbf",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.202Z"
+      "file": "derived/361.47a8a57837c6.json",
+      "hash": "47a8a57837c6",
+      "from": 1978,
+      "to": 2018,
+      "lastFetched": "2026-07-21T19:47:19.194Z"
     },
     "365": {
       "file": "derived/365.5fffc0962576.json",
@@ -267,11 +267,11 @@
       "lastFetched": "2026-07-21T17:46:01.203Z"
     },
     "404": {
-      "file": "derived/404.d719fa0f4401.json",
-      "hash": "d719fa0f4401",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.203Z"
+      "file": "derived/404.c1f371fe0af6.json",
+      "hash": "c1f371fe0af6",
+      "from": 1949,
+      "to": 2000,
+      "lastFetched": "2026-07-21T19:47:19.221Z"
     },
     "428": {
       "file": "derived/428.69709e567120.json",
@@ -281,88 +281,88 @@
       "lastFetched": "2026-07-21T17:46:01.197Z"
     },
     "449": {
-      "file": "derived/449.0381d0a10aa8.json",
-      "hash": "0381d0a10aa8",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.203Z"
+      "file": "derived/449.f9ca828349e0.json",
+      "hash": "f9ca828349e0",
+      "from": 1973,
+      "to": 1978,
+      "lastFetched": "2026-07-21T19:47:19.232Z"
     },
     "479": {
-      "file": "derived/479.18eb28527657.json",
-      "hash": "18eb28527657",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.203Z"
+      "file": "derived/479.eba1373497df.json",
+      "hash": "eba1373497df",
+      "from": 1956,
+      "to": 2016,
+      "lastFetched": "2026-07-21T19:47:19.259Z"
     },
     "495": {
-      "file": "derived/495.477b32d5767c.json",
-      "hash": "477b32d5767c",
-      "from": 2026,
+      "file": "derived/495.7e1d60441d0b.json",
+      "hash": "7e1d60441d0b",
+      "from": 1949,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.204Z"
+      "lastFetched": "2026-07-21T19:47:19.301Z"
     },
     "505": {
-      "file": "derived/505.89198656460a.json",
-      "hash": "89198656460a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.205Z"
+      "file": "derived/505.23965dec8fa4.json",
+      "hash": "23965dec8fa4",
+      "from": 1949,
+      "to": 2009,
+      "lastFetched": "2026-07-21T19:47:19.341Z"
     },
     "508": {
-      "file": "derived/508.7bf0eb598088.json",
-      "hash": "7bf0eb598088",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.205Z"
+      "file": "derived/508.4fb0046ecd8e.json",
+      "hash": "4fb0046ecd8e",
+      "from": 1981,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.360Z"
     },
     "510": {
-      "file": "derived/510.99277146ae0d.json",
-      "hash": "99277146ae0d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.205Z"
+      "file": "derived/510.505c3c93cd7f.json",
+      "hash": "505c3c93cd7f",
+      "from": 1949,
+      "to": 1970,
+      "lastFetched": "2026-07-21T19:47:19.374Z"
     },
     "521": {
-      "file": "derived/521.2616b592a67a.json",
-      "hash": "2616b592a67a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.205Z"
+      "file": "derived/521.f0e0fcc8fbe9.json",
+      "hash": "f0e0fcc8fbe9",
+      "from": 1980,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.386Z"
     },
     "525": {
-      "file": "derived/525.0f32a2a7f4ea.json",
-      "hash": "0f32a2a7f4ea",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.205Z"
+      "file": "derived/525.97ff03868008.json",
+      "hash": "97ff03868008",
+      "from": 1964,
+      "to": 1993,
+      "lastFetched": "2026-07-21T19:47:19.401Z"
     },
     "530": {
-      "file": "derived/530.9d3fac77fd3c.json",
-      "hash": "9d3fac77fd3c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.206Z"
+      "file": "derived/530.ffeedee869be.json",
+      "hash": "ffeedee869be",
+      "from": 1961,
+      "to": 1966,
+      "lastFetched": "2026-07-21T19:47:19.411Z"
     },
     "533": {
-      "file": "derived/533.04de65234425.json",
-      "hash": "04de65234425",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.206Z"
+      "file": "derived/533.1284ac5dc8b9.json",
+      "hash": "1284ac5dc8b9",
+      "from": 1949,
+      "to": 1964,
+      "lastFetched": "2026-07-21T19:47:19.419Z"
     },
     "570": {
-      "file": "derived/570.4b2256bccf4d.json",
-      "hash": "4b2256bccf4d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.206Z"
+      "file": "derived/570.1a0dc15e85d7.json",
+      "hash": "1a0dc15e85d7",
+      "from": 1949,
+      "to": 1998,
+      "lastFetched": "2026-07-21T19:47:19.441Z"
     },
     "598": {
-      "file": "derived/598.372b30067c2c.json",
-      "hash": "372b30067c2c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.207Z"
+      "file": "derived/598.f4e472882a59.json",
+      "hash": "f4e472882a59",
+      "from": 1990,
+      "to": 2000,
+      "lastFetched": "2026-07-21T19:47:19.451Z"
     },
     "620": {
       "file": "derived/620.40e7734e56ac.json",
@@ -393,11 +393,11 @@
       "lastFetched": "2026-07-21T17:46:01.209Z"
     },
     "676": {
-      "file": "derived/676.e0b2e0ca2744.json",
-      "hash": "e0b2e0ca2744",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.289Z"
+      "file": "derived/676.185eee85be44.json",
+      "hash": "185eee85be44",
+      "from": 1949,
+      "to": 1960,
+      "lastFetched": "2026-07-21T19:47:20.549Z"
     },
     "680": {
       "file": "derived/680.af28e1b60e50.json",
@@ -414,39 +414,39 @@
       "lastFetched": "2026-07-21T17:46:01.209Z"
     },
     "706": {
-      "file": "derived/706.0f64018b5763.json",
-      "hash": "0f64018b5763",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.289Z"
+      "file": "derived/706.b703281c195b.json",
+      "hash": "b703281c195b",
+      "from": 1985,
+      "to": 1992,
+      "lastFetched": "2026-07-21T19:47:20.554Z"
     },
     "707": {
-      "file": "derived/707.8f159268b361.json",
-      "hash": "8f159268b361",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.290Z"
+      "file": "derived/707.b19b97d8f974.json",
+      "hash": "b19b97d8f974",
+      "from": 1992,
+      "to": 2006,
+      "lastFetched": "2026-07-21T19:47:20.561Z"
     },
     "745": {
-      "file": "derived/745.a1ceb850a32c.json",
-      "hash": "a1ceb850a32c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.290Z"
+      "file": "derived/745.eea3b490e97a.json",
+      "hash": "eea3b490e97a",
+      "from": 1949,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:20.588Z"
     },
     "772": {
-      "file": "derived/772.a7fe5089cd1a.json",
-      "hash": "a7fe5089cd1a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.290Z"
+      "file": "derived/772.a612f6cb9b32.json",
+      "hash": "a612f6cb9b32",
+      "from": 1949,
+      "to": 2013,
+      "lastFetched": "2026-07-21T19:47:20.622Z"
     },
     "790": {
-      "file": "derived/790.f2eac0fbad69.json",
-      "hash": "f2eac0fbad69",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.291Z"
+      "file": "derived/790.af73b4096af0.json",
+      "hash": "af73b4096af0",
+      "from": 1959,
+      "to": 1986,
+      "lastFetched": "2026-07-21T19:47:20.644Z"
     },
     "791": {
       "file": "derived/791.30f6afe08599.json",
@@ -456,11 +456,11 @@
       "lastFetched": "2026-07-21T17:46:01.210Z"
     },
     "798": {
-      "file": "derived/798.2cb5d1881673.json",
-      "hash": "2cb5d1881673",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.210Z"
+      "file": "derived/798.fb938a6d3451.json",
+      "hash": "fb938a6d3451",
+      "from": 1961,
+      "to": 2014,
+      "lastFetched": "2026-07-21T19:47:19.480Z"
     },
     "801": {
       "file": "derived/801.2b78c186a45a.json",
@@ -470,25 +470,25 @@
       "lastFetched": "2026-07-21T17:46:01.291Z"
     },
     "802": {
-      "file": "derived/802.dd1c1ed19c6b.json",
-      "hash": "dd1c1ed19c6b",
-      "from": 2026,
+      "file": "derived/802.c80909404afd.json",
+      "hash": "c80909404afd",
+      "from": 1978,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.292Z"
+      "lastFetched": "2026-07-21T19:47:20.668Z"
     },
     "830": {
-      "file": "derived/830.3740d421f1e2.json",
-      "hash": "3740d421f1e2",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.293Z"
+      "file": "derived/830.ea25a869c4e0.json",
+      "hash": "ea25a869c4e0",
+      "from": 1991,
+      "to": 2003,
+      "lastFetched": "2026-07-21T19:47:20.678Z"
     },
     "855": {
-      "file": "derived/855.530c2bc16ed7.json",
-      "hash": "530c2bc16ed7",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.210Z"
+      "file": "derived/855.562b0307e4f1.json",
+      "hash": "562b0307e4f1",
+      "from": 1958,
+      "to": 2005,
+      "lastFetched": "2026-07-21T19:47:19.512Z"
     },
     "884": {
       "file": "derived/884.bf2381725b92.json",
@@ -498,18 +498,18 @@
       "lastFetched": "2026-07-21T17:46:01.211Z"
     },
     "888": {
-      "file": "derived/888.c21ed056234b.json",
-      "hash": "c21ed056234b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.211Z"
+      "file": "derived/888.43754e3de245.json",
+      "hash": "43754e3de245",
+      "from": 1990,
+      "to": 2000,
+      "lastFetched": "2026-07-21T19:47:19.523Z"
     },
     "892": {
-      "file": "derived/892.f86370abecc1.json",
-      "hash": "f86370abecc1",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.211Z"
+      "file": "derived/892.3ada02dffa91.json",
+      "hash": "3ada02dffa91",
+      "from": 1965,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.540Z"
     },
     "898": {
       "file": "derived/898.6fce80d9ab06.json",
@@ -526,11 +526,11 @@
       "lastFetched": "2026-07-21T17:46:01.293Z"
     },
     "923": {
-      "file": "derived/923.524c5c3020fd.json",
-      "hash": "524c5c3020fd",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.294Z"
+      "file": "derived/923.2c93b9144819.json",
+      "hash": "2c93b9144819",
+      "from": 1957,
+      "to": 2017,
+      "lastFetched": "2026-07-21T19:47:20.704Z"
     },
     "925": {
       "file": "derived/925.ac6f4a906930.json",
@@ -540,39 +540,39 @@
       "lastFetched": "2026-07-21T17:46:01.212Z"
     },
     "945": {
-      "file": "derived/945.c9d31611a7d1.json",
-      "hash": "c9d31611a7d1",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.212Z"
+      "file": "derived/945.fb915d4b2961.json",
+      "hash": "fb915d4b2961",
+      "from": 1949,
+      "to": 1983,
+      "lastFetched": "2026-07-21T19:47:19.563Z"
     },
     "949": {
-      "file": "derived/949.732bde3c01e4.json",
-      "hash": "732bde3c01e4",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.294Z"
+      "file": "derived/949.c4d01adce1e5.json",
+      "hash": "c4d01adce1e5",
+      "from": 1965,
+      "to": 1991,
+      "lastFetched": "2026-07-21T19:47:20.723Z"
     },
     "985": {
-      "file": "derived/985.d2ed2c47b77b.json",
-      "hash": "d2ed2c47b77b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.212Z"
+      "file": "derived/985.4eb63c117f65.json",
+      "hash": "4eb63c117f65",
+      "from": 1949,
+      "to": 1998,
+      "lastFetched": "2026-07-21T19:47:19.590Z"
     },
     "990": {
-      "file": "derived/990.8180a5a6593f.json",
-      "hash": "8180a5a6593f",
-      "from": 2026,
+      "file": "derived/990.c1ffe739547b.json",
+      "hash": "c1ffe739547b",
+      "from": 1952,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.213Z"
+      "lastFetched": "2026-07-21T19:47:19.635Z"
     },
     "1350": {
-      "file": "derived/1350.eaecfc5ae78f.json",
-      "hash": "eaecfc5ae78f",
+      "file": "derived/1350.de01975957d9.json",
+      "hash": "de01975957d9",
       "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-20T07:18:37.594Z"
+      "lastFetched": "2026-07-21T19:47:20.735Z"
     },
     "1357": {
       "file": "derived/1357.937d7e80b8b7.json",
@@ -582,46 +582,46 @@
       "lastFetched": "2026-07-21T17:46:01.214Z"
     },
     "1361": {
-      "file": "derived/1361.1b11fc8f22c8.json",
-      "hash": "1b11fc8f22c8",
-      "from": 2026,
+      "file": "derived/1361.9f176aad080f.json",
+      "hash": "9f176aad080f",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.215Z"
+      "lastFetched": "2026-07-21T19:47:19.655Z"
     },
     "1362": {
-      "file": "derived/1362.062b76124498.json",
-      "hash": "062b76124498",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.315Z"
+      "file": "derived/1362.58c6712507d9.json",
+      "hash": "58c6712507d9",
+      "from": 1995,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:20.744Z"
     },
     "1368": {
-      "file": "derived/1368.29b89d3020e3.json",
-      "hash": "29b89d3020e3",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.216Z"
+      "file": "derived/1368.4a3c3e01d4bf.json",
+      "hash": "4a3c3e01d4bf",
+      "from": 2000,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:19.664Z"
     },
     "1370": {
-      "file": "derived/1370.3a42724abc9e.json",
-      "hash": "3a42724abc9e",
-      "from": 2026,
+      "file": "derived/1370.ebd754f3d7c0.json",
+      "hash": "ebd754f3d7c0",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.316Z"
+      "lastFetched": "2026-07-21T19:47:20.749Z"
     },
     "1391": {
-      "file": "derived/1391.94a40bb9a41b.json",
-      "hash": "94a40bb9a41b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.317Z"
+      "file": "derived/1391.334aecb2e957.json",
+      "hash": "334aecb2e957",
+      "from": 1995,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:20.758Z"
     },
     "1395": {
-      "file": "derived/1395.a226d0494b8b.json",
-      "hash": "a226d0494b8b",
-      "from": 2026,
+      "file": "derived/1395.7db9f85addbf.json",
+      "hash": "7db9f85addbf",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.217Z"
+      "lastFetched": "2026-07-21T19:47:19.676Z"
     },
     "1452": {
       "file": "derived/1452.3b060de9deda.json",
@@ -631,172 +631,172 @@
       "lastFetched": "2026-07-21T17:46:01.318Z"
     },
     "1453": {
-      "file": "derived/1453.59063281cec3.json",
-      "hash": "59063281cec3",
-      "from": 2026,
+      "file": "derived/1453.7f2f90727b84.json",
+      "hash": "7f2f90727b84",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.218Z"
+      "lastFetched": "2026-07-21T19:47:19.695Z"
     },
     "1469": {
-      "file": "derived/1469.6f42777cbaf2.json",
-      "hash": "6f42777cbaf2",
-      "from": 2026,
+      "file": "derived/1469.15a11151865a.json",
+      "hash": "15a11151865a",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.684Z"
+      "lastFetched": "2026-07-21T19:47:23.700Z"
     },
     "1470": {
-      "file": "derived/1470.9d936a900846.json",
-      "hash": "9d936a900846",
-      "from": 2026,
+      "file": "derived/1470.f9aaccd0f663.json",
+      "hash": "f9aaccd0f663",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.673Z"
+      "lastFetched": "2026-07-21T19:47:23.683Z"
     },
     "1471": {
-      "file": "derived/1471.e76923dc99ab.json",
-      "hash": "e76923dc99ab",
-      "from": 2026,
+      "file": "derived/1471.0f34a339217a.json",
+      "hash": "0f34a339217a",
+      "from": 2019,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.655Z"
+      "lastFetched": "2026-07-21T19:47:23.653Z"
     },
     "1472": {
-      "file": "derived/1472.e759f6b968ac.json",
-      "hash": "e759f6b968ac",
-      "from": 2026,
+      "file": "derived/1472.62322ea0b421.json",
+      "hash": "62322ea0b421",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.674Z"
+      "lastFetched": "2026-07-21T19:47:23.685Z"
     },
     "1473": {
-      "file": "derived/1473.051e32697f78.json",
-      "hash": "051e32697f78",
-      "from": 2026,
+      "file": "derived/1473.eb41c2870f57.json",
+      "hash": "eb41c2870f57",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.220Z"
+      "lastFetched": "2026-07-21T19:47:19.713Z"
     },
     "1474": {
-      "file": "derived/1474.d98d4b656884.json",
-      "hash": "d98d4b656884",
-      "from": 2026,
+      "file": "derived/1474.739f382b3f9c.json",
+      "hash": "739f382b3f9c",
+      "from": 2019,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.654Z"
+      "lastFetched": "2026-07-21T19:47:23.650Z"
     },
     "1475": {
-      "file": "derived/1475.e3ed080883c5.json",
-      "hash": "e3ed080883c5",
-      "from": 2026,
+      "file": "derived/1475.cdd1ac32955d.json",
+      "hash": "cdd1ac32955d",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.221Z"
+      "lastFetched": "2026-07-21T19:47:19.731Z"
     },
     "1477": {
-      "file": "derived/1477.9a0237f11205.json",
-      "hash": "9a0237f11205",
-      "from": 2026,
+      "file": "derived/1477.da79798d75f4.json",
+      "hash": "da79798d75f4",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.319Z"
+      "lastFetched": "2026-07-21T19:47:20.773Z"
     },
     "1478": {
-      "file": "derived/1478.241b9df0cbfb.json",
-      "hash": "241b9df0cbfb",
-      "from": 2026,
+      "file": "derived/1478.4cd46211a965.json",
+      "hash": "4cd46211a965",
+      "from": 2019,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.661Z"
+      "lastFetched": "2026-07-21T19:47:23.664Z"
     },
     "1479": {
-      "file": "derived/1479.e5a79ca1d757.json",
-      "hash": "e5a79ca1d757",
-      "from": 2026,
+      "file": "derived/1479.e3d9a18dcc21.json",
+      "hash": "e3d9a18dcc21",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.320Z"
+      "lastFetched": "2026-07-21T19:47:20.794Z"
     },
     "1480": {
-      "file": "derived/1480.96ade4399d81.json",
-      "hash": "96ade4399d81",
-      "from": 2026,
+      "file": "derived/1480.f0a772e20f70.json",
+      "hash": "f0a772e20f70",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.223Z"
+      "lastFetched": "2026-07-21T19:47:19.748Z"
     },
     "1481": {
-      "file": "derived/1481.9e920c77bdfd.json",
-      "hash": "9e920c77bdfd",
-      "from": 2026,
+      "file": "derived/1481.35af5077fa7c.json",
+      "hash": "35af5077fa7c",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.321Z"
+      "lastFetched": "2026-07-21T19:47:20.809Z"
     },
     "1482": {
-      "file": "derived/1482.8622de526aec.json",
-      "hash": "8622de526aec",
-      "from": 2026,
+      "file": "derived/1482.c5682f819f2f.json",
+      "hash": "c5682f819f2f",
+      "from": 2018,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.649Z"
+      "lastFetched": "2026-07-21T19:47:23.641Z"
     },
     "1483": {
-      "file": "derived/1483.1701c9b11a90.json",
-      "hash": "1701c9b11a90",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.224Z"
+      "file": "derived/1483.6168b4687d22.json",
+      "hash": "6168b4687d22",
+      "from": 2001,
+      "to": 2011,
+      "lastFetched": "2026-07-21T19:47:19.759Z"
     },
     "1485": {
-      "file": "derived/1485.0bcde829383a.json",
-      "hash": "0bcde829383a",
-      "from": 2026,
+      "file": "derived/1485.fe5023b0099e.json",
+      "hash": "fe5023b0099e",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.323Z"
+      "lastFetched": "2026-07-21T19:47:20.824Z"
     },
     "1486": {
-      "file": "derived/1486.cd0cb68b3689.json",
-      "hash": "cd0cb68b3689",
-      "from": 2026,
+      "file": "derived/1486.242f8671f167.json",
+      "hash": "242f8671f167",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.225Z"
+      "lastFetched": "2026-07-21T19:47:19.774Z"
     },
     "1487": {
-      "file": "derived/1487.51260cd4569f.json",
-      "hash": "51260cd4569f",
-      "from": 2026,
+      "file": "derived/1487.4ce19a735f55.json",
+      "hash": "4ce19a735f55",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.324Z"
+      "lastFetched": "2026-07-21T19:47:20.840Z"
     },
     "1490": {
-      "file": "derived/1490.a5fd73a47a8e.json",
-      "hash": "a5fd73a47a8e",
-      "from": 2026,
+      "file": "derived/1490.bff5687c43e0.json",
+      "hash": "bff5687c43e0",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.229Z"
+      "lastFetched": "2026-07-21T19:47:19.791Z"
     },
     "1493": {
-      "file": "derived/1493.b03fd9bc1032.json",
-      "hash": "b03fd9bc1032",
-      "from": 2026,
+      "file": "derived/1493.d45f393402fc.json",
+      "hash": "d45f393402fc",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.325Z"
+      "lastFetched": "2026-07-21T19:47:20.858Z"
     },
     "1494": {
-      "file": "derived/1494.62c29393236e.json",
-      "hash": "62c29393236e",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.229Z"
+      "file": "derived/1494.44faa86fc76b.json",
+      "hash": "44faa86fc76b",
+      "from": 2003,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.796Z"
     },
     "1495": {
-      "file": "derived/1495.87fc13ef0b28.json",
-      "hash": "87fc13ef0b28",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.230Z"
+      "file": "derived/1495.e1d1aa094b4a.json",
+      "hash": "e1d1aa094b4a",
+      "from": 2003,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:19.797Z"
     },
     "1496": {
-      "file": "derived/1496.6c2bbe52505e.json",
-      "hash": "6c2bbe52505e",
-      "from": 2026,
+      "file": "derived/1496.d748cc63eb6e.json",
+      "hash": "d748cc63eb6e",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.326Z"
+      "lastFetched": "2026-07-21T19:47:20.871Z"
     },
     "1570": {
-      "file": "derived/1570.4afcd0e31bd8.json",
-      "hash": "4afcd0e31bd8",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.327Z"
+      "file": "derived/1570.110a018e4f93.json",
+      "hash": "110a018e4f93",
+      "from": 1997,
+      "to": 2007,
+      "lastFetched": "2026-07-21T19:47:20.879Z"
     },
     "1573": {
       "file": "derived/1573.52515617f1a7.json",
@@ -827,270 +827,270 @@
       "lastFetched": "2026-07-21T17:46:01.231Z"
     },
     "1578": {
-      "file": "derived/1578.00cf05362569.json",
-      "hash": "00cf05362569",
-      "from": 2026,
+      "file": "derived/1578.ada9e1023542.json",
+      "hash": "ada9e1023542",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.232Z"
+      "lastFetched": "2026-07-21T19:47:19.810Z"
     },
     "1579": {
-      "file": "derived/1579.3961f0e9a1cd.json",
-      "hash": "3961f0e9a1cd",
-      "from": 2026,
+      "file": "derived/1579.94c8d04630a4.json",
+      "hash": "94c8d04630a4",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.730Z"
+      "lastFetched": "2026-07-21T19:47:23.742Z"
     },
     "1590": {
-      "file": "derived/1590.849d4c894c11.json",
-      "hash": "849d4c894c11",
-      "from": 2026,
+      "file": "derived/1590.38cb6ff5643a.json",
+      "hash": "38cb6ff5643a",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.328Z"
+      "lastFetched": "2026-07-21T19:47:20.894Z"
     },
     "1596": {
-      "file": "derived/1596.d07488c090a0.json",
-      "hash": "d07488c090a0",
-      "from": 2026,
+      "file": "derived/1596.821e045dc873.json",
+      "hash": "821e045dc873",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.234Z"
+      "lastFetched": "2026-07-21T19:47:19.828Z"
     },
     "1672": {
-      "file": "derived/1672.ac6501c83a39.json",
-      "hash": "ac6501c83a39",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.329Z"
+      "file": "derived/1672.78b8108eacfd.json",
+      "hash": "78b8108eacfd",
+      "from": 2001,
+      "to": 2006,
+      "lastFetched": "2026-07-21T19:47:20.902Z"
     },
     "1673": {
-      "file": "derived/1673.044b70dd8325.json",
-      "hash": "044b70dd8325",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.235Z"
+      "file": "derived/1673.5314f42266e5.json",
+      "hash": "5314f42266e5",
+      "from": 1998,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:19.844Z"
     },
     "1678": {
-      "file": "derived/1678.1184301c6d3f.json",
-      "hash": "1184301c6d3f",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.236Z"
+      "file": "derived/1678.03e2b269dbf2.json",
+      "hash": "03e2b269dbf2",
+      "from": 1995,
+      "to": 1999,
+      "lastFetched": "2026-07-21T19:47:19.850Z"
     },
     "1679": {
-      "file": "derived/1679.2bfdc95dc997.json",
-      "hash": "2bfdc95dc997",
-      "from": 2026,
+      "file": "derived/1679.6282caa7501c.json",
+      "hash": "6282caa7501c",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.329Z"
+      "lastFetched": "2026-07-21T19:47:20.910Z"
     },
     "1685": {
-      "file": "derived/1685.87837f95137f.json",
-      "hash": "87837f95137f",
-      "from": 2026,
+      "file": "derived/1685.dadb00b869d2.json",
+      "hash": "dadb00b869d2",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.331Z"
+      "lastFetched": "2026-07-21T19:47:20.923Z"
     },
     "1689": {
-      "file": "derived/1689.9baade4f8767.json",
-      "hash": "9baade4f8767",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.236Z"
+      "file": "derived/1689.0d8de60d6d81.json",
+      "hash": "0d8de60d6d81",
+      "from": 2001,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:19.861Z"
     },
     "1777": {
-      "file": "derived/1777.0563b9875fbb.json",
-      "hash": "0563b9875fbb",
-      "from": 2026,
+      "file": "derived/1777.8ba229d223bc.json",
+      "hash": "8ba229d223bc",
+      "from": 2023,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.679Z"
+      "lastFetched": "2026-07-21T19:47:23.693Z"
     },
     "1779": {
-      "file": "derived/1779.ea7caf9b92e9.json",
-      "hash": "ea7caf9b92e9",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.237Z"
+      "file": "derived/1779.65a804d814b2.json",
+      "hash": "65a804d814b2",
+      "from": 1997,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:19.881Z"
     },
     "1781": {
-      "file": "derived/1781.dde8c2b073c9.json",
-      "hash": "dde8c2b073c9",
-      "from": 2026,
+      "file": "derived/1781.7a93a2663233.json",
+      "hash": "7a93a2663233",
+      "from": 2018,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.651Z"
+      "lastFetched": "2026-07-21T19:47:23.645Z"
     },
     "1868": {
-      "file": "derived/1868.c5297b71bd9a.json",
-      "hash": "c5297b71bd9a",
-      "from": 2026,
+      "file": "derived/1868.f542f12752ff.json",
+      "hash": "f542f12752ff",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.332Z"
+      "lastFetched": "2026-07-21T19:47:20.935Z"
     },
     "1881": {
-      "file": "derived/1881.15542d45eab3.json",
-      "hash": "15542d45eab3",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.237Z"
+      "file": "derived/1881.73170db75585.json",
+      "hash": "73170db75585",
+      "from": 2000,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:19.896Z"
     },
     "1919": {
-      "file": "derived/1919.87fadf0f22c4.json",
-      "hash": "87fadf0f22c4",
-      "from": 2026,
+      "file": "derived/1919.99004e5441d3.json",
+      "hash": "99004e5441d3",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.238Z"
+      "lastFetched": "2026-07-21T19:47:19.915Z"
     },
     "1924": {
-      "file": "derived/1924.3f581df4abf0.json",
-      "hash": "3f581df4abf0",
-      "from": 2026,
+      "file": "derived/1924.79fcec274c73.json",
+      "hash": "79fcec274c73",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.333Z"
+      "lastFetched": "2026-07-21T19:47:20.951Z"
     },
     "1925": {
-      "file": "derived/1925.ce18d0128656.json",
-      "hash": "ce18d0128656",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.334Z"
+      "file": "derived/1925.0ab142b2739a.json",
+      "hash": "0ab142b2739a",
+      "from": 2000,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:20.959Z"
     },
     "1936": {
-      "file": "derived/1936.73f157bbd119.json",
-      "hash": "73f157bbd119",
-      "from": 2026,
+      "file": "derived/1936.4fef9d684d6e.json",
+      "hash": "4fef9d684d6e",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.335Z"
+      "lastFetched": "2026-07-21T19:47:20.970Z"
     },
     "1938": {
-      "file": "derived/1938.253e9ca747c5.json",
-      "hash": "253e9ca747c5",
-      "from": 2026,
+      "file": "derived/1938.25756c5426ed.json",
+      "hash": "25756c5426ed",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.239Z"
+      "lastFetched": "2026-07-21T19:47:19.930Z"
     },
     "2050": {
-      "file": "derived/2050.1042c2bc1686.json",
-      "hash": "1042c2bc1686",
-      "from": 2026,
+      "file": "derived/2050.9b4ae14b490f.json",
+      "hash": "9b4ae14b490f",
+      "from": 2002,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.240Z"
+      "lastFetched": "2026-07-21T19:47:19.945Z"
     },
     "2175": {
-      "file": "derived/2175.3d472b5ace6c.json",
-      "hash": "3d472b5ace6c",
-      "from": 2026,
+      "file": "derived/2175.ef20fecaebdd.json",
+      "hash": "ef20fecaebdd",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.242Z"
+      "lastFetched": "2026-07-21T19:47:19.963Z"
     },
     "2197": {
-      "file": "derived/2197.a5614a9eaf66.json",
-      "hash": "a5614a9eaf66",
-      "from": 2026,
+      "file": "derived/2197.ca11a446d8c5.json",
+      "hash": "ca11a446d8c5",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.243Z"
+      "lastFetched": "2026-07-21T19:47:19.978Z"
     },
     "2266": {
-      "file": "derived/2266.e9d3ecfb00f9.json",
-      "hash": "e9d3ecfb00f9",
-      "from": 2026,
+      "file": "derived/2266.64aea3bf906a.json",
+      "hash": "64aea3bf906a",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.336Z"
+      "lastFetched": "2026-07-21T19:47:20.983Z"
     },
     "2304": {
-      "file": "derived/2304.d6432c21b571.json",
-      "hash": "d6432c21b571",
-      "from": 2026,
+      "file": "derived/2304.2b405ed35a8b.json",
+      "hash": "2b405ed35a8b",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.244Z"
+      "lastFetched": "2026-07-21T19:47:19.996Z"
     },
     "2315": {
-      "file": "derived/2315.0d46cec31ef4.json",
-      "hash": "0d46cec31ef4",
-      "from": 2026,
+      "file": "derived/2315.cf86a27638f7.json",
+      "hash": "cf86a27638f7",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.245Z"
+      "lastFetched": "2026-07-21T19:47:20.017Z"
     },
     "2318": {
-      "file": "derived/2318.8374b900df82.json",
-      "hash": "8374b900df82",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.336Z"
+      "file": "derived/2318.a81e1951dacf.json",
+      "hash": "a81e1951dacf",
+      "from": 1995,
+      "to": 2007,
+      "lastFetched": "2026-07-21T19:47:20.992Z"
     },
     "2319": {
-      "file": "derived/2319.ada978ceed21.json",
-      "hash": "ada978ceed21",
-      "from": 2026,
+      "file": "derived/2319.5b224b94522f.json",
+      "hash": "5b224b94522f",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.247Z"
+      "lastFetched": "2026-07-21T19:47:20.034Z"
     },
     "2320": {
-      "file": "derived/2320.4abf207b9949.json",
-      "hash": "4abf207b9949",
-      "from": 2026,
+      "file": "derived/2320.91a0ac553e18.json",
+      "hash": "91a0ac553e18",
+      "from": 2014,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.337Z"
+      "lastFetched": "2026-07-21T19:47:20.999Z"
     },
     "2323": {
-      "file": "derived/2323.2ba81ab59d6f.json",
-      "hash": "2ba81ab59d6f",
-      "from": 2026,
+      "file": "derived/2323.53dc491a12d5.json",
+      "hash": "53dc491a12d5",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.248Z"
+      "lastFetched": "2026-07-21T19:47:20.046Z"
     },
     "2370": {
-      "file": "derived/2370.1ab9ed73bd7d.json",
-      "hash": "1ab9ed73bd7d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.338Z"
+      "file": "derived/2370.f51de5af7858.json",
+      "hash": "f51de5af7858",
+      "from": 2013,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:21.005Z"
     },
     "2390": {
-      "file": "derived/2390.799ee90c00ba.json",
-      "hash": "799ee90c00ba",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.248Z"
+      "file": "derived/2390.a9e261bfc503.json",
+      "hash": "a9e261bfc503",
+      "from": 2015,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:20.051Z"
     },
     "2428": {
-      "file": "derived/2428.6c3c53a4dee3.json",
-      "hash": "6c3c53a4dee3",
-      "from": 2026,
+      "file": "derived/2428.65534a9bf3d9.json",
+      "hash": "65534a9bf3d9",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.339Z"
+      "lastFetched": "2026-07-21T19:47:21.019Z"
     },
     "2443": {
-      "file": "derived/2443.309b38984e29.json",
-      "hash": "309b38984e29",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.249Z"
+      "file": "derived/2443.3fdc2a13ffac.json",
+      "hash": "3fdc2a13ffac",
+      "from": 1993,
+      "to": 1997,
+      "lastFetched": "2026-07-21T19:47:20.055Z"
     },
     "2453": {
-      "file": "derived/2453.e7348e1eb89a.json",
-      "hash": "e7348e1eb89a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.340Z"
+      "file": "derived/2453.fd9c993ff3e3.json",
+      "hash": "fd9c993ff3e3",
+      "from": 1994,
+      "to": 2018,
+      "lastFetched": "2026-07-21T19:47:21.026Z"
     },
     "2454": {
-      "file": "derived/2454.d2224fef1951.json",
-      "hash": "d2224fef1951",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.249Z"
+      "file": "derived/2454.5d870e6d14b7.json",
+      "hash": "5d870e6d14b7",
+      "from": 2000,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:20.058Z"
     },
     "2480": {
-      "file": "derived/2480.310f68a9dcb6.json",
-      "hash": "310f68a9dcb6",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.340Z"
+      "file": "derived/2480.22348c9591c9.json",
+      "hash": "22348c9591c9",
+      "from": 2013,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:21.034Z"
     },
     "2481": {
-      "file": "derived/2481.d4f2653eb136.json",
-      "hash": "d4f2653eb136",
-      "from": 2026,
+      "file": "derived/2481.0ca0ae74ef91.json",
+      "hash": "0ca0ae74ef91",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.250Z"
+      "lastFetched": "2026-07-21T19:47:20.069Z"
     },
     "2525": {
       "file": "derived/2525.cc685f65c3ff.json",
@@ -1100,508 +1100,508 @@
       "lastFetched": "2026-07-21T17:46:01.341Z"
     },
     "2530": {
-      "file": "derived/2530.2e03a8e6949c.json",
-      "hash": "2e03a8e6949c",
-      "from": 2026,
+      "file": "derived/2530.b3e66e4208d6.json",
+      "hash": "b3e66e4208d6",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.670Z"
+      "lastFetched": "2026-07-21T19:47:23.677Z"
     },
     "2630": {
-      "file": "derived/2630.a606fe3c26ed.json",
-      "hash": "a606fe3c26ed",
-      "from": 2026,
+      "file": "derived/2630.0b18bb6043c5.json",
+      "hash": "0b18bb6043c5",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.690Z"
+      "lastFetched": "2026-07-21T19:47:23.708Z"
     },
     "2631": {
-      "file": "derived/2631.7c60b2c86611.json",
-      "hash": "7c60b2c86611",
-      "from": 2026,
+      "file": "derived/2631.8cf7bd75d6f9.json",
+      "hash": "8cf7bd75d6f9",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.251Z"
+      "lastFetched": "2026-07-21T19:47:20.086Z"
     },
     "2636": {
-      "file": "derived/2636.c80f953335ff.json",
-      "hash": "c80f953335ff",
-      "from": 2026,
+      "file": "derived/2636.c829aeba84fe.json",
+      "hash": "c829aeba84fe",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.342Z"
+      "lastFetched": "2026-07-21T19:47:21.050Z"
     },
     "2640": {
-      "file": "derived/2640.fa4f6ff1b6ff.json",
-      "hash": "fa4f6ff1b6ff",
-      "from": 2026,
+      "file": "derived/2640.c1aafe675060.json",
+      "hash": "c1aafe675060",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.253Z"
+      "lastFetched": "2026-07-21T19:47:20.101Z"
     },
     "2641": {
-      "file": "derived/2641.a1d39a9b2cdb.json",
-      "hash": "a1d39a9b2cdb",
-      "from": 2026,
+      "file": "derived/2641.870fee7c9fb3.json",
+      "hash": "870fee7c9fb3",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.343Z"
+      "lastFetched": "2026-07-21T19:47:21.066Z"
     },
     "2642": {
-      "file": "derived/2642.eb4ad382885b.json",
-      "hash": "eb4ad382885b",
-      "from": 2026,
+      "file": "derived/2642.3f23aab10558.json",
+      "hash": "3f23aab10558",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.254Z"
+      "lastFetched": "2026-07-21T19:47:20.118Z"
     },
     "2643": {
-      "file": "derived/2643.b1653da59a7b.json",
-      "hash": "b1653da59a7b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.642Z"
+      "file": "derived/2643.a72b536df87e.json",
+      "hash": "a72b536df87e",
+      "from": 2018,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:23.624Z"
     },
     "2644": {
-      "file": "derived/2644.b8addffba28d.json",
-      "hash": "b8addffba28d",
-      "from": 2026,
+      "file": "derived/2644.32d127ee8d86.json",
+      "hash": "32d127ee8d86",
+      "from": 2023,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.698Z"
+      "lastFetched": "2026-07-21T19:47:23.716Z"
     },
     "2646": {
-      "file": "derived/2646.78bbd4b2e82b.json",
-      "hash": "78bbd4b2e82b",
-      "from": 2026,
+      "file": "derived/2646.2d0dfdf76e50.json",
+      "hash": "2d0dfdf76e50",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.344Z"
+      "lastFetched": "2026-07-21T19:47:21.083Z"
     },
     "2655": {
-      "file": "derived/2655.9b70ae2f480d.json",
-      "hash": "9b70ae2f480d",
-      "from": 2026,
+      "file": "derived/2655.fd63ab94941f.json",
+      "hash": "fd63ab94941f",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.346Z"
+      "lastFetched": "2026-07-21T19:47:21.094Z"
     },
     "2691": {
-      "file": "derived/2691.2cc43c8bd550.json",
-      "hash": "2cc43c8bd550",
-      "from": 2026,
+      "file": "derived/2691.e9f19b6b7bcc.json",
+      "hash": "e9f19b6b7bcc",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.689Z"
+      "lastFetched": "2026-07-21T19:47:23.706Z"
     },
     "2692": {
-      "file": "derived/2692.48559e30624e.json",
-      "hash": "48559e30624e",
-      "from": 2026,
+      "file": "derived/2692.05bebf15eb48.json",
+      "hash": "05bebf15eb48",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.255Z"
+      "lastFetched": "2026-07-21T19:47:20.137Z"
     },
     "2693": {
-      "file": "derived/2693.3d1d51a3dd83.json",
-      "hash": "3d1d51a3dd83",
-      "from": 2026,
+      "file": "derived/2693.366fbdb21251.json",
+      "hash": "366fbdb21251",
+      "from": 2016,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.256Z"
+      "lastFetched": "2026-07-21T19:47:20.146Z"
     },
     "2738": {
-      "file": "derived/2738.f744d711e081.json",
-      "hash": "f744d711e081",
-      "from": 2026,
+      "file": "derived/2738.618b8fc4ed57.json",
+      "hash": "618b8fc4ed57",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.257Z"
+      "lastFetched": "2026-07-21T19:47:20.160Z"
     },
     "2841": {
-      "file": "derived/2841.8db903e2d5c9.json",
-      "hash": "8db903e2d5c9",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.347Z"
+      "file": "derived/2841.151ac0b990da.json",
+      "hash": "151ac0b990da",
+      "from": 2013,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:21.101Z"
     },
     "2862": {
-      "file": "derived/2862.f25b7bdd2fc2.json",
-      "hash": "f25b7bdd2fc2",
-      "from": 2026,
+      "file": "derived/2862.db0b5b20e2cf.json",
+      "hash": "db0b5b20e2cf",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.258Z"
+      "lastFetched": "2026-07-21T19:47:20.178Z"
     },
     "2941": {
-      "file": "derived/2941.044dd834a30a.json",
-      "hash": "044dd834a30a",
-      "from": 2026,
+      "file": "derived/2941.a2e0b9d46376.json",
+      "hash": "a2e0b9d46376",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.348Z"
+      "lastFetched": "2026-07-21T19:47:21.118Z"
     },
     "3007": {
-      "file": "derived/3007.a7a8dc69d5d0.json",
-      "hash": "a7a8dc69d5d0",
-      "from": 2026,
+      "file": "derived/3007.cccabd76d0d2.json",
+      "hash": "cccabd76d0d2",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.259Z"
+      "lastFetched": "2026-07-21T19:47:20.191Z"
     },
     "3054": {
-      "file": "derived/3054.de3f3cfea60b.json",
-      "hash": "de3f3cfea60b",
-      "from": 2026,
+      "file": "derived/3054.9ebcd1700a46.json",
+      "hash": "9ebcd1700a46",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.349Z"
+      "lastFetched": "2026-07-21T19:47:21.134Z"
     },
     "3103": {
-      "file": "derived/3103.7c3a4fec3feb.json",
-      "hash": "7c3a4fec3feb",
-      "from": 2026,
+      "file": "derived/3103.07462796246b.json",
+      "hash": "07462796246b",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.350Z"
+      "lastFetched": "2026-07-21T19:47:21.150Z"
     },
     "3122": {
-      "file": "derived/3122.847f4906951a.json",
-      "hash": "847f4906951a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.260Z"
+      "file": "derived/3122.a1e45c315c90.json",
+      "hash": "a1e45c315c90",
+      "from": 2009,
+      "to": 2016,
+      "lastFetched": "2026-07-21T19:47:20.198Z"
     },
     "3128": {
-      "file": "derived/3128.a9970099a0c0.json",
-      "hash": "a9970099a0c0",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.351Z"
+      "file": "derived/3128.a6733e2f87aa.json",
+      "hash": "a6733e2f87aa",
+      "from": 2011,
+      "to": 2014,
+      "lastFetched": "2026-07-21T19:47:21.155Z"
     },
     "3223": {
-      "file": "derived/3223.ae691dd6e8dc.json",
-      "hash": "ae691dd6e8dc",
-      "from": 2026,
+      "file": "derived/3223.6f6b188a155e.json",
+      "hash": "6f6b188a155e",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.352Z"
+      "lastFetched": "2026-07-21T19:47:21.166Z"
     },
     "3225": {
-      "file": "derived/3225.39e084d670cf.json",
-      "hash": "39e084d670cf",
-      "from": 2026,
+      "file": "derived/3225.359e0088521e.json",
+      "hash": "359e0088521e",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.261Z"
+      "lastFetched": "2026-07-21T19:47:20.213Z"
     },
     "3229": {
-      "file": "derived/3229.50af787a201a.json",
-      "hash": "50af787a201a",
-      "from": 2026,
+      "file": "derived/3229.b9c786bb3db7.json",
+      "hash": "b9c786bb3db7",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.728Z"
+      "lastFetched": "2026-07-21T19:47:23.741Z"
     },
     "3242": {
-      "file": "derived/3242.dbf5c843c8f1.json",
-      "hash": "dbf5c843c8f1",
-      "from": 2026,
+      "file": "derived/3242.9f31401f0144.json",
+      "hash": "9f31401f0144",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.262Z"
+      "lastFetched": "2026-07-21T19:47:20.229Z"
     },
     "3292": {
-      "file": "derived/3292.ea2a8a8e0d20.json",
-      "hash": "ea2a8a8e0d20",
-      "from": 2026,
+      "file": "derived/3292.19adb8b8cb9c.json",
+      "hash": "19adb8b8cb9c",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.263Z"
+      "lastFetched": "2026-07-21T19:47:20.245Z"
     },
     "3317": {
-      "file": "derived/3317.fd27d657884e.json",
-      "hash": "fd27d657884e",
-      "from": 2026,
+      "file": "derived/3317.e7572fa82a98.json",
+      "hash": "e7572fa82a98",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.353Z"
+      "lastFetched": "2026-07-21T19:47:21.181Z"
     },
     "3339": {
-      "file": "derived/3339.f83a95f90cb2.json",
-      "hash": "f83a95f90cb2",
-      "from": 2026,
+      "file": "derived/3339.5b423eea2673.json",
+      "hash": "5b423eea2673",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.703Z"
+      "lastFetched": "2026-07-21T19:47:23.721Z"
     },
     "3371": {
-      "file": "derived/3371.66b09f3c5840.json",
-      "hash": "66b09f3c5840",
-      "from": 2026,
+      "file": "derived/3371.338fcaa3032f.json",
+      "hash": "338fcaa3032f",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.264Z"
+      "lastFetched": "2026-07-21T19:47:20.258Z"
     },
     "3380": {
-      "file": "derived/3380.38ce449c8ac0.json",
-      "hash": "38ce449c8ac0",
-      "from": 2026,
+      "file": "derived/3380.efa96e8575ee.json",
+      "hash": "efa96e8575ee",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.354Z"
+      "lastFetched": "2026-07-21T19:47:21.199Z"
     },
     "3433": {
-      "file": "derived/3433.7dc61fe94d29.json",
-      "hash": "7dc61fe94d29",
-      "from": 2026,
+      "file": "derived/3433.c2617673674f.json",
+      "hash": "c2617673674f",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.265Z"
+      "lastFetched": "2026-07-21T19:47:20.273Z"
     },
     "3463": {
-      "file": "derived/3463.3fe3544a89e3.json",
-      "hash": "3fe3544a89e3",
-      "from": 2026,
+      "file": "derived/3463.221c7689f903.json",
+      "hash": "221c7689f903",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.267Z"
+      "lastFetched": "2026-07-21T19:47:20.290Z"
     },
     "3470": {
-      "file": "derived/3470.5e6a240968ea.json",
-      "hash": "5e6a240968ea",
-      "from": 2026,
+      "file": "derived/3470.0ee68c263a61.json",
+      "hash": "0ee68c263a61",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.268Z"
+      "lastFetched": "2026-07-21T19:47:20.299Z"
     },
     "3471": {
-      "file": "derived/3471.2d8b008c90b8.json",
-      "hash": "2d8b008c90b8",
-      "from": 2026,
+      "file": "derived/3471.454031804c16.json",
+      "hash": "454031804c16",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.356Z"
+      "lastFetched": "2026-07-21T19:47:21.214Z"
     },
     "3474": {
-      "file": "derived/3474.15c66ab68940.json",
-      "hash": "15c66ab68940",
-      "from": 2026,
+      "file": "derived/3474.31399cf8c26a.json",
+      "hash": "31399cf8c26a",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.269Z"
+      "lastFetched": "2026-07-21T19:47:20.313Z"
     },
     "3477": {
-      "file": "derived/3477.851e1e0f4f11.json",
-      "hash": "851e1e0f4f11",
-      "from": 2026,
+      "file": "derived/3477.6e924f641fb8.json",
+      "hash": "6e924f641fb8",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.357Z"
+      "lastFetched": "2026-07-21T19:47:21.231Z"
     },
     "3482": {
-      "file": "derived/3482.31b0459c79b9.json",
-      "hash": "31b0459c79b9",
-      "from": 2026,
+      "file": "derived/3482.a75943d407ce.json",
+      "hash": "a75943d407ce",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.731Z"
+      "lastFetched": "2026-07-21T19:47:23.743Z"
     },
     "3490": {
-      "file": "derived/3490.8a2b43983b9c.json",
-      "hash": "8a2b43983b9c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.269Z"
+      "file": "derived/3490.ed6ffa572f35.json",
+      "hash": "ed6ffa572f35",
+      "from": 2010,
+      "to": 2021,
+      "lastFetched": "2026-07-21T19:47:20.323Z"
     },
     "3585": {
-      "file": "derived/3585.9792db39f224.json",
-      "hash": "9792db39f224",
-      "from": 2026,
+      "file": "derived/3585.5bb02dfbb95f.json",
+      "hash": "5bb02dfbb95f",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.686Z"
+      "lastFetched": "2026-07-21T19:47:23.702Z"
     },
     "3591": {
-      "file": "derived/3591.8941ead7bbf4.json",
-      "hash": "8941ead7bbf4",
-      "from": 2026,
+      "file": "derived/3591.2449d2c9a544.json",
+      "hash": "2449d2c9a544",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.272Z"
+      "lastFetched": "2026-07-21T19:47:20.333Z"
     },
     "3595": {
-      "file": "derived/3595.b594ba1d300b.json",
-      "hash": "b594ba1d300b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.358Z"
+      "file": "derived/3595.1f3cae6acfe0.json",
+      "hash": "1f3cae6acfe0",
+      "from": 2006,
+      "to": 2015,
+      "lastFetched": "2026-07-21T19:47:21.239Z"
     },
     "3596": {
-      "file": "derived/3596.1e4c35cfb85b.json",
-      "hash": "1e4c35cfb85b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.273Z"
+      "file": "derived/3596.2b9650d4b93d.json",
+      "hash": "2b9650d4b93d",
+      "from": 2015,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:20.338Z"
     },
     "3658": {
-      "file": "derived/3658.0fc2abba75e4.json",
-      "hash": "0fc2abba75e4",
-      "from": 2026,
+      "file": "derived/3658.b2958152dbde.json",
+      "hash": "b2958152dbde",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.359Z"
+      "lastFetched": "2026-07-21T19:47:21.254Z"
     },
     "3662": {
-      "file": "derived/3662.5fd2d98b9abb.json",
-      "hash": "5fd2d98b9abb",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.273Z"
+      "file": "derived/3662.869706cb147d.json",
+      "hash": "869706cb147d",
+      "from": 1995,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:20.345Z"
     },
     "3691": {
-      "file": "derived/3691.8ad4c64c72d6.json",
-      "hash": "8ad4c64c72d6",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.359Z"
+      "file": "derived/3691.5f877db24f99.json",
+      "hash": "5f877db24f99",
+      "from": 1997,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:21.264Z"
     },
     "3692": {
-      "file": "derived/3692.95aa04a28566.json",
-      "hash": "95aa04a28566",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.273Z"
+      "file": "derived/3692.35173d33fbd2.json",
+      "hash": "35173d33fbd2",
+      "from": 2002,
+      "to": 2009,
+      "lastFetched": "2026-07-21T19:47:20.351Z"
     },
     "3693": {
-      "file": "derived/3693.606f10885a10.json",
-      "hash": "606f10885a10",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.360Z"
+      "file": "derived/3693.577b816311a4.json",
+      "hash": "577b816311a4",
+      "from": 2002,
+      "to": 2005,
+      "lastFetched": "2026-07-21T19:47:21.268Z"
     },
     "3694": {
-      "file": "derived/3694.077a12426b9c.json",
-      "hash": "077a12426b9c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.274Z"
+      "file": "derived/3694.6527bb62e088.json",
+      "hash": "6527bb62e088",
+      "from": 2002,
+      "to": 2005,
+      "lastFetched": "2026-07-21T19:47:20.354Z"
     },
     "3695": {
-      "file": "derived/3695.5f5ea9765700.json",
-      "hash": "5f5ea9765700",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.360Z"
+      "file": "derived/3695.0a7976d9dccd.json",
+      "hash": "0a7976d9dccd",
+      "from": 2007,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:21.272Z"
     },
     "3696": {
-      "file": "derived/3696.cb846f207f61.json",
-      "hash": "cb846f207f61",
-      "from": 2026,
+      "file": "derived/3696.0f444045e138.json",
+      "hash": "0f444045e138",
+      "from": 2002,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.275Z"
+      "lastFetched": "2026-07-21T19:47:20.365Z"
     },
     "3720": {
-      "file": "derived/3720.d5e97500aa35.json",
-      "hash": "d5e97500aa35",
-      "from": 2026,
+      "file": "derived/3720.f26aabd16010.json",
+      "hash": "f26aabd16010",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.361Z"
+      "lastFetched": "2026-07-21T19:47:21.287Z"
     },
     "3751": {
-      "file": "derived/3751.7eaae87c8dca.json",
-      "hash": "7eaae87c8dca",
-      "from": 2026,
+      "file": "derived/3751.e9137f58970e.json",
+      "hash": "e9137f58970e",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.647Z"
+      "lastFetched": "2026-07-21T19:47:23.635Z"
     },
     "3752": {
-      "file": "derived/3752.d31540a5663d.json",
-      "hash": "d31540a5663d",
-      "from": 2026,
+      "file": "derived/3752.0c9fe4b8909e.json",
+      "hash": "0c9fe4b8909e",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.362Z"
+      "lastFetched": "2026-07-21T19:47:21.306Z"
     },
     "3754": {
-      "file": "derived/3754.619767ff3aea.json",
-      "hash": "619767ff3aea",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.275Z"
+      "file": "derived/3754.61302e0cfa9d.json",
+      "hash": "61302e0cfa9d",
+      "from": 1995,
+      "to": 2021,
+      "lastFetched": "2026-07-21T19:47:20.380Z"
     },
     "3779": {
-      "file": "derived/3779.624b83e4c097.json",
-      "hash": "624b83e4c097",
-      "from": 2026,
+      "file": "derived/3779.88e6a9b7abf2.json",
+      "hash": "88e6a9b7abf2",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.364Z"
+      "lastFetched": "2026-07-21T19:47:21.321Z"
     },
     "3797": {
-      "file": "derived/3797.c81780f9c076.json",
-      "hash": "c81780f9c076",
-      "from": 2026,
+      "file": "derived/3797.bb9c93f7f640.json",
+      "hash": "bb9c93f7f640",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.365Z"
+      "lastFetched": "2026-07-21T19:47:21.335Z"
     },
     "3975": {
-      "file": "derived/3975.05efd1d30c13.json",
-      "hash": "05efd1d30c13",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.365Z"
+      "file": "derived/3975.ac23447bf09f.json",
+      "hash": "ac23447bf09f",
+      "from": 1994,
+      "to": 2005,
+      "lastFetched": "2026-07-21T19:47:21.346Z"
     },
     "3976": {
-      "file": "derived/3976.85929b32d845.json",
-      "hash": "85929b32d845",
-      "from": 2026,
+      "file": "derived/3976.53562ca609ca.json",
+      "hash": "53562ca609ca",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.276Z"
+      "lastFetched": "2026-07-21T19:47:20.395Z"
     },
     "4019": {
-      "file": "derived/4019.cff84867bfb0.json",
-      "hash": "cff84867bfb0",
-      "from": 2026,
+      "file": "derived/4019.f9588b1c33b2.json",
+      "hash": "f9588b1c33b2",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.366Z"
+      "lastFetched": "2026-07-21T19:47:21.362Z"
     },
     "4020": {
-      "file": "derived/4020.8073e48d2ac7.json",
-      "hash": "8073e48d2ac7",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.277Z"
+      "file": "derived/4020.96790c4ff145.json",
+      "hash": "96790c4ff145",
+      "from": 1996,
+      "to": 1997,
+      "lastFetched": "2026-07-21T19:47:20.399Z"
     },
     "4060": {
-      "file": "derived/4060.71473d19fa4c.json",
-      "hash": "71473d19fa4c",
-      "from": 2026,
+      "file": "derived/4060.efbc68c8bc5e.json",
+      "hash": "efbc68c8bc5e",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.367Z"
+      "lastFetched": "2026-07-21T19:47:21.381Z"
     },
     "4180": {
-      "file": "derived/4180.e498d7342839.json",
-      "hash": "e498d7342839",
-      "from": 2026,
+      "file": "derived/4180.8bdc78d6dc26.json",
+      "hash": "8bdc78d6dc26",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.278Z"
+      "lastFetched": "2026-07-21T19:47:20.414Z"
     },
     "4181": {
-      "file": "derived/4181.161dc98c7b78.json",
-      "hash": "161dc98c7b78",
-      "from": 2026,
+      "file": "derived/4181.5033ca3d8673.json",
+      "hash": "5033ca3d8673",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.369Z"
+      "lastFetched": "2026-07-21T19:47:21.394Z"
     },
     "4182": {
-      "file": "derived/4182.3bc6f639d029.json",
-      "hash": "3bc6f639d029",
-      "from": 2026,
+      "file": "derived/4182.f774cfb9c48f.json",
+      "hash": "f774cfb9c48f",
+      "from": 2014,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.279Z"
+      "lastFetched": "2026-07-21T19:47:20.424Z"
     },
     "4183": {
-      "file": "derived/4183.7fa73465f27b.json",
-      "hash": "7fa73465f27b",
-      "from": 2026,
+      "file": "derived/4183.a1aaa66ef2f1.json",
+      "hash": "a1aaa66ef2f1",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.648Z"
+      "lastFetched": "2026-07-21T19:47:23.638Z"
     },
     "4193": {
-      "file": "derived/4193.c2277bb34e04.json",
-      "hash": "c2277bb34e04",
-      "from": 2026,
+      "file": "derived/4193.543371a8b61e.json",
+      "hash": "543371a8b61e",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.280Z"
+      "lastFetched": "2026-07-21T19:47:20.440Z"
     },
     "4271": {
-      "file": "derived/4271.12cafb894950.json",
-      "hash": "12cafb894950",
-      "from": 2026,
+      "file": "derived/4271.06f6ef3a57ac.json",
+      "hash": "06f6ef3a57ac",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.370Z"
+      "lastFetched": "2026-07-21T19:47:21.409Z"
     },
     "4275": {
-      "file": "derived/4275.5ae10d64c156.json",
-      "hash": "5ae10d64c156",
-      "from": 2026,
+      "file": "derived/4275.cc5bff08ca41.json",
+      "hash": "cc5bff08ca41",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.281Z"
+      "lastFetched": "2026-07-21T19:47:20.460Z"
     },
     "4276": {
-      "file": "derived/4276.0010599edef4.json",
-      "hash": "0010599edef4",
-      "from": 2026,
+      "file": "derived/4276.9d330ff108c2.json",
+      "hash": "9d330ff108c2",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.692Z"
+      "lastFetched": "2026-07-21T19:47:23.710Z"
     },
     "4300": {
-      "file": "derived/4300.9b24d429207a.json",
-      "hash": "9b24d429207a",
-      "from": 2026,
+      "file": "derived/4300.f75dd4810ea6.json",
+      "hash": "f75dd4810ea6",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.282Z"
+      "lastFetched": "2026-07-21T19:47:20.479Z"
     },
     "4302": {
       "file": "derived/4302.1b50ad44c426.json",
@@ -1611,11 +1611,11 @@
       "lastFetched": "2026-07-21T17:46:01.371Z"
     },
     "4303": {
-      "file": "derived/4303.7082e9c8900f.json",
-      "hash": "7082e9c8900f",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.283Z"
+      "file": "derived/4303.75b2bfaf211f.json",
+      "hash": "75b2bfaf211f",
+      "from": 2004,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:20.487Z"
     },
     "4304": {
       "file": "derived/4304.37e7b895b649.json",
@@ -1625,11 +1625,11 @@
       "lastFetched": "2026-07-21T17:46:01.371Z"
     },
     "4323": {
-      "file": "derived/4323.31bcd829d78a.json",
-      "hash": "31bcd829d78a",
-      "from": 2026,
+      "file": "derived/4323.3f6ee61da6b3.json",
+      "hash": "3f6ee61da6b3",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.373Z"
+      "lastFetched": "2026-07-21T19:47:21.422Z"
     },
     "4374": {
       "file": "derived/4374.930a8d5f8c15.json",
@@ -1639,46 +1639,46 @@
       "lastFetched": "2026-07-21T17:46:01.283Z"
     },
     "4380": {
-      "file": "derived/4380.8ceb8beb6d95.json",
-      "hash": "8ceb8beb6d95",
-      "from": 2026,
+      "file": "derived/4380.840c337085d0.json",
+      "hash": "840c337085d0",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.374Z"
+      "lastFetched": "2026-07-21T19:47:21.429Z"
     },
     "4404": {
-      "file": "derived/4404.b14efba8adee.json",
-      "hash": "b14efba8adee",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.284Z"
+      "file": "derived/4404.480237868b57.json",
+      "hash": "480237868b57",
+      "from": 2008,
+      "to": 2010,
+      "lastFetched": "2026-07-21T19:47:20.490Z"
     },
     "4406": {
-      "file": "derived/4406.62f4a61cb25f.json",
-      "hash": "62f4a61cb25f",
-      "from": 2026,
+      "file": "derived/4406.587249963fb5.json",
+      "hash": "587249963fb5",
+      "from": 2011,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.375Z"
+      "lastFetched": "2026-07-21T19:47:21.436Z"
     },
     "4455": {
-      "file": "derived/4455.6347327bae2d.json",
-      "hash": "6347327bae2d",
-      "from": 2026,
+      "file": "derived/4455.7b5291d6a674.json",
+      "hash": "7b5291d6a674",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.377Z"
+      "lastFetched": "2026-07-21T19:47:21.449Z"
     },
     "4472": {
-      "file": "derived/4472.2518aeaa7729.json",
-      "hash": "2518aeaa7729",
-      "from": 2026,
+      "file": "derived/4472.99c568ca2cbc.json",
+      "hash": "99c568ca2cbc",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.285Z"
+      "lastFetched": "2026-07-21T19:47:20.505Z"
     },
     "4500": {
-      "file": "derived/4500.95482fd3bb4b.json",
-      "hash": "95482fd3bb4b",
-      "from": 2026,
+      "file": "derived/4500.d42aaafb2ca6.json",
+      "hash": "d42aaafb2ca6",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.378Z"
+      "lastFetched": "2026-07-21T19:47:21.462Z"
     },
     "4560": {
       "file": "derived/4560.1934e3dcfdee.json",
@@ -1688,32 +1688,32 @@
       "lastFetched": "2026-07-21T17:46:01.285Z"
     },
     "4614": {
-      "file": "derived/4614.3c8c08a1db14.json",
-      "hash": "3c8c08a1db14",
-      "from": 2026,
+      "file": "derived/4614.edd6cee06c96.json",
+      "hash": "edd6cee06c96",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.287Z"
+      "lastFetched": "2026-07-21T19:47:20.525Z"
     },
     "4652": {
-      "file": "derived/4652.5e62f1bb01f7.json",
-      "hash": "5e62f1bb01f7",
-      "from": 2026,
+      "file": "derived/4652.e6b51d3405f3.json",
+      "hash": "e6b51d3405f3",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.288Z"
+      "lastFetched": "2026-07-21T19:47:20.539Z"
     },
     "4828": {
-      "file": "derived/4828.5c38661548fb.json",
-      "hash": "5c38661548fb",
-      "from": 2026,
+      "file": "derived/4828.ea6329522b1a.json",
+      "hash": "ea6329522b1a",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.379Z"
+      "lastFetched": "2026-07-21T19:47:21.475Z"
     },
     "4830": {
-      "file": "derived/4830.83ebe25a8651.json",
-      "hash": "83ebe25a8651",
-      "from": 2026,
+      "file": "derived/4830.82454e95819d.json",
+      "hash": "82454e95819d",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.381Z"
+      "lastFetched": "2026-07-21T19:47:21.489Z"
     },
     "4832": {
       "file": "derived/4832.eefa2cef5f1e.json",
@@ -1723,25 +1723,25 @@
       "lastFetched": "2026-07-21T17:46:01.288Z"
     },
     "4867": {
-      "file": "derived/4867.8719b054b01f.json",
-      "hash": "8719b054b01f",
-      "from": 2026,
+      "file": "derived/4867.11137f030f7d.json",
+      "hash": "11137f030f7d",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.382Z"
+      "lastFetched": "2026-07-21T19:47:21.506Z"
     },
     "4912": {
-      "file": "derived/4912.374c29e0bc41.json",
-      "hash": "374c29e0bc41",
-      "from": 2026,
+      "file": "derived/4912.3f979f6eb2b5.json",
+      "hash": "3f979f6eb2b5",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.387Z"
+      "lastFetched": "2026-07-21T19:47:21.581Z"
     },
     "4921": {
-      "file": "derived/4921.55709d4a2839.json",
-      "hash": "55709d4a2839",
-      "from": 2026,
+      "file": "derived/4921.9d578a929563.json",
+      "hash": "9d578a929563",
+      "from": 2018,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.659Z"
+      "lastFetched": "2026-07-21T19:47:23.661Z"
     },
     "5208": {
       "file": "derived/5208.4161ecf8fbdc.json",
@@ -1751,67 +1751,67 @@
       "lastFetched": "2026-07-21T17:46:01.383Z"
     },
     "5210": {
-      "file": "derived/5210.1bad98c3bf8f.json",
-      "hash": "1bad98c3bf8f",
-      "from": 2026,
+      "file": "derived/5210.e2ab75dda3c0.json",
+      "hash": "e2ab75dda3c0",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.389Z"
+      "lastFetched": "2026-07-21T19:47:21.600Z"
     },
     "5309": {
-      "file": "derived/5309.0e18eb040eaf.json",
-      "hash": "0e18eb040eaf",
-      "from": 2026,
+      "file": "derived/5309.98d3bc23e079.json",
+      "hash": "98d3bc23e079",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.383Z"
+      "lastFetched": "2026-07-21T19:47:21.532Z"
     },
     "5316": {
-      "file": "derived/5316.55c3d7130ad6.json",
-      "hash": "55c3d7130ad6",
-      "from": 2026,
+      "file": "derived/5316.2abb99c1ad82.json",
+      "hash": "2abb99c1ad82",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.385Z"
+      "lastFetched": "2026-07-21T19:47:21.544Z"
     },
     "5544": {
-      "file": "derived/5544.44635cf1abdb.json",
-      "hash": "44635cf1abdb",
-      "from": 2026,
+      "file": "derived/5544.8356f7ec2475.json",
+      "hash": "8356f7ec2475",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.390Z"
+      "lastFetched": "2026-07-21T19:47:21.614Z"
     },
     "5548": {
-      "file": "derived/5548.ccb98b81d533.json",
-      "hash": "ccb98b81d533",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.391Z"
+      "file": "derived/5548.49fd60a6127a.json",
+      "hash": "49fd60a6127a",
+      "from": 2003,
+      "to": 2007,
+      "lastFetched": "2026-07-21T19:47:21.620Z"
     },
     "5552": {
-      "file": "derived/5552.f6abf436dd9a.json",
-      "hash": "f6abf436dd9a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.385Z"
+      "file": "derived/5552.44f1b5aebdb6.json",
+      "hash": "44f1b5aebdb6",
+      "from": 1995,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:21.554Z"
     },
     "5777": {
-      "file": "derived/5777.533d4cccd2ba.json",
-      "hash": "533d4cccd2ba",
-      "from": 2026,
+      "file": "derived/5777.07fff47b4042.json",
+      "hash": "07fff47b4042",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.392Z"
+      "lastFetched": "2026-07-21T19:47:21.634Z"
     },
     "5825": {
-      "file": "derived/5825.ffa8f65cb067.json",
-      "hash": "ffa8f65cb067",
-      "from": 2026,
+      "file": "derived/5825.68f7bcb8bfb1.json",
+      "hash": "68f7bcb8bfb1",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.386Z"
+      "lastFetched": "2026-07-21T19:47:21.566Z"
     },
     "5847": {
-      "file": "derived/5847.83e1119dde84.json",
-      "hash": "83e1119dde84",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.392Z"
+      "file": "derived/5847.cbf3db431bef.json",
+      "hash": "cbf3db431bef",
+      "from": 2014,
+      "to": 2021,
+      "lastFetched": "2026-07-21T19:47:21.646Z"
     },
     "5853": {
       "file": "derived/5853.f410a9b52bdc.json",
@@ -1821,53 +1821,53 @@
       "lastFetched": "2026-07-21T17:46:01.443Z"
     },
     "5860": {
-      "file": "derived/5860.481fd5510810.json",
-      "hash": "481fd5510810",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.393Z"
+      "file": "derived/5860.41e74140e4fb.json",
+      "hash": "41e74140e4fb",
+      "from": 2000,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:21.652Z"
     },
     "5872": {
-      "file": "derived/5872.47651ad39c6a.json",
-      "hash": "47651ad39c6a",
-      "from": 2026,
+      "file": "derived/5872.a7de67d82658.json",
+      "hash": "a7de67d82658",
+      "from": 2001,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.394Z"
+      "lastFetched": "2026-07-21T19:47:21.669Z"
     },
     "5885": {
-      "file": "derived/5885.f63672aa37bf.json",
-      "hash": "f63672aa37bf",
-      "from": 2026,
+      "file": "derived/5885.3e0f0cd1a140.json",
+      "hash": "3e0f0cd1a140",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.395Z"
+      "lastFetched": "2026-07-21T19:47:21.690Z"
     },
     "5932": {
-      "file": "derived/5932.a005d5806e42.json",
-      "hash": "a005d5806e42",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.444Z"
+      "file": "derived/5932.8af2f63c656e.json",
+      "hash": "8af2f63c656e",
+      "from": 2005,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:22.197Z"
     },
     "5933": {
-      "file": "derived/5933.e6ff672bf0e8.json",
-      "hash": "e6ff672bf0e8",
-      "from": 2026,
+      "file": "derived/5933.e5e006eace34.json",
+      "hash": "e5e006eace34",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.396Z"
+      "lastFetched": "2026-07-21T19:47:21.710Z"
     },
     "5940": {
-      "file": "derived/5940.baaa2fbbb473.json",
-      "hash": "baaa2fbbb473",
-      "from": 2026,
+      "file": "derived/5940.32eee04a3b08.json",
+      "hash": "32eee04a3b08",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.398Z"
+      "lastFetched": "2026-07-21T19:47:21.727Z"
     },
     "5943": {
-      "file": "derived/5943.65e560e63f85.json",
-      "hash": "65e560e63f85",
-      "from": 2026,
+      "file": "derived/5943.07d54fa95b6f.json",
+      "hash": "07d54fa95b6f",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.445Z"
+      "lastFetched": "2026-07-21T19:47:22.213Z"
     },
     "5945": {
       "file": "derived/5945.3ff865c16c2a.json",
@@ -1877,158 +1877,158 @@
       "lastFetched": "2026-07-21T17:46:01.399Z"
     },
     "5960": {
-      "file": "derived/5960.de98df7c47d6.json",
-      "hash": "de98df7c47d6",
-      "from": 2026,
+      "file": "derived/5960.54243c867e1f.json",
+      "hash": "54243c867e1f",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.446Z"
+      "lastFetched": "2026-07-21T19:47:22.232Z"
     },
     "5965": {
-      "file": "derived/5965.aca6cfb7a47e.json",
-      "hash": "aca6cfb7a47e",
-      "from": 2026,
+      "file": "derived/5965.6b001c3705dc.json",
+      "hash": "6b001c3705dc",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.641Z"
+      "lastFetched": "2026-07-21T19:47:23.621Z"
     },
     "5968": {
-      "file": "derived/5968.c4628f4bd500.json",
-      "hash": "c4628f4bd500",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.399Z"
+      "file": "derived/5968.65cdd7f1bac6.json",
+      "hash": "65cdd7f1bac6",
+      "from": 2006,
+      "to": 2017,
+      "lastFetched": "2026-07-21T19:47:21.737Z"
     },
     "5969": {
-      "file": "derived/5969.2802de908bd8.json",
-      "hash": "2802de908bd8",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.447Z"
+      "file": "derived/5969.7bf3bdd85c3f.json",
+      "hash": "7bf3bdd85c3f",
+      "from": 2006,
+      "to": 2021,
+      "lastFetched": "2026-07-21T19:47:22.245Z"
     },
     "5970": {
-      "file": "derived/5970.73c62af46bc9.json",
-      "hash": "73c62af46bc9",
-      "from": 2026,
+      "file": "derived/5970.514967880cc7.json",
+      "hash": "514967880cc7",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.401Z"
+      "lastFetched": "2026-07-21T19:47:21.748Z"
     },
     "5975": {
-      "file": "derived/5975.897642366c58.json",
-      "hash": "897642366c58",
-      "from": 2026,
+      "file": "derived/5975.3483d00d180c.json",
+      "hash": "3483d00d180c",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.402Z"
+      "lastFetched": "2026-07-21T19:47:21.763Z"
     },
     "5977": {
-      "file": "derived/5977.f76a10876e39.json",
-      "hash": "f76a10876e39",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.447Z"
+      "file": "derived/5977.e2719177696f.json",
+      "hash": "e2719177696f",
+      "from": 2000,
+      "to": 2004,
+      "lastFetched": "2026-07-21T19:47:22.250Z"
     },
     "5981": {
-      "file": "derived/5981.8fdb65f53bf9.json",
-      "hash": "8fdb65f53bf9",
-      "from": 2026,
+      "file": "derived/5981.49c538a2c1e9.json",
+      "hash": "49c538a2c1e9",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.403Z"
+      "lastFetched": "2026-07-21T19:47:21.780Z"
     },
     "5982": {
-      "file": "derived/5982.1657cc3b351f.json",
-      "hash": "1657cc3b351f",
-      "from": 2026,
+      "file": "derived/5982.7e5da5990227.json",
+      "hash": "7e5da5990227",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.448Z"
+      "lastFetched": "2026-07-21T19:47:22.262Z"
     },
     "5988": {
-      "file": "derived/5988.26f73fe4c44c.json",
-      "hash": "26f73fe4c44c",
-      "from": 2026,
+      "file": "derived/5988.08205bbda68f.json",
+      "hash": "08205bbda68f",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.404Z"
+      "lastFetched": "2026-07-21T19:47:21.797Z"
     },
     "5990": {
-      "file": "derived/5990.90d9d7381f9f.json",
-      "hash": "90d9d7381f9f",
-      "from": 2026,
+      "file": "derived/5990.72f064823332.json",
+      "hash": "72f064823332",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.406Z"
+      "lastFetched": "2026-07-21T19:47:21.813Z"
     },
     "5991": {
-      "file": "derived/5991.f926774ddf2e.json",
-      "hash": "f926774ddf2e",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.449Z"
+      "file": "derived/5991.5aff5be42cc5.json",
+      "hash": "5aff5be42cc5",
+      "from": 1997,
+      "to": 1999,
+      "lastFetched": "2026-07-21T19:47:22.266Z"
     },
     "5992": {
-      "file": "derived/5992.45a397c70cb7.json",
-      "hash": "45a397c70cb7",
-      "from": 2026,
+      "file": "derived/5992.4a0c074bbf21.json",
+      "hash": "4a0c074bbf21",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.407Z"
+      "lastFetched": "2026-07-21T19:47:21.825Z"
     },
     "5993": {
-      "file": "derived/5993.a890f0745eaa.json",
-      "hash": "a890f0745eaa",
-      "from": 2026,
+      "file": "derived/5993.959c2d25d26c.json",
+      "hash": "959c2d25d26c",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.450Z"
+      "lastFetched": "2026-07-21T19:47:22.280Z"
     },
     "5994": {
-      "file": "derived/5994.6bcd769e792d.json",
-      "hash": "6bcd769e792d",
-      "from": 2026,
+      "file": "derived/5994.a9b5e692d881.json",
+      "hash": "a9b5e692d881",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.693Z"
+      "lastFetched": "2026-07-21T19:47:23.711Z"
     },
     "6011": {
-      "file": "derived/6011.cd105c433137.json",
-      "hash": "cd105c433137",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.451Z"
+      "file": "derived/6011.7bc14ca7bc16.json",
+      "hash": "7bc14ca7bc16",
+      "from": 1996,
+      "to": 1996,
+      "lastFetched": "2026-07-21T19:47:22.285Z"
     },
     "6012": {
-      "file": "derived/6012.6c7dd44a49a1.json",
-      "hash": "6c7dd44a49a1",
-      "from": 2026,
+      "file": "derived/6012.76c4d64feddd.json",
+      "hash": "76c4d64feddd",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.452Z"
+      "lastFetched": "2026-07-21T19:47:22.298Z"
     },
     "6015": {
-      "file": "derived/6015.4e63c5839560.json",
-      "hash": "4e63c5839560",
-      "from": 2026,
+      "file": "derived/6015.30e829965192.json",
+      "hash": "30e829965192",
+      "from": 2002,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.408Z"
+      "lastFetched": "2026-07-21T19:47:21.839Z"
     },
     "6016": {
-      "file": "derived/6016.16478a7f6e7d.json",
-      "hash": "16478a7f6e7d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.453Z"
+      "file": "derived/6016.89c4596ac64b.json",
+      "hash": "89c4596ac64b",
+      "from": 2002,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:22.308Z"
     },
     "6017": {
-      "file": "derived/6017.44d4d0687a71.json",
-      "hash": "44d4d0687a71",
-      "from": 2026,
+      "file": "derived/6017.5a7f79c74d26.json",
+      "hash": "5a7f79c74d26",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.454Z"
+      "lastFetched": "2026-07-21T19:47:22.331Z"
     },
     "6045": {
-      "file": "derived/6045.93f1043f686b.json",
-      "hash": "93f1043f686b",
-      "from": 2026,
+      "file": "derived/6045.08d469f851b7.json",
+      "hash": "08d469f851b7",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.456Z"
+      "lastFetched": "2026-07-21T19:47:22.352Z"
     },
     "6049": {
-      "file": "derived/6049.b647b62c7089.json",
-      "hash": "b647b62c7089",
-      "from": 2026,
+      "file": "derived/6049.5ad804925f38.json",
+      "hash": "5ad804925f38",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.701Z"
+      "lastFetched": "2026-07-21T19:47:23.719Z"
     },
     "6072": {
       "file": "derived/6072.ae9f7964be4e.json",
@@ -2045,95 +2045,95 @@
       "lastFetched": "2026-07-21T17:46:01.457Z"
     },
     "6134": {
-      "file": "derived/6134.abf94feff4d9.json",
-      "hash": "abf94feff4d9",
-      "from": 2026,
+      "file": "derived/6134.9bc38705e4fc.json",
+      "hash": "9bc38705e4fc",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.410Z"
+      "lastFetched": "2026-07-21T19:47:21.854Z"
     },
     "6176": {
-      "file": "derived/6176.586a345c280c.json",
-      "hash": "586a345c280c",
-      "from": 2026,
+      "file": "derived/6176.5c3f3f59e3da.json",
+      "hash": "5c3f3f59e3da",
+      "from": 1994,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.458Z"
+      "lastFetched": "2026-07-21T19:47:22.378Z"
     },
     "6208": {
-      "file": "derived/6208.8d6dd10e7953.json",
-      "hash": "8d6dd10e7953",
-      "from": 2026,
+      "file": "derived/6208.63d1ba1f1c20.json",
+      "hash": "63d1ba1f1c20",
+      "from": 1996,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.459Z"
+      "lastFetched": "2026-07-21T19:47:22.399Z"
     },
     "6222": {
-      "file": "derived/6222.bceafd922acb.json",
-      "hash": "bceafd922acb",
-      "from": 2026,
+      "file": "derived/6222.6da697b93158.json",
+      "hash": "6da697b93158",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.460Z"
+      "lastFetched": "2026-07-21T19:47:22.417Z"
     },
     "6235": {
-      "file": "derived/6235.740e073ff0ed.json",
-      "hash": "740e073ff0ed",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.411Z"
+      "file": "derived/6235.89b0f7e01ab7.json",
+      "hash": "89b0f7e01ab7",
+      "from": 2005,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:21.865Z"
     },
     "6237": {
-      "file": "derived/6237.4afb06943089.json",
-      "hash": "4afb06943089",
-      "from": 2026,
+      "file": "derived/6237.8c47a95d363b.json",
+      "hash": "8c47a95d363b",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.412Z"
+      "lastFetched": "2026-07-21T19:47:21.875Z"
     },
     "6272": {
-      "file": "derived/6272.7a1429d5f203.json",
-      "hash": "7a1429d5f203",
-      "from": 2026,
+      "file": "derived/6272.eae1621d8c3e.json",
+      "hash": "eae1621d8c3e",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.462Z"
+      "lastFetched": "2026-07-21T19:47:22.432Z"
     },
     "6300": {
-      "file": "derived/6300.c4e1a2dc33bf.json",
-      "hash": "c4e1a2dc33bf",
-      "from": 2026,
+      "file": "derived/6300.c526ff420871.json",
+      "hash": "c526ff420871",
+      "from": 2019,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.657Z"
+      "lastFetched": "2026-07-21T19:47:23.657Z"
     },
     "6310": {
-      "file": "derived/6310.0d8642407847.json",
-      "hash": "0d8642407847",
-      "from": 2026,
+      "file": "derived/6310.cbef884d23a0.json",
+      "hash": "cbef884d23a0",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.413Z"
+      "lastFetched": "2026-07-21T19:47:21.891Z"
     },
     "6315": {
-      "file": "derived/6315.c44c8f2392a2.json",
-      "hash": "c44c8f2392a2",
-      "from": 2026,
+      "file": "derived/6315.0bcc8ad03d16.json",
+      "hash": "0bcc8ad03d16",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.463Z"
+      "lastFetched": "2026-07-21T19:47:22.444Z"
     },
     "6393": {
-      "file": "derived/6393.61c1418cf7e2.json",
-      "hash": "61c1418cf7e2",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.414Z"
+      "file": "derived/6393.25d64032e7a7.json",
+      "hash": "25d64032e7a7",
+      "from": 2013,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:21.899Z"
     },
     "6420": {
-      "file": "derived/6420.0270a786ff4b.json",
-      "hash": "0270a786ff4b",
-      "from": 2026,
+      "file": "derived/6420.c4ca452ee2f7.json",
+      "hash": "c4ca452ee2f7",
+      "from": 2003,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.464Z"
+      "lastFetched": "2026-07-21T19:47:22.459Z"
     },
     "6424": {
-      "file": "derived/6424.2e19ce510cd8.json",
-      "hash": "2e19ce510cd8",
-      "from": 2026,
+      "file": "derived/6424.3837a84db784.json",
+      "hash": "3837a84db784",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.415Z"
+      "lastFetched": "2026-07-21T19:47:21.908Z"
     },
     "6429": {
       "file": "derived/6429.9779798365e8.json",
@@ -2143,11 +2143,11 @@
       "lastFetched": "2026-07-21T17:46:01.465Z"
     },
     "6430": {
-      "file": "derived/6430.dce7466fe9a9.json",
-      "hash": "dce7466fe9a9",
-      "from": 2026,
+      "file": "derived/6430.4a4974ae4713.json",
+      "hash": "4a4974ae4713",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.416Z"
+      "lastFetched": "2026-07-21T19:47:21.926Z"
     },
     "6438": {
       "file": "derived/6438.69fdc1cfa913.json",
@@ -2157,32 +2157,32 @@
       "lastFetched": "2026-07-21T17:46:01.466Z"
     },
     "6459": {
-      "file": "derived/6459.929b782456b3.json",
-      "hash": "929b782456b3",
-      "from": 2026,
+      "file": "derived/6459.83a5400ef4c5.json",
+      "hash": "83a5400ef4c5",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.417Z"
+      "lastFetched": "2026-07-21T19:47:21.946Z"
     },
     "6472": {
-      "file": "derived/6472.0fe6d7d1411b.json",
-      "hash": "0fe6d7d1411b",
-      "from": 2026,
+      "file": "derived/6472.9296e3f1676e.json",
+      "hash": "9296e3f1676e",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.467Z"
+      "lastFetched": "2026-07-21T19:47:22.476Z"
     },
     "6499": {
-      "file": "derived/6499.3cf97eed8b1c.json",
-      "hash": "3cf97eed8b1c",
-      "from": 2026,
+      "file": "derived/6499.05f60c1b628f.json",
+      "hash": "05f60c1b628f",
+      "from": 1995,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.419Z"
+      "lastFetched": "2026-07-21T19:47:21.967Z"
     },
     "6515": {
-      "file": "derived/6515.ca64a2ece269.json",
-      "hash": "ca64a2ece269",
-      "from": 2026,
+      "file": "derived/6515.1e738983cb73.json",
+      "hash": "1e738983cb73",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.420Z"
+      "lastFetched": "2026-07-21T19:47:21.983Z"
     },
     "6534": {
       "file": "derived/6534.7ef6128a9ea1.json",
@@ -2206,102 +2206,102 @@
       "lastFetched": "2026-07-21T17:46:01.468Z"
     },
     "6545": {
-      "file": "derived/6545.892c325bf8c2.json",
-      "hash": "892c325bf8c2",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.469Z"
+      "file": "derived/6545.94d5a186138d.json",
+      "hash": "94d5a186138d",
+      "from": 1999,
+      "to": 2002,
+      "lastFetched": "2026-07-21T19:47:22.482Z"
     },
     "6546": {
-      "file": "derived/6546.6d85f51f46e1.json",
-      "hash": "6d85f51f46e1",
-      "from": 2026,
+      "file": "derived/6546.5f9efdaa5533.json",
+      "hash": "5f9efdaa5533",
+      "from": 2004,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.422Z"
+      "lastFetched": "2026-07-21T19:47:21.998Z"
     },
     "6657": {
-      "file": "derived/6657.458f6319ba64.json",
-      "hash": "458f6319ba64",
-      "from": 2026,
+      "file": "derived/6657.2c8394e2f745.json",
+      "hash": "2c8394e2f745",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.470Z"
+      "lastFetched": "2026-07-21T19:47:22.498Z"
     },
     "6670": {
-      "file": "derived/6670.daf853bd6338.json",
-      "hash": "daf853bd6338",
-      "from": 2026,
+      "file": "derived/6670.89b0f5609480.json",
+      "hash": "89b0f5609480",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.423Z"
+      "lastFetched": "2026-07-21T19:47:22.025Z"
     },
     "6745": {
-      "file": "derived/6745.5aead7dd7b48.json",
-      "hash": "5aead7dd7b48",
-      "from": 2026,
+      "file": "derived/6745.e4d23e4f2267.json",
+      "hash": "e4d23e4f2267",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.644Z"
+      "lastFetched": "2026-07-21T19:47:23.628Z"
     },
     "6748": {
-      "file": "derived/6748.06d418da7532.json",
-      "hash": "06d418da7532",
-      "from": 2026,
+      "file": "derived/6748.d1c4976f2191.json",
+      "hash": "d1c4976f2191",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.471Z"
+      "lastFetched": "2026-07-21T19:47:22.520Z"
     },
     "6760": {
-      "file": "derived/6760.1adf2819ae1b.json",
-      "hash": "1adf2819ae1b",
-      "from": 2026,
+      "file": "derived/6760.4be95d61d890.json",
+      "hash": "4be95d61d890",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.424Z"
+      "lastFetched": "2026-07-21T19:47:22.046Z"
     },
     "6775": {
-      "file": "derived/6775.a1a0fb0b77a0.json",
-      "hash": "a1a0fb0b77a0",
-      "from": 2026,
+      "file": "derived/6775.a42cd1914e66.json",
+      "hash": "a42cd1914e66",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.724Z"
+      "lastFetched": "2026-07-21T19:47:23.738Z"
     },
     "6776": {
-      "file": "derived/6776.f65888de5940.json",
-      "hash": "f65888de5940",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.472Z"
+      "file": "derived/6776.57303be285fb.json",
+      "hash": "57303be285fb",
+      "from": 2004,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:22.537Z"
     },
     "6802": {
-      "file": "derived/6802.6ebf9ada52de.json",
-      "hash": "6ebf9ada52de",
-      "from": 2026,
+      "file": "derived/6802.45cb4d80f645.json",
+      "hash": "45cb4d80f645",
+      "from": 1998,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.426Z"
+      "lastFetched": "2026-07-21T19:47:22.068Z"
     },
     "6935": {
-      "file": "derived/6935.482d01c9b370.json",
-      "hash": "482d01c9b370",
-      "from": 2026,
+      "file": "derived/6935.49aac0ed6f58.json",
+      "hash": "49aac0ed6f58",
+      "from": 1997,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.427Z"
+      "lastFetched": "2026-07-21T19:47:22.085Z"
     },
     "6975": {
-      "file": "derived/6975.6aea916fa3f0.json",
-      "hash": "6aea916fa3f0",
-      "from": 2026,
+      "file": "derived/6975.090593bf2982.json",
+      "hash": "090593bf2982",
+      "from": 1993,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.429Z"
+      "lastFetched": "2026-07-21T19:47:22.105Z"
     },
     "7001": {
-      "file": "derived/7001.2a8604fec014.json",
-      "hash": "2a8604fec014",
-      "from": 2026,
+      "file": "derived/7001.7c43d0f279bc.json",
+      "hash": "7c43d0f279bc",
+      "from": 2023,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.695Z"
+      "lastFetched": "2026-07-21T19:47:23.713Z"
     },
     "7002": {
-      "file": "derived/7002.99ee7fc3f117.json",
-      "hash": "99ee7fc3f117",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.700Z"
+      "file": "derived/7002.18b3b288b1f0.json",
+      "hash": "18b3b288b1f0",
+      "from": 2024,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:23.718Z"
     },
     "7049": {
       "file": "derived/7049.14dd7e673158.json",
@@ -2318,11 +2318,11 @@
       "lastFetched": "2026-07-21T17:46:01.430Z"
     },
     "7078": {
-      "file": "derived/7078.ec5cc17d5184.json",
-      "hash": "ec5cc17d5184",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.473Z"
+      "file": "derived/7078.a76c8c06bd93.json",
+      "hash": "a76c8c06bd93",
+      "from": 2000,
+      "to": 2003,
+      "lastFetched": "2026-07-21T19:47:22.543Z"
     },
     "7080": {
       "file": "derived/7080.c31fcec3bfa0.json",
@@ -2339,46 +2339,46 @@
       "lastFetched": "2026-07-21T17:46:01.474Z"
     },
     "7091": {
-      "file": "derived/7091.86e936083e7c.json",
-      "hash": "86e936083e7c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.431Z"
+      "file": "derived/7091.39fd0e442a49.json",
+      "hash": "39fd0e442a49",
+      "from": 2011,
+      "to": 2013,
+      "lastFetched": "2026-07-21T19:47:22.113Z"
     },
     "7092": {
-      "file": "derived/7092.3e4ac3d36efc.json",
-      "hash": "3e4ac3d36efc",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.475Z"
+      "file": "derived/7092.78e3335d716c.json",
+      "hash": "78e3335d716c",
+      "from": 2011,
+      "to": 2013,
+      "lastFetched": "2026-07-21T19:47:22.545Z"
     },
     "7093": {
-      "file": "derived/7093.fc3251bb7901.json",
-      "hash": "fc3251bb7901",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.431Z"
+      "file": "derived/7093.33f61f2fa7af.json",
+      "hash": "33f61f2fa7af",
+      "from": 2011,
+      "to": 2013,
+      "lastFetched": "2026-07-21T19:47:22.114Z"
     },
     "7094": {
-      "file": "derived/7094.7553e68341af.json",
-      "hash": "7553e68341af",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.475Z"
+      "file": "derived/7094.29d5e736f480.json",
+      "hash": "29d5e736f480",
+      "from": 2011,
+      "to": 2013,
+      "lastFetched": "2026-07-21T19:47:22.547Z"
     },
     "7272": {
-      "file": "derived/7272.ef5fd56c4b60.json",
-      "hash": "ef5fd56c4b60",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.432Z"
+      "file": "derived/7272.814de0a55a9f.json",
+      "hash": "814de0a55a9f",
+      "from": 2008,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:22.117Z"
     },
     "7273": {
-      "file": "derived/7273.044701ee6c61.json",
-      "hash": "044701ee6c61",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.432Z"
+      "file": "derived/7273.1d2e054c5461.json",
+      "hash": "1d2e054c5461",
+      "from": 2009,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:22.119Z"
     },
     "7275": {
       "file": "derived/7275.8c18d1e216d0.json",
@@ -2395,25 +2395,25 @@
       "lastFetched": "2026-07-21T17:46:01.433Z"
     },
     "7365": {
-      "file": "derived/7365.16a857fd9317.json",
-      "hash": "16a857fd9317",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.652Z"
+      "file": "derived/7365.a2e76da3faa7.json",
+      "hash": "a2e76da3faa7",
+      "from": 2021,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:23.647Z"
     },
     "7366": {
-      "file": "derived/7366.e001f365010e.json",
-      "hash": "e001f365010e",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.683Z"
+      "file": "derived/7366.d3f8115e239f.json",
+      "hash": "d3f8115e239f",
+      "from": 2022,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:23.698Z"
     },
     "7370": {
-      "file": "derived/7370.f78091a2ea40.json",
-      "hash": "f78091a2ea40",
-      "from": 2026,
+      "file": "derived/7370.bac7dc95f728.json",
+      "hash": "bac7dc95f728",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.664Z"
+      "lastFetched": "2026-07-21T19:47:23.668Z"
     },
     "7372": {
       "file": "derived/7372.2087560d45b4.json",
@@ -2444,53 +2444,53 @@
       "lastFetched": "2026-07-21T17:46:01.476Z"
     },
     "7470": {
-      "file": "derived/7470.e414219020e2.json",
-      "hash": "e414219020e2",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.702Z"
+      "file": "derived/7470.e25915d11e9b.json",
+      "hash": "e25915d11e9b",
+      "from": 2022,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:23.720Z"
     },
     "7471": {
-      "file": "derived/7471.35169a5c4e3a.json",
-      "hash": "35169a5c4e3a",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.477Z"
+      "file": "derived/7471.7a2a40d834b3.json",
+      "hash": "7a2a40d834b3",
+      "from": 1999,
+      "to": 2000,
+      "lastFetched": "2026-07-21T19:47:22.550Z"
     },
     "7472": {
-      "file": "derived/7472.53c3f0a15c1d.json",
-      "hash": "53c3f0a15c1d",
-      "from": 2026,
+      "file": "derived/7472.a3f9ca6c8aa6.json",
+      "hash": "a3f9ca6c8aa6",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.687Z"
+      "lastFetched": "2026-07-21T19:47:23.704Z"
     },
     "7474": {
-      "file": "derived/7474.80a3dac8592b.json",
-      "hash": "80a3dac8592b",
-      "from": 2026,
+      "file": "derived/7474.f4dfddf89864.json",
+      "hash": "f4dfddf89864",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.478Z"
+      "lastFetched": "2026-07-21T19:47:22.559Z"
     },
     "7475": {
-      "file": "derived/7475.d6a8ffd559db.json",
-      "hash": "d6a8ffd559db",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.479Z"
+      "file": "derived/7475.c1df4fd45be9.json",
+      "hash": "c1df4fd45be9",
+      "from": 2005,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:22.572Z"
     },
     "7476": {
-      "file": "derived/7476.5f9310ed0de3.json",
-      "hash": "5f9310ed0de3",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.480Z"
+      "file": "derived/7476.d7ac69a4793d.json",
+      "hash": "d7ac69a4793d",
+      "from": 2007,
+      "to": 2025,
+      "lastFetched": "2026-07-21T19:47:22.581Z"
     },
     "7477": {
-      "file": "derived/7477.62228bfeae15.json",
-      "hash": "62228bfeae15",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.671Z"
+      "file": "derived/7477.41039e8ef6a6.json",
+      "hash": "41039e8ef6a6",
+      "from": 2018,
+      "to": 2022,
+      "lastFetched": "2026-07-21T19:47:23.679Z"
     },
     "7479": {
       "file": "derived/7479.90a496f74b2c.json",
@@ -2500,123 +2500,123 @@
       "lastFetched": "2026-07-21T17:46:01.435Z"
     },
     "7481": {
-      "file": "derived/7481.b6922e2089a6.json",
-      "hash": "b6922e2089a6",
-      "from": 2026,
+      "file": "derived/7481.98cbc4e655a8.json",
+      "hash": "98cbc4e655a8",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.662Z"
+      "lastFetched": "2026-07-21T19:47:23.666Z"
     },
     "7601": {
-      "file": "derived/7601.38b0355dbfcb.json",
-      "hash": "38b0355dbfcb",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.480Z"
+      "file": "derived/7601.e3d9ad5b5711.json",
+      "hash": "e3d9ad5b5711",
+      "from": 1998,
+      "to": 2002,
+      "lastFetched": "2026-07-21T19:47:22.584Z"
     },
     "7631": {
-      "file": "derived/7631.28dd15c18823.json",
-      "hash": "28dd15c18823",
-      "from": 2026,
+      "file": "derived/7631.779059439eaa.json",
+      "hash": "779059439eaa",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.665Z"
+      "lastFetched": "2026-07-21T19:47:23.670Z"
     },
     "7632": {
-      "file": "derived/7632.3bc065d1941f.json",
-      "hash": "3bc065d1941f",
-      "from": 2026,
+      "file": "derived/7632.87c7a5ca456d.json",
+      "hash": "87c7a5ca456d",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.668Z"
+      "lastFetched": "2026-07-21T19:47:23.674Z"
     },
     "7633": {
-      "file": "derived/7633.34aeb985d79c.json",
-      "hash": "34aeb985d79c",
-      "from": 2026,
+      "file": "derived/7633.bd2fb998b997.json",
+      "hash": "bd2fb998b997",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.667Z"
+      "lastFetched": "2026-07-21T19:47:23.672Z"
     },
     "7634": {
-      "file": "derived/7634.299d4dfe9383.json",
-      "hash": "299d4dfe9383",
-      "from": 2026,
+      "file": "derived/7634.f0c3791fb01f.json",
+      "hash": "f0c3791fb01f",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.705Z"
+      "lastFetched": "2026-07-21T19:47:23.722Z"
     },
     "7635": {
-      "file": "derived/7635.b9d0ef5e476b.json",
-      "hash": "b9d0ef5e476b",
-      "from": 2026,
+      "file": "derived/7635.cd2107af865c.json",
+      "hash": "cd2107af865c",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.706Z"
+      "lastFetched": "2026-07-21T19:47:23.723Z"
     },
     "7636": {
-      "file": "derived/7636.06098d748b65.json",
-      "hash": "06098d748b65",
-      "from": 2026,
+      "file": "derived/7636.7cf176d0aa19.json",
+      "hash": "7cf176d0aa19",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.639Z"
+      "lastFetched": "2026-07-21T19:47:23.617Z"
     },
     "7659": {
-      "file": "derived/7659.81873ac0672f.json",
-      "hash": "81873ac0672f",
-      "from": 2026,
+      "file": "derived/7659.144774cdee12.json",
+      "hash": "144774cdee12",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.436Z"
+      "lastFetched": "2026-07-21T19:47:22.132Z"
     },
     "7711": {
-      "file": "derived/7711.1e98be539edf.json",
-      "hash": "1e98be539edf",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.696Z"
+      "file": "derived/7711.1e1a7de0dad6.json",
+      "hash": "1e1a7de0dad6",
+      "from": 2023,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:23.714Z"
     },
     "7712": {
-      "file": "derived/7712.aa85ece3d620.json",
-      "hash": "aa85ece3d620",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.697Z"
+      "file": "derived/7712.2138034de51a.json",
+      "hash": "2138034de51a",
+      "from": 2023,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:23.714Z"
     },
     "7736": {
-      "file": "derived/7736.74945888f32a.json",
-      "hash": "74945888f32a",
-      "from": 2026,
+      "file": "derived/7736.3ecd0bdbcc0f.json",
+      "hash": "3ecd0bdbcc0f",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.481Z"
+      "lastFetched": "2026-07-21T19:47:22.593Z"
     },
     "7738": {
-      "file": "derived/7738.104aabddefaf.json",
-      "hash": "104aabddefaf",
-      "from": 2026,
+      "file": "derived/7738.27e4d7937815.json",
+      "hash": "27e4d7937815",
+      "from": 2016,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.437Z"
+      "lastFetched": "2026-07-21T19:47:22.140Z"
     },
     "7751": {
-      "file": "derived/7751.8ee898ed8efb.json",
-      "hash": "8ee898ed8efb",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.482Z"
+      "file": "derived/7751.86b59d83757d.json",
+      "hash": "86b59d83757d",
+      "from": 2002,
+      "to": 2005,
+      "lastFetched": "2026-07-21T19:47:22.597Z"
     },
     "7752": {
-      "file": "derived/7752.eae792c058a0.json",
-      "hash": "eae792c058a0",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.483Z"
+      "file": "derived/7752.866cd680e30c.json",
+      "hash": "866cd680e30c",
+      "from": 2005,
+      "to": 2006,
+      "lastFetched": "2026-07-21T19:47:22.599Z"
     },
     "7753": {
-      "file": "derived/7753.19dcb1426c5e.json",
-      "hash": "19dcb1426c5e",
-      "from": 2026,
+      "file": "derived/7753.6e2f4cc606f2.json",
+      "hash": "6e2f4cc606f2",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.484Z"
+      "lastFetched": "2026-07-21T19:47:22.608Z"
     },
     "7777": {
-      "file": "derived/7777.178c19f898b4.json",
-      "hash": "178c19f898b4",
-      "from": 2026,
+      "file": "derived/7777.ae73aab10f93.json",
+      "hash": "ae73aab10f93",
+      "from": 2023,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.680Z"
+      "lastFetched": "2026-07-21T19:47:23.694Z"
     },
     "7783": {
       "file": "derived/7783.b121cdd73294.json",
@@ -2626,11 +2626,11 @@
       "lastFetched": "2026-07-21T17:46:01.484Z"
     },
     "7790": {
-      "file": "derived/7790.005d546be93b.json",
-      "hash": "005d546be93b",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.438Z"
+      "file": "derived/7790.078cee881896.json",
+      "hash": "078cee881896",
+      "from": 2016,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:22.144Z"
     },
     "7935": {
       "file": "derived/7935.4c128565da4b.json",
@@ -2661,221 +2661,221 @@
       "lastFetched": "2026-07-21T17:46:01.726Z"
     },
     "26400": {
-      "file": "derived/26400.74accc245128.json",
-      "hash": "74accc245128",
-      "from": 2026,
+      "file": "derived/26400.61d547b2838b.json",
+      "hash": "61d547b2838b",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.723Z"
+      "lastFetched": "2026-07-21T19:47:23.738Z"
     },
     "31109": {
-      "file": "derived/31109.b1ce7952eb71.json",
-      "hash": "b1ce7952eb71",
-      "from": 2026,
+      "file": "derived/31109.d9e52025da0b.json",
+      "hash": "d9e52025da0b",
+      "from": 2016,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.486Z"
+      "lastFetched": "2026-07-21T19:47:22.617Z"
     },
     "31122": {
-      "file": "derived/31122.ff90ee3e9740.json",
-      "hash": "ff90ee3e9740",
-      "from": 2026,
+      "file": "derived/31122.0dc150e68249.json",
+      "hash": "0dc150e68249",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.439Z"
+      "lastFetched": "2026-07-21T19:47:22.153Z"
     },
     "31361": {
-      "file": "derived/31361.4bd7b8aff888.json",
-      "hash": "4bd7b8aff888",
-      "from": 2026,
+      "file": "derived/31361.95c2b3698cf4.json",
+      "hash": "95c2b3698cf4",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.713Z"
+      "lastFetched": "2026-07-21T19:47:23.730Z"
     },
     "31363": {
-      "file": "derived/31363.0842d7284745.json",
-      "hash": "0842d7284745",
-      "from": 2026,
+      "file": "derived/31363.2bda48fa2885.json",
+      "hash": "2bda48fa2885",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.488Z"
+      "lastFetched": "2026-07-21T19:47:22.630Z"
     },
     "31364": {
-      "file": "derived/31364.c8683cecfbe8.json",
-      "hash": "c8683cecfbe8",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.440Z"
+      "file": "derived/31364.4788d2f7f3ec.json",
+      "hash": "4788d2f7f3ec",
+      "from": 2012,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:22.162Z"
     },
     "31365": {
-      "file": "derived/31365.6b2a6ff08d86.json",
-      "hash": "6b2a6ff08d86",
-      "from": 2026,
+      "file": "derived/31365.1f70162438d5.json",
+      "hash": "1f70162438d5",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.489Z"
+      "lastFetched": "2026-07-21T19:47:22.641Z"
     },
     "31372": {
-      "file": "derived/31372.da224bb96f14.json",
-      "hash": "da224bb96f14",
-      "from": 2026,
+      "file": "derived/31372.d1bf4e67648a.json",
+      "hash": "d1bf4e67648a",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.720Z"
+      "lastFetched": "2026-07-21T19:47:23.736Z"
     },
     "31374": {
-      "file": "derived/31374.9f70ee13eb97.json",
-      "hash": "9f70ee13eb97",
-      "from": 2026,
+      "file": "derived/31374.02e0b55a2bad.json",
+      "hash": "02e0b55a2bad",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.716Z"
+      "lastFetched": "2026-07-21T19:47:23.733Z"
     },
     "31380": {
-      "file": "derived/31380.baa8a7a45399.json",
-      "hash": "baa8a7a45399",
-      "from": 2026,
+      "file": "derived/31380.8e3e40d5910d.json",
+      "hash": "8e3e40d5910d",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.441Z"
+      "lastFetched": "2026-07-21T19:47:22.170Z"
     },
     "31387": {
-      "file": "derived/31387.3518da9d1455.json",
-      "hash": "3518da9d1455",
-      "from": 2026,
+      "file": "derived/31387.498509d9946e.json",
+      "hash": "498509d9946e",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.490Z"
+      "lastFetched": "2026-07-21T19:47:22.653Z"
     },
     "31392": {
-      "file": "derived/31392.e69102170b77.json",
-      "hash": "e69102170b77",
-      "from": 2026,
+      "file": "derived/31392.41d0d4fe7c0f.json",
+      "hash": "41d0d4fe7c0f",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.442Z"
+      "lastFetched": "2026-07-21T19:47:22.183Z"
     },
     "31399": {
-      "file": "derived/31399.325c4cb515c9.json",
-      "hash": "325c4cb515c9",
-      "from": 2026,
+      "file": "derived/31399.79304714e092.json",
+      "hash": "79304714e092",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.492Z"
+      "lastFetched": "2026-07-21T19:47:22.665Z"
     },
     "31474": {
-      "file": "derived/31474.558204bdad33.json",
-      "hash": "558204bdad33",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.493Z"
+      "file": "derived/31474.4ca2ffaa32a2.json",
+      "hash": "4ca2ffaa32a2",
+      "from": 2005,
+      "to": 2008,
+      "lastFetched": "2026-07-21T19:47:22.670Z"
     },
     "31475": {
-      "file": "derived/31475.80f9b8fbfe01.json",
-      "hash": "80f9b8fbfe01",
-      "from": 2026,
+      "file": "derived/31475.467edfa30e75.json",
+      "hash": "467edfa30e75",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.494Z"
+      "lastFetched": "2026-07-21T19:47:22.677Z"
     },
     "31484": {
-      "file": "derived/31484.c73f7d277a7d.json",
-      "hash": "c73f7d277a7d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.495Z"
+      "file": "derived/31484.0b1a0516deb8.json",
+      "hash": "0b1a0516deb8",
+      "from": 2005,
+      "to": 2010,
+      "lastFetched": "2026-07-21T19:47:22.682Z"
     },
     "31488": {
-      "file": "derived/31488.6c5b6316c2ff.json",
-      "hash": "6c5b6316c2ff",
-      "from": 2026,
+      "file": "derived/31488.686ea00400dc.json",
+      "hash": "686ea00400dc",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.496Z"
+      "lastFetched": "2026-07-21T19:47:22.696Z"
     },
     "31561": {
-      "file": "derived/31561.0db1e2e8883d.json",
-      "hash": "0db1e2e8883d",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.497Z"
+      "file": "derived/31561.2b64e2e4feca.json",
+      "hash": "2b64e2e4feca",
+      "from": 2005,
+      "to": 2010,
+      "lastFetched": "2026-07-21T19:47:22.701Z"
     },
     "31562": {
-      "file": "derived/31562.bcc04a6032ec.json",
-      "hash": "bcc04a6032ec",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.497Z"
+      "file": "derived/31562.c24e232ea8cc.json",
+      "hash": "c24e232ea8cc",
+      "from": 2005,
+      "to": 2010,
+      "lastFetched": "2026-07-21T19:47:22.705Z"
     },
     "31572": {
-      "file": "derived/31572.5c89f276f4ce.json",
-      "hash": "5c89f276f4ce",
-      "from": 2026,
+      "file": "derived/31572.2a14093acc84.json",
+      "hash": "2a14093acc84",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.498Z"
+      "lastFetched": "2026-07-21T19:47:22.716Z"
     },
     "31577": {
-      "file": "derived/31577.08a97c7138dd.json",
-      "hash": "08a97c7138dd",
-      "from": 2026,
+      "file": "derived/31577.6d62798c3d58.json",
+      "hash": "6d62798c3d58",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.500Z"
+      "lastFetched": "2026-07-21T19:47:22.731Z"
     },
     "31578": {
-      "file": "derived/31578.ffb1557e135b.json",
-      "hash": "ffb1557e135b",
-      "from": 2026,
+      "file": "derived/31578.ba722edb36d7.json",
+      "hash": "ba722edb36d7",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.682Z"
+      "lastFetched": "2026-07-21T19:47:23.697Z"
     },
     "31579": {
-      "file": "derived/31579.8050527886da.json",
-      "hash": "8050527886da",
-      "from": 2026,
+      "file": "derived/31579.a2b1bde286ca.json",
+      "hash": "a2b1bde286ca",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.501Z"
+      "lastFetched": "2026-07-21T19:47:22.745Z"
     },
     "31591": {
-      "file": "derived/31591.b54dbba63e3c.json",
-      "hash": "b54dbba63e3c",
-      "from": 2026,
+      "file": "derived/31591.488c40093d48.json",
+      "hash": "488c40093d48",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.503Z"
+      "lastFetched": "2026-07-21T19:47:22.756Z"
     },
     "31599": {
-      "file": "derived/31599.77fc7e4a6777.json",
-      "hash": "77fc7e4a6777",
-      "from": 2026,
+      "file": "derived/31599.79dd5128256f.json",
+      "hash": "79dd5128256f",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.504Z"
+      "lastFetched": "2026-07-21T19:47:22.768Z"
     },
     "31640": {
-      "file": "derived/31640.6250fa4d9e3e.json",
-      "hash": "6250fa4d9e3e",
-      "from": 2026,
+      "file": "derived/31640.f9747531462e.json",
+      "hash": "f9747531462e",
+      "from": 2021,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.677Z"
+      "lastFetched": "2026-07-21T19:47:23.691Z"
     },
     "31674": {
-      "file": "derived/31674.e301c64263d8.json",
-      "hash": "e301c64263d8",
-      "from": 2026,
+      "file": "derived/31674.9671deb80f4b.json",
+      "hash": "9671deb80f4b",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.506Z"
+      "lastFetched": "2026-07-21T19:47:22.781Z"
     },
     "31840": {
-      "file": "derived/31840.a7eaed520fd2.json",
-      "hash": "a7eaed520fd2",
-      "from": 2026,
+      "file": "derived/31840.3eac55972593.json",
+      "hash": "3eac55972593",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.508Z"
+      "lastFetched": "2026-07-21T19:47:22.796Z"
     },
     "31882": {
-      "file": "derived/31882.e324ece5f5ae.json",
-      "hash": "e324ece5f5ae",
-      "from": 2026,
+      "file": "derived/31882.49fdb578269f.json",
+      "hash": "49fdb578269f",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.509Z"
+      "lastFetched": "2026-07-21T19:47:22.808Z"
     },
     "31931": {
-      "file": "derived/31931.7b1860c00ea9.json",
-      "hash": "7b1860c00ea9",
-      "from": 2026,
+      "file": "derived/31931.de3e9e65a139.json",
+      "hash": "de3e9e65a139",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.511Z"
+      "lastFetched": "2026-07-21T19:47:22.821Z"
     },
     "31932": {
-      "file": "derived/31932.35108691dc2c.json",
-      "hash": "35108691dc2c",
-      "from": 2026,
+      "file": "derived/31932.203461388a5a.json",
+      "hash": "203461388a5a",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.512Z"
+      "lastFetched": "2026-07-21T19:47:22.831Z"
     },
     "31941": {
       "file": "derived/31941.f56fb105f838.json",
@@ -2885,32 +2885,32 @@
       "lastFetched": "2026-07-21T17:46:01.513Z"
     },
     "31942": {
-      "file": "derived/31942.d23b7ef2c0a8.json",
-      "hash": "d23b7ef2c0a8",
-      "from": 2026,
+      "file": "derived/31942.90fb579331de.json",
+      "hash": "90fb579331de",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.514Z"
+      "lastFetched": "2026-07-21T19:47:22.846Z"
     },
     "31943": {
-      "file": "derived/31943.896dedf2abdf.json",
-      "hash": "896dedf2abdf",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.515Z"
+      "file": "derived/31943.cf413e16eb05.json",
+      "hash": "cf413e16eb05",
+      "from": 2005,
+      "to": 2006,
+      "lastFetched": "2026-07-21T19:47:22.851Z"
     },
     "31948": {
-      "file": "derived/31948.c2665ae5a234.json",
-      "hash": "c2665ae5a234",
-      "from": 2026,
+      "file": "derived/31948.f07476044cb3.json",
+      "hash": "f07476044cb3",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.517Z"
+      "lastFetched": "2026-07-21T19:47:22.861Z"
     },
     "31950": {
-      "file": "derived/31950.876b9812223c.json",
-      "hash": "876b9812223c",
-      "from": 2026,
+      "file": "derived/31950.7cc2cd77f1a5.json",
+      "hash": "7cc2cd77f1a5",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.519Z"
+      "lastFetched": "2026-07-21T19:47:22.872Z"
     },
     "31953": {
       "file": "derived/31953.0e65bb34da79.json",
@@ -2920,60 +2920,60 @@
       "lastFetched": "2026-07-21T17:46:01.520Z"
     },
     "31958": {
-      "file": "derived/31958.7b960ee96a1a.json",
-      "hash": "7b960ee96a1a",
-      "from": 2026,
+      "file": "derived/31958.c6507186bcf2.json",
+      "hash": "c6507186bcf2",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.521Z"
+      "lastFetched": "2026-07-21T19:47:22.886Z"
     },
     "31985": {
-      "file": "derived/31985.f36e7f771933.json",
-      "hash": "f36e7f771933",
-      "from": 2026,
+      "file": "derived/31985.e3f3ca79f3c0.json",
+      "hash": "e3f3ca79f3c0",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.522Z"
+      "lastFetched": "2026-07-21T19:47:22.900Z"
     },
     "31986": {
-      "file": "derived/31986.4ba570e17192.json",
-      "hash": "4ba570e17192",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.727Z"
+      "file": "derived/31986.51ce116e6709.json",
+      "hash": "51ce116e6709",
+      "from": 2022,
+      "to": 2023,
+      "lastFetched": "2026-07-21T19:47:23.740Z"
     },
     "32097": {
-      "file": "derived/32097.fc3d3d8039cb.json",
-      "hash": "fc3d3d8039cb",
-      "from": 2026,
+      "file": "derived/32097.01f1fbc3d492.json",
+      "hash": "01f1fbc3d492",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.524Z"
+      "lastFetched": "2026-07-21T19:47:22.914Z"
     },
     "32179": {
-      "file": "derived/32179.3ae5b2985485.json",
-      "hash": "3ae5b2985485",
-      "from": 2026,
+      "file": "derived/32179.961353ecef25.json",
+      "hash": "961353ecef25",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.525Z"
+      "lastFetched": "2026-07-21T19:47:22.929Z"
     },
     "32190": {
-      "file": "derived/32190.a099491fd736.json",
-      "hash": "a099491fd736",
-      "from": 2026,
+      "file": "derived/32190.94fd38c27997.json",
+      "hash": "94fd38c27997",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.526Z"
+      "lastFetched": "2026-07-21T19:47:22.948Z"
     },
     "32224": {
-      "file": "derived/32224.7361776d4a64.json",
-      "hash": "7361776d4a64",
-      "from": 2026,
+      "file": "derived/32224.ec4b4ec011ec.json",
+      "hash": "ec4b4ec011ec",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.528Z"
+      "lastFetched": "2026-07-21T19:47:22.963Z"
     },
     "32250": {
-      "file": "derived/32250.ffc8dc388562.json",
-      "hash": "ffc8dc388562",
-      "from": 2026,
+      "file": "derived/32250.4b38e15ac1cb.json",
+      "hash": "4b38e15ac1cb",
+      "from": 2023,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.707Z"
+      "lastFetched": "2026-07-21T19:47:23.725Z"
     },
     "32281": {
       "file": "derived/32281.73de5d76b504.json",
@@ -2983,74 +2983,74 @@
       "lastFetched": "2026-07-21T17:46:01.529Z"
     },
     "32282": {
-      "file": "derived/32282.32dd967f8a5e.json",
-      "hash": "32dd967f8a5e",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.529Z"
+      "file": "derived/32282.27ec7a3142ea.json",
+      "hash": "27ec7a3142ea",
+      "from": 2005,
+      "to": 2009,
+      "lastFetched": "2026-07-21T19:47:22.970Z"
     },
     "32322": {
-      "file": "derived/32322.9fb66621c40e.json",
-      "hash": "9fb66621c40e",
-      "from": 2026,
+      "file": "derived/32322.84f43f8126f9.json",
+      "hash": "84f43f8126f9",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.531Z"
+      "lastFetched": "2026-07-21T19:47:22.985Z"
     },
     "32336": {
-      "file": "derived/32336.8dad4ca01543.json",
-      "hash": "8dad4ca01543",
-      "from": 2026,
+      "file": "derived/32336.d133d36bee35.json",
+      "hash": "d133d36bee35",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.719Z"
+      "lastFetched": "2026-07-21T19:47:23.735Z"
     },
     "32355": {
-      "file": "derived/32355.1cd2e3c5134d.json",
-      "hash": "1cd2e3c5134d",
-      "from": 2026,
+      "file": "derived/32355.aca1864d7dd3.json",
+      "hash": "aca1864d7dd3",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.532Z"
+      "lastFetched": "2026-07-21T19:47:22.999Z"
     },
     "32363": {
-      "file": "derived/32363.56c07508fa03.json",
-      "hash": "56c07508fa03",
-      "from": 2026,
+      "file": "derived/32363.d26e8e0d7dc5.json",
+      "hash": "d26e8e0d7dc5",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.717Z"
+      "lastFetched": "2026-07-21T19:47:23.734Z"
     },
     "32365": {
-      "file": "derived/32365.57f28c772684.json",
-      "hash": "57f28c772684",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.534Z"
+      "file": "derived/32365.3261237fa8da.json",
+      "hash": "3261237fa8da",
+      "from": 2012,
+      "to": 2024,
+      "lastFetched": "2026-07-21T19:47:23.009Z"
     },
     "32372": {
-      "file": "derived/32372.613947816f3b.json",
-      "hash": "613947816f3b",
-      "from": 2026,
+      "file": "derived/32372.01a86143dcf2.json",
+      "hash": "01a86143dcf2",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.535Z"
+      "lastFetched": "2026-07-21T19:47:23.019Z"
     },
     "32377": {
-      "file": "derived/32377.5aaefb3d2b2f.json",
-      "hash": "5aaefb3d2b2f",
-      "from": 2026,
+      "file": "derived/32377.f0196f05b24c.json",
+      "hash": "f0196f05b24c",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.536Z"
+      "lastFetched": "2026-07-21T19:47:23.030Z"
     },
     "32390": {
-      "file": "derived/32390.04e5004d3e14.json",
-      "hash": "04e5004d3e14",
-      "from": 2026,
+      "file": "derived/32390.7a825f6f1b21.json",
+      "hash": "7a825f6f1b21",
+      "from": 2002,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.538Z"
+      "lastFetched": "2026-07-21T19:47:23.043Z"
     },
     "32437": {
-      "file": "derived/32437.fb7d65abad97.json",
-      "hash": "fb7d65abad97",
-      "from": 2026,
+      "file": "derived/32437.fe9c23c688bb.json",
+      "hash": "fe9c23c688bb",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.733Z"
+      "lastFetched": "2026-07-21T19:47:23.744Z"
     },
     "32439": {
       "file": "derived/32439.5a56b6e8b28e.json",
@@ -3067,242 +3067,242 @@
       "lastFetched": "2026-07-21T17:46:01.539Z"
     },
     "32474": {
-      "file": "derived/32474.f1f0e4b6f133.json",
-      "hash": "f1f0e4b6f133",
-      "from": 2026,
+      "file": "derived/32474.fa7eefb6ac8b.json",
+      "hash": "fa7eefb6ac8b",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.586Z"
+      "lastFetched": "2026-07-21T19:47:23.350Z"
     },
     "32533": {
-      "file": "derived/32533.ffc2f0107b51.json",
-      "hash": "ffc2f0107b51",
-      "from": 2026,
+      "file": "derived/32533.c0ca7ceda942.json",
+      "hash": "c0ca7ceda942",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.540Z"
+      "lastFetched": "2026-07-21T19:47:23.058Z"
     },
     "32538": {
-      "file": "derived/32538.6538b57c32a1.json",
-      "hash": "6538b57c32a1",
-      "from": 2026,
+      "file": "derived/32538.842f16894945.json",
+      "hash": "842f16894945",
+      "from": 2025,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.735Z"
+      "lastFetched": "2026-07-21T19:47:23.744Z"
     },
     "32635": {
-      "file": "derived/32635.b7cfac6658c2.json",
-      "hash": "b7cfac6658c2",
-      "from": 2026,
+      "file": "derived/32635.f21a129e5680.json",
+      "hash": "f21a129e5680",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.588Z"
+      "lastFetched": "2026-07-21T19:47:23.357Z"
     },
     "32643": {
-      "file": "derived/32643.e238d7a31632.json",
-      "hash": "e238d7a31632",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.541Z"
+      "file": "derived/32643.919633670209.json",
+      "hash": "919633670209",
+      "from": 2006,
+      "to": 2011,
+      "lastFetched": "2026-07-21T19:47:23.064Z"
     },
     "32654": {
-      "file": "derived/32654.3a294d8a4940.json",
-      "hash": "3a294d8a4940",
-      "from": 2026,
+      "file": "derived/32654.863137feb719.json",
+      "hash": "863137feb719",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.590Z"
+      "lastFetched": "2026-07-21T19:47:23.366Z"
     },
     "33023": {
-      "file": "derived/33023.3817fe0dc048.json",
-      "hash": "3817fe0dc048",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.542Z"
+      "file": "derived/33023.e66339ef9804.json",
+      "hash": "e66339ef9804",
+      "from": 2005,
+      "to": 2007,
+      "lastFetched": "2026-07-21T19:47:23.067Z"
     },
     "33142": {
-      "file": "derived/33142.dfd45e1f58e5.json",
-      "hash": "dfd45e1f58e5",
-      "from": 2026,
+      "file": "derived/33142.393b514094c3.json",
+      "hash": "393b514094c3",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.591Z"
+      "lastFetched": "2026-07-21T19:47:23.372Z"
     },
     "33204": {
-      "file": "derived/33204.52768505dd69.json",
-      "hash": "52768505dd69",
-      "from": 2026,
+      "file": "derived/33204.a3b1265bf502.json",
+      "hash": "a3b1265bf502",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.544Z"
+      "lastFetched": "2026-07-21T19:47:23.079Z"
     },
     "33357": {
-      "file": "derived/33357.3a465e24b160.json",
-      "hash": "3a465e24b160",
-      "from": 2026,
+      "file": "derived/33357.28a88bdcb702.json",
+      "hash": "28a88bdcb702",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.593Z"
+      "lastFetched": "2026-07-21T19:47:23.381Z"
     },
     "33394": {
-      "file": "derived/33394.a55c9f1ec814.json",
-      "hash": "a55c9f1ec814",
-      "from": 2026,
+      "file": "derived/33394.4a1908a4005d.json",
+      "hash": "4a1908a4005d",
+      "from": 1999,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.545Z"
+      "lastFetched": "2026-07-21T19:47:23.099Z"
     },
     "33419": {
-      "file": "derived/33419.967dd43641a5.json",
-      "hash": "967dd43641a5",
-      "from": 2026,
+      "file": "derived/33419.31a37b5384ff.json",
+      "hash": "31a37b5384ff",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.594Z"
+      "lastFetched": "2026-07-21T19:47:23.392Z"
     },
     "33420": {
-      "file": "derived/33420.091cd2cb49f0.json",
-      "hash": "091cd2cb49f0",
-      "from": 2026,
+      "file": "derived/33420.6dea0d5e47ce.json",
+      "hash": "6dea0d5e47ce",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.714Z"
+      "lastFetched": "2026-07-21T19:47:23.731Z"
     },
     "33424": {
-      "file": "derived/33424.6c5e22f9daf5.json",
-      "hash": "6c5e22f9daf5",
-      "from": 2026,
+      "file": "derived/33424.bb15f46b21a7.json",
+      "hash": "bb15f46b21a7",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.547Z"
+      "lastFetched": "2026-07-21T19:47:23.114Z"
     },
     "33431": {
-      "file": "derived/33431.baf6d788be18.json",
-      "hash": "baf6d788be18",
-      "from": 2026,
+      "file": "derived/33431.2f5325be741c.json",
+      "hash": "2f5325be741c",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.596Z"
+      "lastFetched": "2026-07-21T19:47:23.403Z"
     },
     "33451": {
-      "file": "derived/33451.e1cde31e1b57.json",
-      "hash": "e1cde31e1b57",
-      "from": 2026,
+      "file": "derived/33451.34eeac163b07.json",
+      "hash": "34eeac163b07",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.548Z"
+      "lastFetched": "2026-07-21T19:47:23.123Z"
     },
     "33480": {
-      "file": "derived/33480.b46536c704bb.json",
-      "hash": "b46536c704bb",
-      "from": 2026,
+      "file": "derived/33480.8d53c8fe967b.json",
+      "hash": "8d53c8fe967b",
+      "from": 2013,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.597Z"
+      "lastFetched": "2026-07-21T19:47:23.411Z"
     },
     "33487": {
-      "file": "derived/33487.2bdd0d7346a5.json",
-      "hash": "2bdd0d7346a5",
-      "from": 2026,
+      "file": "derived/33487.e027ac8e312d.json",
+      "hash": "e027ac8e312d",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.550Z"
+      "lastFetched": "2026-07-21T19:47:23.132Z"
     },
     "33495": {
-      "file": "derived/33495.537a1ec739ec.json",
-      "hash": "537a1ec739ec",
-      "from": 2026,
+      "file": "derived/33495.f8a2a5ead7cf.json",
+      "hash": "f8a2a5ead7cf",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.599Z"
+      "lastFetched": "2026-07-21T19:47:23.420Z"
     },
     "33563": {
-      "file": "derived/33563.547e85bce603.json",
-      "hash": "547e85bce603",
-      "from": 2026,
+      "file": "derived/33563.d5cee2d5a36a.json",
+      "hash": "d5cee2d5a36a",
+      "from": 2008,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.551Z"
+      "lastFetched": "2026-07-21T19:47:23.144Z"
     },
     "33576": {
-      "file": "derived/33576.a89fb8d0131a.json",
-      "hash": "a89fb8d0131a",
-      "from": 2026,
+      "file": "derived/33576.a85401fb8938.json",
+      "hash": "a85401fb8938",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.600Z"
+      "lastFetched": "2026-07-21T19:47:23.429Z"
     },
     "33643": {
-      "file": "derived/33643.b6e86b119bad.json",
-      "hash": "b6e86b119bad",
-      "from": 2026,
+      "file": "derived/33643.e641ff6929fd.json",
+      "hash": "e641ff6929fd",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.552Z"
+      "lastFetched": "2026-07-21T19:47:23.154Z"
     },
     "33652": {
-      "file": "derived/33652.ef0dc0988822.json",
-      "hash": "ef0dc0988822",
-      "from": 2026,
+      "file": "derived/33652.9ad827e030e0.json",
+      "hash": "9ad827e030e0",
+      "from": 2020,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.676Z"
+      "lastFetched": "2026-07-21T19:47:23.688Z"
     },
     "33654": {
-      "file": "derived/33654.2c37c063f9c9.json",
-      "hash": "2c37c063f9c9",
-      "from": 2026,
+      "file": "derived/33654.4e3d9ba2e777.json",
+      "hash": "4e3d9ba2e777",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.602Z"
+      "lastFetched": "2026-07-21T19:47:23.437Z"
     },
     "33661": {
-      "file": "derived/33661.1ff7be3cec1a.json",
-      "hash": "1ff7be3cec1a",
-      "from": 2026,
+      "file": "derived/33661.4b452a034045.json",
+      "hash": "4b452a034045",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.554Z"
+      "lastFetched": "2026-07-21T19:47:23.166Z"
     },
     "33750": {
-      "file": "derived/33750.7f2f2ded4698.json",
-      "hash": "7f2f2ded4698",
-      "from": 2026,
+      "file": "derived/33750.8662a4786f59.json",
+      "hash": "8662a4786f59",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.603Z"
+      "lastFetched": "2026-07-21T19:47:23.446Z"
     },
     "33751": {
-      "file": "derived/33751.cf59a75878c4.json",
-      "hash": "cf59a75878c4",
-      "from": 2026,
+      "file": "derived/33751.a03fb7256f93.json",
+      "hash": "a03fb7256f93",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.555Z"
+      "lastFetched": "2026-07-21T19:47:23.177Z"
     },
     "34073": {
-      "file": "derived/34073.8b2f4a5a8eee.json",
-      "hash": "8b2f4a5a8eee",
-      "from": 2026,
+      "file": "derived/34073.c0e36b8cb7ec.json",
+      "hash": "c0e36b8cb7ec",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.605Z"
+      "lastFetched": "2026-07-21T19:47:23.455Z"
     },
     "34075": {
-      "file": "derived/34075.7980d7f24107.json",
-      "hash": "7980d7f24107",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.556Z"
+      "file": "derived/34075.a4a58335e0f1.json",
+      "hash": "a4a58335e0f1",
+      "from": 2007,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:23.182Z"
     },
     "34081": {
-      "file": "derived/34081.03fed9fdd638.json",
-      "hash": "03fed9fdd638",
-      "from": 2026,
+      "file": "derived/34081.07d004138572.json",
+      "hash": "07d004138572",
+      "from": 2017,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.606Z"
+      "lastFetched": "2026-07-21T19:47:23.462Z"
     },
     "34087": {
-      "file": "derived/34087.db5605117c25.json",
-      "hash": "db5605117c25",
-      "from": 2026,
+      "file": "derived/34087.58bee1d2fba2.json",
+      "hash": "58bee1d2fba2",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.558Z"
+      "lastFetched": "2026-07-21T19:47:23.191Z"
     },
     "34148": {
-      "file": "derived/34148.e9e490fffc44.json",
-      "hash": "e9e490fffc44",
-      "from": 2026,
+      "file": "derived/34148.fdb72f8e3896.json",
+      "hash": "fdb72f8e3896",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.608Z"
+      "lastFetched": "2026-07-21T19:47:23.468Z"
     },
     "34175": {
-      "file": "derived/34175.cfaf71b431f8.json",
-      "hash": "cfaf71b431f8",
-      "from": 2026,
+      "file": "derived/34175.e7a513a5e1e2.json",
+      "hash": "e7a513a5e1e2",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.559Z"
+      "lastFetched": "2026-07-21T19:47:23.201Z"
     },
     "34238": {
-      "file": "derived/34238.3de0fb4405e0.json",
-      "hash": "3de0fb4405e0",
-      "from": 2026,
+      "file": "derived/34238.1f0a44bae921.json",
+      "hash": "1f0a44bae921",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.609Z"
+      "lastFetched": "2026-07-21T19:47:23.476Z"
     },
     "34239": {
       "file": "derived/34239.3e3370b7b7e2.json",
@@ -3312,11 +3312,11 @@
       "lastFetched": "2026-07-21T17:46:01.561Z"
     },
     "34326": {
-      "file": "derived/34326.505b7a9e0d4b.json",
-      "hash": "505b7a9e0d4b",
-      "from": 2026,
+      "file": "derived/34326.85950cb141e5.json",
+      "hash": "85950cb141e5",
+      "from": 2007,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.611Z"
+      "lastFetched": "2026-07-21T19:47:23.486Z"
     },
     "34335": {
       "file": "derived/34335.c54816ddc85f.json",
@@ -3333,102 +3333,102 @@
       "lastFetched": "2026-07-21T17:46:01.612Z"
     },
     "34347": {
-      "file": "derived/34347.1c8891ba717c.json",
-      "hash": "1c8891ba717c",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.562Z"
+      "file": "derived/34347.403016e82447.json",
+      "hash": "403016e82447",
+      "from": 2005,
+      "to": 2011,
+      "lastFetched": "2026-07-21T19:47:23.208Z"
     },
     "34348": {
-      "file": "derived/34348.3d4b40c5362b.json",
-      "hash": "3d4b40c5362b",
-      "from": 2026,
+      "file": "derived/34348.79c046bbe1fc.json",
+      "hash": "79c046bbe1fc",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.613Z"
+      "lastFetched": "2026-07-21T19:47:23.493Z"
     },
     "34382": {
-      "file": "derived/34382.9e37a11316c3.json",
-      "hash": "9e37a11316c3",
-      "from": 2026,
+      "file": "derived/34382.a4021debd885.json",
+      "hash": "a4021debd885",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.563Z"
+      "lastFetched": "2026-07-21T19:47:23.215Z"
     },
     "34413": {
-      "file": "derived/34413.86ddd2bb01d3.json",
-      "hash": "86ddd2bb01d3",
-      "from": 2026,
+      "file": "derived/34413.1013c29b0e6f.json",
+      "hash": "1013c29b0e6f",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.615Z"
+      "lastFetched": "2026-07-21T19:47:23.502Z"
     },
     "34415": {
-      "file": "derived/34415.921d68323544.json",
-      "hash": "921d68323544",
-      "from": 2026,
+      "file": "derived/34415.5249e1ce7d65.json",
+      "hash": "5249e1ce7d65",
+      "from": 2022,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.709Z"
+      "lastFetched": "2026-07-21T19:47:23.727Z"
     },
     "34450": {
-      "file": "derived/34450.ff96add2163a.json",
-      "hash": "ff96add2163a",
-      "from": 2026,
+      "file": "derived/34450.6fe3a2ae6b25.json",
+      "hash": "6fe3a2ae6b25",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.564Z"
+      "lastFetched": "2026-07-21T19:47:23.223Z"
     },
     "34559": {
-      "file": "derived/34559.056eff98cd09.json",
-      "hash": "056eff98cd09",
-      "from": 2026,
+      "file": "derived/34559.be5d279963a4.json",
+      "hash": "be5d279963a4",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.617Z"
+      "lastFetched": "2026-07-21T19:47:23.512Z"
     },
     "34700": {
-      "file": "derived/34700.31eb0311a080.json",
-      "hash": "31eb0311a080",
-      "from": 2026,
+      "file": "derived/34700.3413520c1cc4.json",
+      "hash": "3413520c1cc4",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.566Z"
+      "lastFetched": "2026-07-21T19:47:23.233Z"
     },
     "34732": {
-      "file": "derived/34732.428a47db5093.json",
-      "hash": "428a47db5093",
-      "from": 2026,
+      "file": "derived/34732.a8052dc4ffbe.json",
+      "hash": "a8052dc4ffbe",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.618Z"
+      "lastFetched": "2026-07-21T19:47:23.521Z"
     },
     "34733": {
-      "file": "derived/34733.dc24d5ee2177.json",
-      "hash": "dc24d5ee2177",
-      "from": 2026,
+      "file": "derived/34733.9d534e926832.json",
+      "hash": "9d534e926832",
+      "from": 2000,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.567Z"
+      "lastFetched": "2026-07-21T19:47:23.243Z"
     },
     "35107": {
-      "file": "derived/35107.0653374847eb.json",
-      "hash": "0653374847eb",
-      "from": 2026,
+      "file": "derived/35107.b9843eb25d04.json",
+      "hash": "b9843eb25d04",
+      "from": 2016,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.620Z"
+      "lastFetched": "2026-07-21T19:47:23.526Z"
     },
     "35116": {
-      "file": "derived/35116.a28b4de682c7.json",
-      "hash": "a28b4de682c7",
-      "from": 2026,
+      "file": "derived/35116.a9840665b23e.json",
+      "hash": "a9840665b23e",
+      "from": 2019,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.638Z"
+      "lastFetched": "2026-07-21T19:47:23.615Z"
     },
     "35305": {
-      "file": "derived/35305.fc4432c5f512.json",
-      "hash": "fc4432c5f512",
-      "from": 2026,
+      "file": "derived/35305.0dbc94a17f64.json",
+      "hash": "0dbc94a17f64",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.569Z"
+      "lastFetched": "2026-07-21T19:47:23.252Z"
     },
     "35315": {
-      "file": "derived/35315.3bab4ed4476c.json",
-      "hash": "3bab4ed4476c",
-      "from": 2026,
+      "file": "derived/35315.e88e34b91aff.json",
+      "hash": "e88e34b91aff",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.621Z"
+      "lastFetched": "2026-07-21T19:47:23.534Z"
     },
     "35545": {
       "file": "derived/35545.3185835fe0df.json",
@@ -3445,95 +3445,95 @@
       "lastFetched": "2026-07-21T17:46:01.570Z"
     },
     "35553": {
-      "file": "derived/35553.48b2abfe8158.json",
-      "hash": "48b2abfe8158",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.622Z"
+      "file": "derived/35553.7dcfb122efb4.json",
+      "hash": "7dcfb122efb4",
+      "from": 2010,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:23.538Z"
     },
     "35666": {
-      "file": "derived/35666.72ba87407de2.json",
-      "hash": "72ba87407de2",
-      "from": 2026,
+      "file": "derived/35666.1d97d585e1f5.json",
+      "hash": "1d97d585e1f5",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.571Z"
+      "lastFetched": "2026-07-21T19:47:23.262Z"
     },
     "35769": {
-      "file": "derived/35769.067a96b697da.json",
-      "hash": "067a96b697da",
-      "from": 2026,
+      "file": "derived/35769.036361c67ad8.json",
+      "hash": "036361c67ad8",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.624Z"
+      "lastFetched": "2026-07-21T19:47:23.543Z"
     },
     "35880": {
-      "file": "derived/35880.f7d3e6da8c22.json",
-      "hash": "f7d3e6da8c22",
-      "from": 2026,
+      "file": "derived/35880.76ae821c7fa4.json",
+      "hash": "76ae821c7fa4",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.572Z"
+      "lastFetched": "2026-07-21T19:47:23.270Z"
     },
     "35884": {
-      "file": "derived/35884.ef8f02ed9d5e.json",
-      "hash": "ef8f02ed9d5e",
-      "from": 2026,
+      "file": "derived/35884.b7fbaca1b9e7.json",
+      "hash": "b7fbaca1b9e7",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.625Z"
+      "lastFetched": "2026-07-21T19:47:23.551Z"
     },
     "35963": {
-      "file": "derived/35963.eb5f01396e5b.json",
-      "hash": "eb5f01396e5b",
-      "from": 2026,
+      "file": "derived/35963.c6739cde470d.json",
+      "hash": "c6739cde470d",
+      "from": 2006,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.574Z"
+      "lastFetched": "2026-07-21T19:47:23.279Z"
     },
     "35965": {
-      "file": "derived/35965.3061f3feee5d.json",
-      "hash": "3061f3feee5d",
-      "from": 2026,
+      "file": "derived/35965.c47a6f888aa1.json",
+      "hash": "c47a6f888aa1",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.627Z"
+      "lastFetched": "2026-07-21T19:47:23.560Z"
     },
     "35978": {
-      "file": "derived/35978.f62fecd2b2b3.json",
-      "hash": "f62fecd2b2b3",
-      "from": 0,
-      "to": 0,
-      "lastFetched": "2026-07-21T17:46:01.575Z"
+      "file": "derived/35978.e5045be3b19f.json",
+      "hash": "e5045be3b19f",
+      "from": 2009,
+      "to": 2012,
+      "lastFetched": "2026-07-21T19:47:23.283Z"
     },
     "35985": {
-      "file": "derived/35985.66a87ef5d162.json",
-      "hash": "66a87ef5d162",
-      "from": 2026,
+      "file": "derived/35985.0d07ffef92c1.json",
+      "hash": "0d07ffef92c1",
+      "from": 2018,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.645Z"
+      "lastFetched": "2026-07-21T19:47:23.632Z"
     },
     "36049": {
-      "file": "derived/36049.f24b551e894f.json",
-      "hash": "f24b551e894f",
-      "from": 2026,
+      "file": "derived/36049.5dc4d8fbb0ec.json",
+      "hash": "5dc4d8fbb0ec",
+      "from": 2009,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.628Z"
+      "lastFetched": "2026-07-21T19:47:23.568Z"
     },
     "36122": {
-      "file": "derived/36122.f6d93e9f567c.json",
-      "hash": "f6d93e9f567c",
-      "from": 2026,
+      "file": "derived/36122.2b5b64b2faad.json",
+      "hash": "2b5b64b2faad",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.576Z"
+      "lastFetched": "2026-07-21T19:47:23.289Z"
     },
     "36127": {
-      "file": "derived/36127.fa636e37336d.json",
-      "hash": "fa636e37336d",
-      "from": 2026,
+      "file": "derived/36127.ba9e06de1181.json",
+      "hash": "ba9e06de1181",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.630Z"
+      "lastFetched": "2026-07-21T19:47:23.577Z"
     },
     "36132": {
-      "file": "derived/36132.5c35116bd8bb.json",
-      "hash": "5c35116bd8bb",
-      "from": 2026,
+      "file": "derived/36132.c2415a5109e7.json",
+      "hash": "c2415a5109e7",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.577Z"
+      "lastFetched": "2026-07-21T19:47:23.297Z"
     },
     "36152": {
       "file": "derived/36152.b998726197af.json",
@@ -3543,74 +3543,74 @@
       "lastFetched": "2026-07-21T17:46:01.631Z"
     },
     "36156": {
-      "file": "derived/36156.10001d351a5f.json",
-      "hash": "10001d351a5f",
-      "from": 2026,
+      "file": "derived/36156.f9f477a4fbdb.json",
+      "hash": "f9f477a4fbdb",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.579Z"
+      "lastFetched": "2026-07-21T19:47:23.308Z"
     },
     "36270": {
-      "file": "derived/36270.4155ae64c2e8.json",
-      "hash": "4155ae64c2e8",
-      "from": 2026,
+      "file": "derived/36270.230d47d0a9ed.json",
+      "hash": "230d47d0a9ed",
+      "from": 2014,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.632Z"
+      "lastFetched": "2026-07-21T19:47:23.584Z"
     },
     "36308": {
-      "file": "derived/36308.4a9eafbdcd08.json",
-      "hash": "4a9eafbdcd08",
-      "from": 2026,
+      "file": "derived/36308.1842f581f8f3.json",
+      "hash": "1842f581f8f3",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.580Z"
+      "lastFetched": "2026-07-21T19:47:23.318Z"
     },
     "36382": {
-      "file": "derived/36382.644c7c651400.json",
-      "hash": "644c7c651400",
-      "from": 2026,
+      "file": "derived/36382.37e725decee3.json",
+      "hash": "37e725decee3",
+      "from": 2024,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.711Z"
+      "lastFetched": "2026-07-21T19:47:23.729Z"
     },
     "36386": {
-      "file": "derived/36386.f472e94ee7bf.json",
-      "hash": "f472e94ee7bf",
-      "from": 2026,
+      "file": "derived/36386.2757b005277f.json",
+      "hash": "2757b005277f",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.633Z"
+      "lastFetched": "2026-07-21T19:47:23.593Z"
     },
     "36391": {
-      "file": "derived/36391.4227063fbc2b.json",
-      "hash": "4227063fbc2b",
-      "from": 2026,
+      "file": "derived/36391.d18f21bcf18b.json",
+      "hash": "d18f21bcf18b",
+      "from": 2014,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.582Z"
+      "lastFetched": "2026-07-21T19:47:23.325Z"
     },
     "36411": {
-      "file": "derived/36411.dcec1f6b222c.json",
-      "hash": "dcec1f6b222c",
-      "from": 2026,
+      "file": "derived/36411.4bd867f623d4.json",
+      "hash": "4bd867f623d4",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.635Z"
+      "lastFetched": "2026-07-21T19:47:23.602Z"
     },
     "36415": {
-      "file": "derived/36415.deed622433b5.json",
-      "hash": "deed622433b5",
-      "from": 2026,
+      "file": "derived/36415.f5506296a77f.json",
+      "hash": "f5506296a77f",
+      "from": 2012,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.583Z"
+      "lastFetched": "2026-07-21T19:47:23.331Z"
     },
     "36504": {
-      "file": "derived/36504.bf1131b8585a.json",
-      "hash": "bf1131b8585a",
-      "from": 2026,
+      "file": "derived/36504.b6276f6be870.json",
+      "hash": "b6276f6be870",
+      "from": 2010,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.636Z"
+      "lastFetched": "2026-07-21T19:47:23.610Z"
     },
     "36519": {
-      "file": "derived/36519.77ca190a63bd.json",
-      "hash": "77ca190a63bd",
-      "from": 2026,
+      "file": "derived/36519.1cd5eae848a8.json",
+      "hash": "1cd5eae848a8",
+      "from": 2005,
       "to": 2026,
-      "lastFetched": "2026-07-21T17:46:01.585Z"
+      "lastFetched": "2026-07-21T19:47:23.341Z"
     },
     "51350": {
       "file": "derived/51350.ff2f8873bb34.json",
