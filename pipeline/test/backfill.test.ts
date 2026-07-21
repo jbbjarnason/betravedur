@@ -182,6 +182,54 @@ describe("WR-02: backfillStation returns the store-derived high-water, not the l
   });
 });
 
+describe("DATA-03 self-heal: a missed night resumes from high-water+1, spanning the WHOLE gap", () => {
+  it("self-heal a missed multi-year gap: high-water 2020, now 2024 -> fetches 2021..2024, not just yesterday", async () => {
+    // The pipeline missed several nightly runs (or a multi-year outage). The store's high-water
+    // is 2020; nowYear is 2024. Resuming from `undefined` startYear must gap-fill 2021..2024 —
+    // the ENTIRE missed span — not merely the newest year. This proves the resume is
+    // high-water-driven ("from high-water+1"), never a naive "just yesterday".
+    const stored: DailyObservation[] = [];
+    const upsertPartition = vi.fn((_station: number, rows: DailyObservation[]) => {
+      stored.push(...rows);
+    });
+    const highWaterYear = vi.fn(() => {
+      if (stored.length === 0) return 2020; // seed: last successful backfill reached 2020
+      return Math.max(...stored.map((r) => Number(r.date.slice(0, 4))));
+    });
+
+    const fetchedYears = new Set<number>();
+    const fetchAws = vi.fn(
+      async (_ids: number[], from: string, to: string): Promise<DailyObservation[]> => {
+        const y0 = Number(from.slice(0, 4));
+        const y1 = Number(to.slice(0, 4));
+        const rows: DailyObservation[] = [];
+        for (let y = y0; y <= y1; y++) {
+          fetchedYears.add(y);
+          rows.push(row(1, `${y}-06-15`));
+        }
+        return rows;
+      },
+    );
+
+    const hw = await backfillStation("aws", 1, undefined, {
+      fetchAws,
+      fetchSynop: vi.fn(),
+      upsertPartition,
+      highWaterYear,
+      sleep: async () => {},
+      nowYear: 2024,
+    });
+
+    // Every year of the missed gap was fetched — the resume spans MORE than one year.
+    expect([...fetchedYears].sort((a, b) => a - b)).toEqual([2021, 2022, 2023, 2024]);
+    expect(fetchedYears.size).toBeGreaterThan(1);
+    // No re-fetch of already-stored years (<=2020).
+    for (const y of fetchedYears) expect(y).toBeGreaterThanOrEqual(2021);
+    // The returned high-water reflects the store after the gap-fill.
+    expect(hw).toBe(2024);
+  });
+});
+
 describe("backfill pacing", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
