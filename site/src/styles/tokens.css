@@ -21,7 +21,7 @@
   --accent: #c0392b; /* temperature numeral only (reserved) */
   --ink: #1f2933; /* primary text */
   --muted-ink: #5b6670; /* slogan, unit labels, honesty vocabulary */
-  --marker-empty-fg: #9aa5ae; /* muted marker state */
+  --marker-empty-fg: #646e77; /* muted marker state — darkened for WCAG-AA (4.8:1 on --marker-empty-bg; was #9aa5ae = 2.3:1 fail) while staying visibly lighter than --muted-ink */
   --marker-empty-bg: #f4f6f7;
   --hairline: rgba(31, 41, 51, 0.1);
 
