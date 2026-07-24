@@ -168,9 +168,14 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
         const panel = page.locator(PANEL);
         const canvasCount = await panel.locator("figure canvas").count();
         if (canvasCount >= 3) {
-          // This is a data-complete station: assert each titled figure carries a canvas.
+          // This is a data-complete station: assert each titled figure carries a canvas. Match on
+          // the figcaption title EXACTLY (not whole-figure hasText) so the warming-trend figure —
+          // whose aria summary contains "Hiti eftir árum" — never collides with the "Hiti" boxplot
+          // figure (quick-260723 added a 4th figure; whole-figure hasText became ambiguous).
           for (const title of ["Hiti", "Vindur", "Úrkoma"]) {
-            const figure = panel.locator("figure").filter({ hasText: title });
+            const figure = panel
+              .locator("figure")
+              .filter({ has: page.locator(".station-panel__figure-title", { hasText: title }) });
             await expect(figure).toBeVisible();
             await expect(figure.locator("canvas")).toBeVisible();
           }
@@ -430,8 +435,12 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
       await openPanelViaMarker(page);
       const panel = page.locator(PANEL);
       // Each titled figure carries a figcaption/aria-label summary or a visually-hidden table.
+      // Match on the figcaption title EXACTLY so the quick-260723 warming-trend figure (whose aria
+      // summary contains "Hiti eftir árum") does not make the "Hiti" locator resolve to 2 figures.
       for (const title of ["Hiti", "Vindur", "Úrkoma"]) {
-        const figure = panel.locator("figure").filter({ hasText: title });
+        const figure = panel
+          .locator("figure")
+          .filter({ has: page.locator(".station-panel__figure-title", { hasText: title }) });
         const hasSummary = await figure.evaluate((el) => {
           const cap = el.querySelector("figcaption");
           const aria = el.getAttribute("aria-label") ?? el.querySelector("[aria-label]")?.getAttribute("aria-label");
@@ -520,6 +529,67 @@ test.describe("Phase 6 acceptance criteria (06-UI-SPEC §Acceptance-Checkable Vi
       // ECharts canvases were the leak). Reopen once and compare to the first-open baseline.
       await openStation(dataStation!);
       expect(await canvasCount()).toBe(baselineCanvases);
+    },
+  );
+
+  test(
+    "trend figure: a 4th 'Þróun hita' figure below Úrkoma with an ár/mánuður/vika resolution toggle that survives switching [quick-260723]",
+    async ({ page }) => {
+      await waitForMarkers(page);
+
+      // Open Reykjavík (#1 — deep history) via the store seam so the warming-trend figure has
+      // >=2 years of data and renders a chart, not the honesty no-data text.
+      const errors: string[] = [];
+      page.on("pageerror", (err) => errors.push(String(err)));
+      await page.evaluate(() => {
+        (window as unknown as { __store: { set(p: Record<string, unknown>): void } }).__store.set({
+          stationId: 1,
+        });
+      });
+      const panel = page.locator(PANEL);
+      await panel.waitFor({ state: "visible", timeout: 5_000 });
+      await page.waitForTimeout(600); // lazy chart chunk load + mount
+
+      // (a) A 4th figure titled "Þróun hita" exists, and it is positioned AFTER the Úrkoma figure.
+      const trendFigure = panel.locator("figure").filter({ hasText: "Þróun hita" });
+      await expect(trendFigure).toHaveCount(1);
+      const order = await panel.locator("figure").evaluateAll((figs) =>
+        figs.map((f) => f.textContent ?? ""),
+      );
+      const urkomaIdx = order.findIndex((t) => t.includes("Úrkoma"));
+      const trendIdx = order.findIndex((t) => t.includes("Þróun hita"));
+      expect(urkomaIdx).toBeGreaterThanOrEqual(0);
+      expect(trendIdx).toBeGreaterThan(urkomaIdx); // trend is BELOW Úrkoma
+
+      // (b) The resolution toggle has exactly 3 buttons: ár / mánuður / vika.
+      const toggle = trendFigure.locator(".station-panel__resolution");
+      await expect(toggle).toHaveCount(1);
+      const btns = toggle.locator("button");
+      await expect(btns).toHaveCount(3);
+      await expect(btns.filter({ hasText: "ár" })).toHaveCount(1);
+      await expect(btns.filter({ hasText: "mánuður" })).toHaveCount(1);
+      await expect(btns.filter({ hasText: "vika" })).toHaveCount(1);
+      // Default is ár (pressed).
+      await expect(btns.filter({ hasText: "ár" })).toHaveAttribute("aria-pressed", "true");
+
+      // The trend chart host is present at the default resolution (deep-history station → a chart).
+      const trendHost = trendFigure.locator(".station-panel__chart-slot");
+      await expect(trendHost).toHaveCount(1);
+
+      // (c) Switching resolution keeps the panel alive (no pageerror) and the chart host stays.
+      await btns.filter({ hasText: "mánuður" }).click();
+      await page.waitForTimeout(300);
+      await expect(btns.filter({ hasText: "mánuður" })).toHaveAttribute("aria-pressed", "true");
+      await expect(trendFigure.locator(".station-panel__chart-slot")).toHaveCount(1);
+
+      await btns.filter({ hasText: "vika" }).click();
+      await page.waitForTimeout(300);
+      await expect(btns.filter({ hasText: "vika" })).toHaveAttribute("aria-pressed", "true");
+      await expect(trendFigure.locator(".station-panel__chart-slot")).toHaveCount(1);
+
+      // Panel still open, no uncaught error across the switches.
+      await expect(panel).toBeVisible();
+      expect(errors, `no pageerror during resolution switching: ${errors.join(", ")}`).toEqual([]);
     },
   );
 });
