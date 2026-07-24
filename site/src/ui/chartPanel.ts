@@ -23,11 +23,11 @@
 // Tooltips use an ECharts formatter returning PLAIN Icelandic strings — never interpolated HTML
 // (T-06-07 / V11: the numeric values + fixed labels only, no station-derived HTML injection).
 import * as echarts from "echarts/core";
-import { BoxplotChart, BarChart } from "echarts/charts";
+import { BoxplotChart, BarChart, LineChart } from "echarts/charts";
 import { GridComponent, TooltipComponent, TitleComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
-import type { BoxplotSeriesOption, BarSeriesOption } from "echarts/charts";
+import type { BoxplotSeriesOption, BarSeriesOption, LineSeriesOption } from "echarts/charts";
 import type {
   GridComponentOption,
   TooltipComponentOption,
@@ -38,6 +38,7 @@ import type { PerDoyBox, PerDoyBar } from "@betravedur/domain";
 echarts.use([
   BoxplotChart,
   BarChart,
+  LineChart,
   GridComponent,
   TooltipComponent,
   TitleComponent,
@@ -48,6 +49,7 @@ echarts.use([
 type ECOption = ComposeOption<
   | BoxplotSeriesOption
   | BarSeriesOption
+  | LineSeriesOption
   | GridComponentOption
   | TooltipComponentOption
   | TitleComponentOption
@@ -507,5 +509,125 @@ export function renderBars(container: HTMLElement, spec: BarsSpec): ChartHandle 
   const summary = barsAriaSummary(spec);
   const rows = present.map((b) => [doyLabel(b.doy), formatIce(b.value, 1)]);
   attachA11y(container, summary, ["Dagur", "Úrkoma (mm)"], rows);
+  return handle;
+}
+
+/** One point in the warming-trend line: a year and its mean value. */
+export interface TrendPoint {
+  year: number;
+  mean: number;
+}
+
+/** Spec for the per-year TREND line (warming view) — the fourth station figure. */
+export interface TrendSpec {
+  /** Per-year mean points, ascending by year (from meanPerYearSeries). */
+  series: TrendPoint[];
+  /** Y-axis unit label (`°C`). */
+  unit: string;
+  /** The resolved line hex tone (from --chart-temp). */
+  tone: string;
+  /** Metric name in Icelandic for the aria summary (`Hiti`). */
+  metricLabel: string;
+}
+
+/**
+ * Aria summary for the trend line: first year → last year and the delta between them.
+ * Plain Icelandic, comma-decimal — the text alternative for the opaque canvas. A rising
+ * delta (hlýnun) reads as warming; a falling one as kólnun.
+ */
+function trendAriaSummary(spec: TrendSpec): string {
+  const pts = spec.series;
+  if (pts.length === 0) return `${spec.metricLabel} eftir árum: engin gögn fyrir þetta tímabil.`;
+  const first = pts[0]!;
+  const last = pts[pts.length - 1]!;
+  const u = spec.unit;
+  if (pts.length === 1) {
+    return `${spec.metricLabel} eftir árum: ${first.year}: ${formatIce(first.mean, 1)} ${u}.`;
+  }
+  const delta = last.mean - first.mean;
+  const trendWord = delta > 0 ? "hlýnun" : delta < 0 ? "kólnun" : "óbreytt";
+  const deltaText = `${delta >= 0 ? "+" : "−"}${formatIce(Math.abs(delta), 1)}`;
+  return (
+    `${spec.metricLabel} eftir árum: frá ${formatIce(first.mean, 1)} ${u} (${first.year}) ` +
+    `til ${formatIce(last.mean, 1)} ${u} (${last.year}); breyting ${deltaText} ${u} — ${trendWord}.`
+  );
+}
+
+/**
+ * Render a per-year TREND LINE (mean temperature per year — the warming view) into
+ * `container` from the ascending `{year, mean}` series. Value x-axis with integer year
+ * labels, value y-axis in the metric unit, ONE line with symbol points in the resolved
+ * tone (--chart-temp). Icelandic comma-decimal tooltip; `animation:false` under reduced-
+ * motion; a11y summary + hidden per-year table. Records the built option on
+ * window.__chartOptions.
+ *
+ * Returns a {@link ChartHandle} owning the ECharts instance + its ResizeObserver so the
+ * shell can dispose it (CR-01/WR-01), or `null` on an empty series (the no-data path — the
+ * slot then shows the no-data text, like the other renderers).
+ */
+export function renderTrend(container: HTMLElement, spec: TrendSpec): ChartHandle | null {
+  const pts = spec.series;
+  if (pts.length === 0) {
+    writeNoData(container);
+    return null;
+  }
+
+  const fontFamily = resolveFontFamily();
+  const { grid, tickTextStyle } = baseGridAndText(fontFamily);
+  const unit = spec.unit;
+
+  // [year, mean] pairs on a VALUE x-axis so the horizontal spacing is proportional to
+  // real time gaps (a station with a data hiatus shows the gap honestly, not evenly).
+  const data: Array<[number, number]> = pts.map((p) => [p.year, p.mean]);
+
+  const option: ECOption = {
+    animation: !prefersReducedMotion(),
+    aria: { enabled: true },
+    grid,
+    tooltip: {
+      trigger: "item",
+      // PLAIN string formatter — no HTML injection (V11). "{year}: {mean} °C".
+      formatter: (params: unknown) => {
+        const p = params as { data?: [number, number] };
+        const d = p.data;
+        if (!Array.isArray(d) || d.length < 2) return "";
+        const [year, mean] = d;
+        return `${year}: ${formatIce(mean, 1)} ${unit}`;
+      },
+    },
+    xAxis: {
+      type: "value",
+      // Integer year ticks — never a fractional "2010.5" label.
+      minInterval: 1,
+      axisLabel: { ...tickTextStyle, formatter: (v: number) => String(Math.round(v)) },
+      axisLine: { lineStyle: { color: resolveToken("--hairline") } },
+      splitLine: { show: false },
+    },
+    yAxis: {
+      type: "value",
+      name: unit,
+      nameTextStyle: tickTextStyle,
+      scale: true, // don't force 0 — a warming drift of a few °C must be visible
+      axisLabel: tickTextStyle,
+      splitLine: { lineStyle: { color: resolveToken("--hairline") } },
+    },
+    series: [
+      {
+        type: "line",
+        data,
+        symbol: "circle",
+        symbolSize: 5,
+        showSymbol: true,
+        lineStyle: { color: spec.tone, width: 2 },
+        itemStyle: { color: spec.tone },
+      },
+    ],
+  };
+
+  const handle = initChart(container, option);
+
+  const summary = trendAriaSummary(spec);
+  const rows = pts.map((p) => [String(p.year), formatIce(p.mean, 1)]);
+  attachA11y(container, summary, ["Ár", `Meðalhiti (${unit})`], rows);
   return handle;
 }
