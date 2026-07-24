@@ -579,6 +579,14 @@ export function renderTrend(container: HTMLElement, spec: TrendSpec): ChartHandl
   // [year, mean] pairs on a VALUE x-axis so the horizontal spacing is proportional to
   // real time gaps (a station with a data hiatus shows the gap honestly, not evenly).
   const data: Array<[number, number]> = pts.map((p) => [p.year, p.mean]);
+  // Pin the x-axis to the actual year span so the years fill the width (a bare value axis
+  // anchors at 0 → all years bunch near 2000). Pad a single-year edge case by ±1 so it isn't a
+  // zero-width axis.
+  const years = pts.map((p) => p.year);
+  const minYear = Math.min(...years);
+  const maxYear = Math.max(...years);
+  const xMin = minYear === maxYear ? minYear - 1 : minYear;
+  const xMax = minYear === maxYear ? maxYear + 1 : maxYear;
 
   const option: ECOption = {
     animation: !prefersReducedMotion(),
@@ -597,6 +605,11 @@ export function renderTrend(container: HTMLElement, spec: TrendSpec): ChartHandl
     },
     xAxis: {
       type: "value",
+      // Span exactly the data's year range so the years fill the axis width (aligns the plot to
+      // the input years instead of ECharts' default 0-anchored value scale).
+      min: xMin,
+      max: xMax,
+      scale: true,
       // Integer year ticks — never a fractional "2010.5" label.
       minInterval: 1,
       axisLabel: { ...tickTextStyle, formatter: (v: number) => String(Math.round(v)) },
