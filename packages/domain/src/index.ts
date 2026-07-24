@@ -26,6 +26,8 @@ export type {
 export { circularMeanDirection, scalarMeanSpeed } from "./wind.js";
 export { sumPerYearThenAverage } from "./precip.js";
 export { meanPerYearThenAverage } from "./meanPerYear.js";
+export { meanPerYearSeries } from "./trend.js";
+export type { YearMean } from "./trend.js";
 export { tempComponent, rainComponent, windComponent, combine } from "./score.js";
 export type { Attribution } from "./attribution.js";
 export { ATTRIBUTION } from "./attribution.js";
