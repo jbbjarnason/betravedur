@@ -26,6 +26,9 @@ import { decodeDerived } from "@betravedur/pipeline/derive";
 import {
   perDoyDistribution,
   perDoyPrecip,
+  groupBySeasonYear,
+  expandWindow,
+  meanPerYearSeries,
   type DailyObservation,
   type PerDoyBox,
   type PerDoyBar,
@@ -46,13 +49,19 @@ const COPY = {
   dragHandle: "Stækka eða minnka spjald",
   daylightLabel: "Dagsbirta",
   daylightUnit: "klst.",
-  chartTitles: { temp: "Hiti", wind: "Vindur", precip: "Úrkoma" },
+  chartTitles: { temp: "Hiti", wind: "Vindur", precip: "Úrkoma", trend: "Þróun hita" },
   readingKeys: {
     temp: "Kassinn sýnir hitann sem 8 af hverjum 10 dögum lentu í; línan í miðjunni er dæmigerður dagur og strikin sýna kaldasta og hlýjasta dag.",
     wind: "Kassinn sýnir vindstyrkinn sem 8 af hverjum 10 dögum lentu í; línan í miðjunni er dæmigerður dagur og strikin sýna hægasta og hvassasta dag.",
     precip:
       "Súlurnar sýna dæmigerða úrkomu hvers dags yfir árin; eyða þýðir að úrkoma var ekki mæld, ekki að það hafi verið þurrt.",
+    trend:
+      "Hver punktur er meðalhiti ársins yfir valið tímabil; lína sem stígur upp á við þýðir að hlýnað hefur með árunum.",
   },
+  // Resolution toggle (Upplausn): the window width used per year's mean.
+  trendResLabel: "Upplausn",
+  trendRes: { year: "ár", month: "mánuður", week: "vika" },
+  trendNoData: "of fá ár til að sýna þróun",
   noData: "engin gögn fyrir þetta tímabil",
   precipNoGauge: "engin úrkomumæling á þessari stöð",
   emptyHeading: "Engin gögn",
@@ -157,7 +166,14 @@ type ChartSpec =
       metricLabel: string;
       zeroFloor?: boolean;
     }
-  | { kind: "bars"; perDoy: PerDoyBar[]; tone: string; metricLabel: string };
+  | { kind: "bars"; perDoy: PerDoyBar[]; tone: string; metricLabel: string }
+  | {
+      kind: "trend";
+      series: Array<{ year: number; mean: number }>;
+      unit: string;
+      tone: string;
+      metricLabel: string;
+    };
 
 /**
  * Memoized lazy import of the chart chunk. The FIRST sufficient-metric render triggers
@@ -227,11 +243,18 @@ export function renderChartInto(
               metricLabel: spec.metricLabel,
               zeroFloor: spec.zeroFloor,
             })
-          : mod.renderBars(host, {
-              perDoy: spec.perDoy,
-              tone: spec.tone,
-              metricLabel: spec.metricLabel,
-            });
+          : spec.kind === "bars"
+            ? mod.renderBars(host, {
+                perDoy: spec.perDoy,
+                tone: spec.tone,
+                metricLabel: spec.metricLabel,
+              })
+            : mod.renderTrend(host, {
+                series: spec.series,
+                unit: spec.unit,
+                tone: spec.tone,
+                metricLabel: spec.metricLabel,
+              });
       registerChart?.(chart);
     })
     .catch(() => {
@@ -295,6 +318,131 @@ function buildFigure(
     key.append(swatch, document.createTextNode(readingKey));
     figure.appendChild(key);
   }
+
+  return figure;
+}
+
+/** The three trend resolutions and the window WIDTH (in days) each uses per year's mean. */
+type TrendRes = "year" | "month" | "week";
+const TREND_WIDTHS: Record<TrendRes, number> = { year: 365, month: 30, week: 7 };
+
+/**
+ * Build the per-year mean-temperature SERIES for a station over a chosen resolution. The
+ * resolution sets the WINDOW WIDTH centred on `anchorDoy`: ár = the whole calendar year
+ * (all 365 doys), mánuður = a ~30-day window, vika = a 7-day window. Uses the station's
+ * FULL available history (every season-year present in `rows`, NOT clamped to the Frá/Til
+ * baseline) — warming is only visible across many years. Temp selector (`o.t`).
+ */
+function computeTrendSeries(
+  rows: DailyObservation[],
+  anchorDoy: number,
+  res: TrendRes,
+): Array<{ year: number; mean: number }> {
+  const width = TREND_WIDTHS[res];
+  let windowDays: Set<number>;
+  let rowsByYear: Map<number, DailyObservation[]>;
+  if (res === "year") {
+    // The whole calendar year: all doys, plain calendar-year grouping (no wrap).
+    windowDays = new Set<number>();
+    for (let d = 1; d <= 365; d++) windowDays.add(d);
+    rowsByYear = groupBySeasonYear(rows, { startDoy: 1, endDoy: 365 });
+  } else {
+    // A width-day window CENTRED on the anchor doy (wrap-aware via anchorToWindow).
+    const startDoy = foldDoy(anchorDoy - Math.floor((width - 1) / 2));
+    const spec = anchorToWindow(startDoy, width);
+    windowDays = expandWindow(spec);
+    rowsByYear = groupBySeasonYear(rows, spec);
+  }
+  return meanPerYearSeries(rowsByYear, windowDays, tempSelector);
+}
+
+/**
+ * Build the fourth station figure — the warming TREND: a per-year mean-temperature line with
+ * a resolution toggle (ár / mánuður / vika). The toggle changes the window WIDTH used per
+ * year's mean and re-renders the chart IN PLACE (disposing the previous ECharts instance via
+ * `registerChart`/liveCharts, never leaking). Below the honesty threshold (< 2 usable years at
+ * the default resolution) it shows the no-data honesty text instead of an empty chart.
+ */
+function buildTrendFigure(
+  rows: DailyObservation[],
+  anchorDoy: number,
+  toneTemp: string,
+  registerChart: (chart: DisposableChart | null) => void,
+): HTMLElement {
+  const figure = document.createElement("figure");
+  figure.className = "station-panel__figure";
+
+  const caption = document.createElement("figcaption");
+  caption.className = "station-panel__figure-title";
+  caption.textContent = COPY.chartTitles.trend;
+  figure.appendChild(caption);
+
+  // ── Resolution toggle (segmented control, Icelandic aria "Upplausn") ─────────
+  const toggle = document.createElement("div");
+  toggle.className = "station-panel__resolution";
+  toggle.setAttribute("role", "group");
+  toggle.setAttribute("aria-label", COPY.trendResLabel);
+  const order: TrendRes[] = ["year", "month", "week"];
+  const buttons = new Map<TrendRes, HTMLButtonElement>();
+  let currentRes: TrendRes = "year"; // default = ár (annual mean → cleanest warming signal)
+
+  const slot = document.createElement("div");
+  slot.className = "station-panel__chart-slot";
+
+  const renderRes = (res: TrendRes): void => {
+    currentRes = res;
+    for (const [r, btn] of buttons) btn.setAttribute("aria-pressed", String(r === res));
+    // Recompute the series and re-render in place. renderChartInto appends a fresh host and
+    // registers the new chart handle; the previous instance is disposed by registerChart's
+    // owner on the next teardown/open, but to avoid stacking hosts across toggles we clear the
+    // slot's children first (the old canvas/table) — the disposed instance is dropped by the
+    // lifecycle owner. Clearing here mirrors the panel-rebuild discipline.
+    slot.replaceChildren();
+    const series = computeTrendSeries(rows, anchorDoy, res);
+    if (series.length < 2) {
+      appendNoData(slot, COPY.trendNoData);
+      return;
+    }
+    renderChartInto(
+      slot,
+      {
+        kind: "trend",
+        series,
+        unit: "°C",
+        tone: toneTemp,
+        metricLabel: COPY.chartTitles.temp,
+      },
+      registerChart,
+    );
+  };
+
+  for (const res of order) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "station-panel__resolution-btn";
+    btn.textContent = COPY.trendRes[res];
+    btn.setAttribute("aria-pressed", String(res === currentRes));
+    btn.addEventListener("click", () => {
+      if (res !== currentRes) renderRes(res);
+    });
+    buttons.set(res, btn);
+    toggle.appendChild(btn);
+  }
+
+  figure.appendChild(toggle);
+  figure.appendChild(slot);
+
+  // Initial render at the default resolution (ár).
+  renderRes(currentRes);
+
+  // The plain-Icelandic reading key (real DOM text so AT reads it).
+  const key = document.createElement("p");
+  key.className = "station-panel__reading-key";
+  const swatch = document.createElement("span");
+  swatch.className = "station-panel__swatch station-panel__swatch--temp";
+  swatch.setAttribute("aria-hidden", "true");
+  key.append(swatch, document.createTextNode(COPY.readingKeys.trend));
+  figure.appendChild(key);
 
   return figure;
 }
@@ -486,8 +634,11 @@ export function mountStationPanel(
     let tempResult: DistributionResult = { sufficient: false };
     let windResult: DistributionResult = { sufficient: false };
     let precipResult: PrecipResult = { sufficient: false };
+    // Hoisted so the warming-trend figure (below) can build its FULL-history per-year series from
+    // the SAME decoded rows — decoded once, never re-fetched. Empty for an uncached/muted station.
+    let rows: DailyObservation[] = [];
     if (entry) {
-      const rows = decodeDerived(entry.file);
+      rows = decodeDerived(entry.file);
       tempResult = perDoyDistribution(rows, window, yearRange, tempSelector);
       windResult = perDoyDistribution(rows, window, yearRange, windSelector);
       precipResult = perDoyPrecip(rows, window, yearRange);
@@ -605,6 +756,13 @@ export function mountStationPanel(
           registerChart,
         ),
       );
+
+      // ── Warming-trend figure (4th) — per-year mean temperature + ár/mánuður/vika toggle ─
+      // Placed BELOW Úrkoma and ABOVE the daylight readout. Uses the station's FULL history
+      // (all season-years in `rows`, NOT clamped to the Frá/Til baseline) so warming is visible
+      // across many years. If < 2 usable years at the default resolution, it shows the honesty
+      // no-data text instead of an empty chart (handled inside buildTrendFigure).
+      body.appendChild(buildTrendFigure(rows, state.anchorDoy, toneTemp, registerChart));
     }
 
     // ── Daylight readout (always present — pure astronomy, no data dependency) ─

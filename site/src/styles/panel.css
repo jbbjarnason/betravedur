@@ -157,6 +157,48 @@
   color: var(--muted-ink);
 }
 
+/* Resolution toggle for the warming-trend figure (ár / mánuður / vika): a segmented control
+   that changes the window WIDTH used per year's mean. Mirrors the reading-key rhythm; the
+   pressed button reads via aria-pressed + a filled tone (color is never the sole channel —
+   the label text and the pressed weight carry the state too). */
+.station-panel__resolution {
+  display: inline-flex;
+  gap: 2px;
+  margin-top: var(--space-xs);
+  padding: 2px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface, transparent);
+}
+
+.station-panel__resolution-btn {
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.station-panel__resolution-btn:hover {
+  color: var(--ink);
+}
+
+.station-panel__resolution-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--surface, #fff);
+  font-weight: 600;
+}
+
+.station-panel__resolution-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 /* Whole-station empty state (all three metrics insufficient): a panel-level heading + body,
    rendered instead of the three figures. The daylight readout still renders below it. */
 .station-panel__empty {
