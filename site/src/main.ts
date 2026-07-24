@@ -144,8 +144,12 @@ function renderForState(
   state: Readonly<SelectionState>,
 ): void {
   const data = [...recompute(cache, state), ...muted];
-  latestData = data; // snapshot for the control-bar N readout (updates on every recompute)
-  installMarkerLayer(map, data);
+  latestData = data; // FULL snapshot (panel + fly-to resolve any station) — filter only at display
+  // Minimum-einkunn filter (SEL): when set, HIDE markers below the threshold (muted/null too) so
+  // the map shows only qualifying places. minScore 0 = show everything. Ranked list mirrors this.
+  const min = state.minScore ?? 0;
+  const shown = min > 0 ? data.filter((d) => d.score !== null && d.score >= min) : data;
+  installMarkerLayer(map, shown);
   renderComposite(map);
   // Refresh the global "meðaltal N ára" readout from THIS frame's data (WR-01: no timer race).
   controlBar?.refreshReadout();
@@ -311,7 +315,7 @@ function wireMarkers(map: maplibregl.Map): void {
       // no selection-relevant key changed, so viewport-only changes skip recompute (the URL is
       // still written by the separate URL-writer subscriber above).
       const selectionKey = (s: Readonly<SelectionState>): string =>
-        `${s.anchorDoy}|${s.widthDays}|${s.yearFrom}|${s.yearTil}`;
+        `${s.anchorDoy}|${s.widthDays}|${s.yearFrom}|${s.yearTil}|${s.minScore}`;
       let lastRenderedKey = selectionKey(initial); // the initial render already happened above
       let timer: ReturnType<typeof setTimeout> | undefined;
       store.subscribe((state) => {

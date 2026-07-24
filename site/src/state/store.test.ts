@@ -14,6 +14,7 @@ const BASE: SelectionState = {
   lng: -19,
   lat: 65,
   zoom: 6,
+  minScore: 0,
 };
 
 describe("createStore", () => {

@@ -14,6 +14,7 @@ const FALLBACK: SelectionState = {
   lng: -19.0,
   lat: 65.0,
   zoom: 6,
+  minScore: 0,
 };
 
 // A representative in-bounds selection whose viewport is expressible at the param precision.
@@ -26,6 +27,7 @@ const REP: SelectionState = {
   lng: -20.0,
   lat: 64.5,
   zoom: 7,
+  minScore: 8.5,
 };
 
 describe("stateToParams / paramsToState round-trip (UX-02)", () => {
@@ -39,6 +41,7 @@ describe("stateToParams / paramsToState round-trip (UX-02)", () => {
     expect(back.lat).toBeCloseTo(REP.lat, 4);
     expect(back.lng).toBeCloseTo(REP.lng, 4);
     expect(back.zoom).toBeCloseTo(REP.zoom, 2);
+    expect(back.minScore).toBe(REP.minScore); // emin=8.5 round-trips to 8.5
   });
 
   it("omits st entirely when stationId is null and preserves null on parse", () => {

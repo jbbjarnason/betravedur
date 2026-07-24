@@ -73,5 +73,6 @@ export function defaultSelection(bounds: YearBounds, now: Date = new Date()): Se
     lng: -18.7,
     lat: 64.9,
     zoom: 5.4, // frame the WHOLE island with a sea margin on load (matches init.ts framing)
+    minScore: 0, // no einkunn filter by default (show every station)
   };
 }

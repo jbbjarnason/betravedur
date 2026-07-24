@@ -10,6 +10,7 @@ import "../styles/controls.css";
 import { createScrubber } from "./scrubber.js";
 import { createWidthButtons } from "./widthButtons.js";
 import { createYearRange } from "./yearRange.js";
+import { createEinkunnFilter } from "./einkunnFilter.js";
 import { setDiscrete } from "../state/history.js";
 import type { SelectionStore } from "../state/store.js";
 import type { MarkerDatum } from "../data/types.js";
@@ -106,7 +107,14 @@ export function mountControlBar(
     },
   });
 
-  inner.append(readout, scrubber.el, widthButtons.el, yearRange.el);
+  // Minimum-einkunn filter → store.set minScore (DISCRETE → pushState + shareable, like width/year).
+  // When > 0 the map hides sub-threshold markers and the ranked list trims to qualifying stations.
+  const einkunn = createEinkunnFilter({
+    initialMin: state.minScore,
+    onMinChange: (min) => setDiscrete(store, { minScore: min }),
+  });
+
+  inner.append(readout, scrubber.el, widthButtons.el, yearRange.el, einkunn.el);
   bar.appendChild(inner);
   document.body.appendChild(bar);
 
@@ -133,6 +141,7 @@ export function mountControlBar(
     scrubber.syncDoy(s.anchorDoy);
     widthButtons.syncWidth(s.widthDays);
     yearRange.syncRange(s.yearFrom, s.yearTil);
+    einkunn.syncMin(s.minScore);
   });
 
   // The readout is refreshed by main.ts via the returned refreshReadout(), invoked right after

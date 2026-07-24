@@ -45,6 +45,14 @@ export interface SelectionState {
   lat: number;
   /** Map viewport zoom. */
   zoom: number;
+  /**
+   * Minimum-einkunn (score) filter, 0..10. 0 = no filter (show every station). When > 0, the
+   * map HIDES markers whose score < minScore and the "Bestu staðir" ranked list shows only
+   * qualifying stations. Applied at DISPLAY only — the boot cache stays full so the station
+   * panel + fly-to can still resolve any station id. Primitive (number) → the store's no-op-skip
+   * strict-=== compare stays correct (WR-04 invariant above).
+   */
+  minScore: number;
 }
 
 /** A subscriber invoked with the frozen snapshot after every real (non-no-op) change. */

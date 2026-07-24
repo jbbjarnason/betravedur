@@ -52,6 +52,7 @@ describe("defaultSelection (SEL-02) — today's week over the last 10 years", ()
     expect(s.lng).toBe(-18.7);
     expect(s.lat).toBe(64.9);
     expect(s.zoom).toBe(5.4);
+    expect(s.minScore).toBe(0); // no einkunn filter by default (show everything)
   });
 
   it("clamps yearFrom to bounds.min when fewer than 10 years are available", () => {

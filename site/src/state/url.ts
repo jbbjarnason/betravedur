@@ -7,6 +7,7 @@
 //   til   baseline range upper bound,     integer within [bounds.min, bounds.max], fra ≤ til
 //   st    selected station id,            integer — OMITTED entirely when stationId === null
 //   v     viewport, one compact param     "lat,lng,zoom" = toFixed(4),toFixed(4),toFixed(2)
+//   emin  minimum-einkunn (score) filter, number 0..10 — OMITTED when minScore === 0 (clean URLs)
 //
 // LOOP-PROOF DISCIPLINE (RESEARCH Pattern 2, CITED MDN): stateToParams is called on EVERY
 // store change (the writer); paramsToState is read ONLY at boot and on popstate. There is no
@@ -87,6 +88,9 @@ export function stateToParams(s: SelectionState): string {
   p.set("til", String(s.yearTil));
   if (s.stationId !== null) p.set("st", String(s.stationId));
   p.set("v", `${s.lat.toFixed(4)},${s.lng.toFixed(4)},${s.zoom.toFixed(2)}`);
+  // Minimum-einkunn filter — OMITTED at the default (0 = no filter) so a shared link stays clean,
+  // exactly like `st`. Emitted as-is (e.g. 8.5) when a threshold is set; parse clamps it to [0,10].
+  if (s.minScore > 0) p.set("emin", String(s.minScore));
   return p.toString();
 }
 
@@ -143,5 +147,10 @@ export function paramsToState(
     if (Number.isFinite(zoomN)) zoom = clamp(zoomN, ZOOM_MIN, ZOOM_MAX);
   }
 
-  return { anchorDoy, widthDays, yearFrom, yearTil, stationId, lng, lat, zoom };
+  // emin: minimum-einkunn filter clamped to [0,10]; absent/empty/garbage → fallback.minScore.
+  // numParam guards the Number("")===0 trap so a bare `?emin=` does not silently clear a set filter.
+  const eminRaw = numParam(p, "emin");
+  const minScore = eminRaw !== null ? clamp(eminRaw, 0, 10) : fallback.minScore;
+
+  return { anchorDoy, widthDays, yearFrom, yearTil, stationId, lng, lat, zoom, minScore };
 }

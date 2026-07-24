@@ -34,9 +34,12 @@ import type { MarkerDatum } from "../data/types.js";
  * on `score` is sound because the filter has removed every null (T-05-06: the comparator never
  * dereferences null).
  */
-export function rankStations(data: ReadonlyArray<MarkerDatum>): MarkerDatum[] {
+export function rankStations(
+  data: ReadonlyArray<MarkerDatum>,
+  minScore = 0,
+): MarkerDatum[] {
   return data
-    .filter((d): d is MarkerDatum & { score: number } => d.score !== null)
+    .filter((d): d is MarkerDatum & { score: number } => d.score !== null && d.score >= minScore)
     .sort((a, b) => b.score - a.score || a.station - b.station);
 }
 
@@ -290,7 +293,8 @@ export function mountRankedList(
   // survivors in place, append the newcomers, remove the departed, and finally reorder so the
   // DOM order matches the new ranking. A focused/scrolled row therefore survives a recompute.
   const refresh = (): void => {
-    const ranked = rankStations(getLatestData());
+    // Mirror the map's minimum-einkunn filter so the list shows only qualifying stations.
+    const ranked = rankStations(getLatestData(), store.get().minScore);
     if (ranked.length === 0) {
       list.replaceChildren();
       list.hidden = true;
