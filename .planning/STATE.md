@@ -142,6 +142,7 @@ Recent decisions affecting current work:
 | 260721-map | critical map fixes: coastline visibility (land/sea contrast), zoom-out unlock, subtle info button | 2026-07-21 | 886c448 | [260721-map-critical-fixes](./quick/260721-map-critical-fixes/) |
 | 260721-prune | storing mechanism: prune stale/orphaned derived (965→518) + self-healing sweep so they never accumulate | 2026-07-21 | (aggregate) | [260721-prune-derived](./quick/260721-prune-derived/) |
 | 260721-week | week incrementor (±7-day ‹/› buttons) on the scrubber + Icelandic date-readout fix (Intl is-IS fallback) | 2026-07-21 | (see git) | [260721-week-incrementor](./quick/260721-week-incrementor/) |
+| 260723-einkunn | minimum-einkunn filter (Lágmarkseinkunn slider) — hide places below a chosen score; emin URL param | 2026-07-23 | 31cec05 | [260723-einkunn-filter](./quick/260723-einkunn-filter/) |
 
 ## Deferred Items
 
