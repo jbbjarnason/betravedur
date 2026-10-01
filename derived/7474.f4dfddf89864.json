@@ -1,0 +1,13 @@
+{
+  "station": 7474,
+  "type": "sj",
+  "startYear": 2005,
+  "nYears": 22,
+  "quant": {
+    "temp": 10,
+    "wind": 10,
+    "precip": 1,
+    "dv": 1
+  },
+  "cols": {}
+}
